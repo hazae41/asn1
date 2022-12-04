@@ -2,7 +2,7 @@
   "type": "module",
   "name": "@hazae41/asn1",
   "version": "0.0.1",
-  "description": "Modern ASN.1 <=> DER implementation",
+  "description": "Zero-copy ASN.1 <=> DER encoding/decoding in pure modern TypeScript",
   "author": "hazae41",
   "license": "MIT",
   "types": "./dist/types/index.d.ts",
