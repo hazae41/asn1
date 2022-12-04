@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/asn1",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Zero-copy ASN.1 <=> DER encoding/decoding in pure modern TypeScript",
   "author": "hazae41",
   "license": "MIT",
@@ -36,5 +36,6 @@
       "import": "./dist/cjs/index.cjs",
       "require": "./dist/cjs/index.cjs"
     }
-  }
+  },
+  "files": ["/dist"]
 }
