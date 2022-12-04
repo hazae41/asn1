@@ -1,4 +1,12 @@
-# Modern ASN.1 <=> DER implementation
+# ASN.1 <=> DER
+
+Zero-copy ASN.1 <=> DER encoding/decoding in pure modern TypeScript
+
+```bash
+npm i @hazae41/asn1
+```
+
+[**Node Package 📦**](https://www.npmjs.com/package/@hazae41/asn1)
 
 ### Current features
 - 100% TypeScript and ESM
@@ -8,4 +16,4 @@
 - DER decoding
 
 ### Upcoming features
-- DER encoding
+- (WIP) DER encoding
