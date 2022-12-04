@@ -8,6 +8,15 @@ export class Length {
     readonly value: number
   ) { }
 
+  toDER(binary: Binary) {
+    if (this.value < 128) {
+      binary.writeUint8(this.value)
+      return
+    }
+
+    throw new Error(`Unimplemented`)
+  }
+
   static fromDER(binary: Binary) {
     const first = binary.readUint8()
 

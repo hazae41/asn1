@@ -16,12 +16,12 @@ export class Bitset {
     if (index > this.length)
       throw new Error(`Index is too big`)
 
-    return (this.value & (1 << index)) !== 0
+    return (this.value & (1 << index)) >> index
   }
 
   not() {
     for (let i = 0; i < this.length; i++)
-      this.toggle(i)
+      this.value ^= (1 << i)
     return this
   }
 

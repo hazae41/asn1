@@ -20,6 +20,11 @@ export class Null {
     return `NULL`
   }
 
+  toDER(binary: Binary) {
+    this.type.toDER(binary)
+    new Length(0).toDER(binary)
+  }
+
   static fromDER(binary: Binary) {
     const type = Type.fromDER(binary)
 

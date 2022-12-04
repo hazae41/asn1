@@ -11,7 +11,7 @@ export class Boolean {
     Type.tags.BOOLEAN)
 
   constructor(
-    readonly value: boolean
+    readonly value: number
   ) { }
 
   get type() {
@@ -20,6 +20,12 @@ export class Boolean {
 
   toString() {
     return `BOOLEAN ${this.value}`
+  }
+
+  toDER(binary: Binary) {
+    this.type.toDER(binary)
+    new Length(1).toDER(binary)
+    binary.writeUint8(this.value)
   }
 
   static fromDER(binary: Binary) {
@@ -31,7 +37,7 @@ export class Boolean {
     const length = Length.fromDER(binary)
     const content = binary.offset
 
-    const value = binary.readUint8() > 0
+    const value = binary.readUint8()
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)

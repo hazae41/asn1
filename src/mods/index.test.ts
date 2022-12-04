@@ -1,5 +1,7 @@
+export * from "./boolean/boolean.test.js";
 export * from "./integer/integer.test.js";
 export * from "./length/length.test.js";
+export * from "./null/null.test.js";
 export * from "./object_identifier/object_identifier.test.js";
 export * from "./type/type.test.js";
 

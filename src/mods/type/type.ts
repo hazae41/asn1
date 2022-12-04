@@ -12,8 +12,8 @@ export class Type {
   } as const
 
   static wraps = {
-    PRIMITIVE: false,
-    CONSTRUCTED: true
+    PRIMITIVE: 0,
+    CONSTRUCTED: 1
   } as const
 
   static tags = {
@@ -32,7 +32,7 @@ export class Type {
 
   constructor(
     readonly clazz: number,
-    readonly wrap: boolean,
+    readonly wrap: number,
     readonly tag: number
   ) { }
 
@@ -46,17 +46,26 @@ export class Type {
     return true
   }
 
+  toDER(binary: Binary) {
+    let value = 0
+    value |= this.clazz << 6
+    value |= this.wrap << 5
+    value |= this.tag
+
+    binary.writeUint8(value)
+  }
+
   static fromDER(binary: Binary) {
     const type = binary.readUint8()
     const bitset = new Bitset(type, 8)
 
     const clazz = bitset.first(2)
-    const constructed = bitset.get(5)
+    const wrap = bitset.get(5)
     const tag = bitset.last(5)
 
     if (tag > 30) // TODO
       throw new Error(`Unimplemented tag`)
 
-    return new this(clazz, constructed, tag)
+    return new this(clazz, wrap, tag)
   }
 }
