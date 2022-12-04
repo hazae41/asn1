@@ -24,5 +24,5 @@ npm i @hazae41/asn1
 const buffer = Buffer.from([0x01, 0x01, 0xFF])
 const asn1 = DER.parse(new Binary(buffer))
 
-console.log(asn1) // BOOLEAN true
+console.log(asn1.toString()) // BOOLEAN true
 ```
