@@ -19,7 +19,7 @@ export class Boolean {
   }
 
   toString() {
-    return `BOOLEAN ${this.value}`
+    return `BOOLEAN ${this.value !== 0}`
   }
 
   toDER(binary: Binary) {
