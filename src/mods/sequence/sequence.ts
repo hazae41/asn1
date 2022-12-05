@@ -34,6 +34,7 @@ export class Sequence {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const inner = new Array()

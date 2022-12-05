@@ -15,6 +15,7 @@ export class Length {
     }
 
     // TODO
+
     throw new Error(`Unimplemented`)
   }
 

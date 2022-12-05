@@ -36,17 +36,18 @@ export class Integer {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     let value = BigInt(0)
 
-    const first = binary.readUint8(true)
-    const negative = first > 127
+    const negative = binary.readUint8(true) > 127
 
     for (let i = 0; i < length.value; i++)
       value += BigInt(sign(binary.readUint8(), negative)) * (BigInt(256) ** BigInt(length.value - i - 1))
 
-    if (negative) value = ~value
+    if (negative)
+      value = ~value
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)

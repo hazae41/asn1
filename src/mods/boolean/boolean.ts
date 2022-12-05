@@ -24,8 +24,19 @@ export class Boolean {
 
   toDER(binary: Binary) {
     this.type.toDER(binary)
-    new Length(1).toDER(binary)
+
+    const length = new Length(1)
+
+    length.toDER(binary)
+
+    const content = binary.offset
+
     binary.writeUint8(this.value)
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return binary
   }
 
   static fromDER(binary: Binary) {
@@ -35,6 +46,7 @@ export class Boolean {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const value = binary.readUint8()

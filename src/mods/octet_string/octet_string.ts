@@ -24,8 +24,19 @@ export class OctetString {
 
   toDER(binary: Binary) {
     this.type.toDER(binary)
-    new Length(this.buffer.length).toDER(binary)
+
+    const length = new Length(this.buffer.length)
+
+    length.toDER(binary)
+
+    const content = binary.offset
+
     binary.write(this.buffer)
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return binary
   }
 
   static fromDER(binary: Binary) {
@@ -35,6 +46,7 @@ export class OctetString {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const buffer = binary.read(length.value)

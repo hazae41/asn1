@@ -29,6 +29,7 @@ export class UTCTime {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const text = binary.readString(length.value)

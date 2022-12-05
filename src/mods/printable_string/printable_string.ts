@@ -22,6 +22,28 @@ export class PrintableString {
     return `PrintableString ${this.value}`
   }
 
+  toDER(binary: Binary) {
+    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
+      throw new Error(`Invalid value`)
+
+    this.type.toDER(binary)
+
+    const buffer = Buffer.from(this.value)
+
+    const length = new Length(buffer.length)
+
+    length.toDER(binary)
+
+    const content = binary.offset
+
+    binary.write(buffer)
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return binary
+  }
+
   static fromDER(binary: Binary) {
     const type = Type.fromDER(binary)
 
@@ -29,6 +51,7 @@ export class PrintableString {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const value = binary.readString(length.value)

@@ -27,9 +27,20 @@ export class BitString {
 
   toDER(binary: Binary) {
     this.type.toDER(binary)
-    new Length(1 + this.buffer.length).toDER(binary)
+
+    const length = new Length(1 + this.buffer.length)
+
+    length.toDER(binary)
+
+    const content = binary.offset
+
     binary.writeUint8(this.padding)
     binary.write(this.buffer)
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return binary
   }
 
   static fromDER(binary: Binary) {
@@ -39,6 +50,7 @@ export class BitString {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const padding = binary.readUint8()

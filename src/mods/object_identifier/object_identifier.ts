@@ -56,11 +56,12 @@ export class ObjectIdentifier {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
 
     const head = binary.readUint8()
-    const first = Math.floor(head / 40);
-    const second = head % 40;
+    const first = Math.floor(head / 40)
+    const second = head % 40
 
     const values = [first, second]
 

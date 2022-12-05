@@ -22,7 +22,19 @@ export class Null {
 
   toDER(binary: Binary) {
     this.type.toDER(binary)
-    new Length(0).toDER(binary)
+
+    const length = new Length(0)
+
+    length.toDER(binary)
+
+    const content = binary.offset
+
+    // * NO-OP *
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return binary
   }
 
   static fromDER(binary: Binary) {
@@ -32,7 +44,10 @@ export class Null {
       throw new Error(`Invalid type`)
 
     const length = Length.fromDER(binary)
+
     const content = binary.offset
+
+    // * NO-OP *
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
