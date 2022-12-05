@@ -22,6 +22,13 @@ export class UTF8String {
     return `UTF8String ${this.value}`
   }
 
+  toDER(binary: Binary) {
+    this.type.toDER(binary)
+    const buffer = Buffer.from(this.value)
+    new Length(buffer.length).toDER(binary)
+    binary.write(buffer)
+  }
+
   static fromDER(binary: Binary) {
     const type = Type.fromDER(binary)
 

@@ -6,6 +6,7 @@ export * from "./null/null.test.js";
 export * from "./object_identifier/object_identifier.test.js";
 export * from "./octet_string/octet_string.test.js";
 export * from "./type/type.test.js";
+export * from "./utf8_string/utf8_string.test.js";
 
 import { readFile } from "fs/promises";
 import { Binary } from "libs/binary/binary.js";
