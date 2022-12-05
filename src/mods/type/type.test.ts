@@ -1,6 +1,6 @@
 import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
-import { Sequence } from "mods/tuples/sequence/sequence.js";
+import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Type } from "mods/type/type.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
