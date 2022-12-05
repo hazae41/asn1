@@ -1,6 +1,6 @@
 import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
-import { PrintableString } from "mods/printable_string/printable_string.js";
+import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
 

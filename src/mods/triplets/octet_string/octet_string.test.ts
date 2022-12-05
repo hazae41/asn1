@@ -1,6 +1,6 @@
 import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
-import { OctetString } from "mods/octet_string/octet_string.js";
+import { OctetString } from "mods/triplets/octet_string/octet_string.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
 

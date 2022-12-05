@@ -16,9 +16,17 @@ export class Unknown {
 
   static fromDER(binary: Binary) {
     const type = Type.fromDER(binary)
+
+    // NO-OP
+
     const length = Length.fromDER(binary)
 
+    const content = binary.offset
+
     binary.offset += length.value
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
 
     return new this(type, length)
   }

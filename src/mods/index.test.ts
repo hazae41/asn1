@@ -1,4 +1,5 @@
 export * from "./length/length.test.js";
+export * from "./triplets/index.test.js";
 export * from "./type/type.test.js";
 
 import { readFile } from "fs/promises";

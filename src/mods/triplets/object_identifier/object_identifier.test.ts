@@ -1,5 +1,5 @@
 import { Binary } from "libs/binary/binary.js";
-import { ObjectIdentifier, VLQ } from "mods/object_identifier/object_identifier.js";
+import { ObjectIdentifier, VLQ } from "mods/triplets/object_identifier/object_identifier.js";
 import { assert } from "node:console";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";

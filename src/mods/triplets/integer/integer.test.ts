@@ -1,6 +1,6 @@
 import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
-import { Integer } from "mods/integer/integer.js";
+import { Integer } from "mods/triplets/integer/integer.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
 
