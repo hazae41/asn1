@@ -10,9 +10,16 @@ test.before(async () => {
   console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 })
 
+function hexToBinary(hex: string) {
+  const hex2 = hex.replaceAll(" ", "")
+  const buffer = Buffer.from(hex2, "hex")
+  return new Binary(buffer)
+}
+
 function hexToInteger(hex: string) {
-  const buffer = Buffer.from(hex.replaceAll(" ", ""), "hex")
-  return Integer.fromDER(new Binary(buffer)).value
+  const binary = hexToBinary(hex)
+  const integer = Integer.fromDER(binary)
+  return integer.value
 }
 
 test("Read", async () => {

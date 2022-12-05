@@ -18,12 +18,12 @@ function hexToBinary(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToBinary(hex)
-  const output = Binary.allocUnsafe(3)
+  const output = Binary.allocUnsafe(input.buffer.length)
   Boolean.fromDER(input).toDER(output)
   return input.buffer.equals(output.buffer)
 }
 
-test("Read then write (true)", async () => {
+test("Read then write", async () => {
   assert(checkReadWrite("01 01 00"))
   assert(checkReadWrite("01 01 01"))
   assert(checkReadWrite("01 01 FF"))

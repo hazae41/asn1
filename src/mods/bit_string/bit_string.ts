@@ -1,5 +1,4 @@
 import { Binary } from "libs/binary/binary.js";
-import { Buffers } from "libs/buffers/buffers.js";
 import { Length } from "mods/length/length.js";
 import { Type } from "mods/type/type.js";
 
@@ -21,8 +20,16 @@ export class BitString {
   }
 
   toString() {
-    const binary = Buffers.toBinary(this.buffer)
+    const bignum = BigInt("0x" + this.buffer.toString("hex"))
+    const binary = bignum.toString(2).padStart(this.buffer.length * 8, "0")
     return `BITSTRING ${binary.slice(0, binary.length - this.padding)}`
+  }
+
+  toDER(binary: Binary) {
+    this.type.toDER(binary)
+    new Length(1 + this.buffer.length).toDER(binary)
+    binary.writeUint8(this.padding)
+    binary.write(this.buffer)
   }
 
   static fromDER(binary: Binary) {

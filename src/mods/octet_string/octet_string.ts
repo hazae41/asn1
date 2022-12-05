@@ -22,6 +22,12 @@ export class OctetString {
     return `OCTET STRING ${this.buffer.toString("hex")}`
   }
 
+  toDER(binary: Binary) {
+    this.type.toDER(binary)
+    new Length(this.buffer.length).toDER(binary)
+    binary.write(this.buffer)
+  }
+
   static fromDER(binary: Binary) {
     const type = Type.fromDER(binary)
 
