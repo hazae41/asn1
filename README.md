@@ -1,6 +1,6 @@
 # Zero-copy ASN.1 <=> DER 🏎️
 
-Zero-copy ASN.1 <=> DER encoding/decoding in pure modern TypeScript
+Zero-copy ASN.1 <=> DER in pure modern TypeScript
 
 ```bash
 npm i @hazae41/asn1
