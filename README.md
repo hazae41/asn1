@@ -1,4 +1,4 @@
-# ASN.1 <=> DER
+# Zero-copy ASN.1 <=> DER 🏎️
 
 Zero-copy ASN.1 <=> DER encoding/decoding in pure modern TypeScript
 
