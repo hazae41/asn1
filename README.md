@@ -11,7 +11,7 @@ npm i @hazae41/asn1
 ### Current features
 - 100% TypeScript and ESM
 - Zero-copy reading and writing
-- No dependency
+- No external dependency
 - Unit tested
 - DER decoding
 
