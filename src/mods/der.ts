@@ -1,19 +1,19 @@
 import { Binary } from "libs/binary/binary.js";
-import { BitString } from "mods/bit_string/bit_string.js";
-import { Boolean } from "mods/boolean/boolean.js";
-import { Constructed } from "mods/constructed/constructed.js";
-import { Integer } from "mods/integer/integer.js";
-import { Null } from "mods/null/null.js";
-import { ObjectIdentifier } from "mods/object_identifier/object_identifier.js";
-import { OctetString } from "mods/octet_string/octet_string.js";
-import { PrintableString } from "mods/printable_string/printable_string.js";
-import { Sequence } from "mods/sequence/sequence.js";
-import { Set } from "mods/set/set.js";
+import { BitString } from "mods/tuples/bit_string/bit_string.js";
+import { Boolean } from "mods/tuples/boolean/boolean.js";
+import { Constructed } from "mods/tuples/constructed/constructed.js";
+import { Integer } from "mods/tuples/integer/integer.js";
+import { Null } from "mods/tuples/null/null.js";
+import { ObjectIdentifier } from "mods/tuples/object_identifier/object_identifier.js";
+import { OctetString } from "mods/tuples/octet_string/octet_string.js";
+import { PrintableString } from "mods/tuples/printable_string/printable_string.js";
+import { Sequence } from "mods/tuples/sequence/sequence.js";
+import { Set } from "mods/tuples/set/set.js";
+import { Unknown } from "mods/tuples/unknown/unknown.js";
+import { UTCTime } from "mods/tuples/utc_time/utc_time.js";
+import { UTF8String } from "mods/tuples/utf8_string/utf8_string.js";
 import { Type } from "mods/type/type.js";
 import { ToStringable } from "mods/types.js";
-import { Unknown } from "mods/unknown/unknown.js";
-import { UTCTime } from "mods/utc_time/utc_time.js";
-import { UTF8String } from "mods/utf8_string/utf8_string.js";
 
 export namespace DER {
 
