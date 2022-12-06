@@ -18,10 +18,10 @@ export class Length {
 
     const values = new Array<number>()
 
-    while (value) {
+    do {
       values.push(value % 256)
       value = Math.floor(value / 256)
-    }
+    } while (value)
 
     this._values = values.reverse()
   }
@@ -35,7 +35,7 @@ export class Length {
     const values = this._values
 
     if (!values)
-      throw new Error(`Unprepared size`)
+      throw new Error(`Unprepared values`)
 
     return 1 + values.length
   }
@@ -47,7 +47,7 @@ export class Length {
     const values = this._values
 
     if (!values)
-      throw new Error(`Unprepared write`)
+      throw new Error(`Unprepared values`)
 
     const count = new Bitset(values.length, 8)
       .enable(7)

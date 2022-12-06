@@ -10,6 +10,8 @@ function sign(value: number, negative: boolean) {
   return value
 }
 
+const bn256 = BigInt(256)
+
 export class Integer {
   readonly class = Integer
 
@@ -39,8 +41,25 @@ export class Integer {
     return length
   }
 
+  private _values?: Array<number>
+
   prepare() {
-    this._length = new Length(0) // TODO
+    let value = this.value < 0
+      ? ~this.value
+      : this.value
+
+    const values = new Array<number>()
+
+    do {
+      values.push(Number(value % bn256))
+      value = value / bn256
+    } while (value)
+
+    if (values[values.length - 1] > 127)
+      values.push(0)
+
+    this._values = values.reverse()
+    this._length = new Length(values.length)
   }
 
   size() {
@@ -59,7 +78,20 @@ export class Integer {
 
     const content = binary.offset
 
-    // TODO
+    const values = this._values
+
+    if (!values)
+      throw new Error(`Unprepared values`)
+
+    const negative = this.value < 0
+
+    const first = new Bitset(sign(values[0], negative), 8)
+      .set(7, negative)
+      .value
+    binary.writeUint8(first)
+
+    for (let i = 1; i < values.length; i++)
+      binary.writeUint8(sign(values[i], negative))
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
@@ -82,10 +114,11 @@ export class Integer {
     const negative = binary.readUint8(true) > 127
 
     for (let i = 0; i < length.value; i++)
-      value = (value * BigInt(256)) + BigInt(sign(binary.readUint8(), negative))
+      value = (value * bn256) + BigInt(sign(binary.readUint8(), negative))
 
-    if (negative)
-      value = ~value
+    value = negative
+      ? ~value
+      : value
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
