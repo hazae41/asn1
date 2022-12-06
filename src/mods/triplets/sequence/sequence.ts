@@ -23,8 +23,21 @@ export class Sequence {
     return this.class.type
   }
 
+  private _length?: Length
+
   get length() {
-    return new Length(this.triplets.reduce((p, c) => p + c.size(), 0))
+    this.prepare()
+
+    const length = this._length
+
+    if (!length)
+      throw new Error(`Unprepared length`)
+
+    return length
+  }
+
+  prepare() {
+    this._length = new Length(this.triplets.reduce((p, c) => p + c.size(), 0))
   }
 
   size() {
@@ -34,7 +47,10 @@ export class Sequence {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const { length } = this
+    const length = this._length
+
+    if (!length)
+      throw new Error(`Unprepared length`)
 
     length.write(binary)
 

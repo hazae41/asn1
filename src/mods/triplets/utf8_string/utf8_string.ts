@@ -19,8 +19,21 @@ export class UTF8String {
     return this.class.type
   }
 
+  private _length?: Length
+
   get length() {
-    return new Length(Buffer.from(this.value).length)
+    this.prepare()
+
+    const length = this._length
+
+    if (!length)
+      throw new Error(`Unprepared length`)
+
+    return length
+  }
+
+  prepare() {
+    this._length = new Length(Buffer.from(this.value).length)
   }
 
   size() {
@@ -30,7 +43,10 @@ export class UTF8String {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const { length } = this
+    const length = this._length
+
+    if (!length)
+      throw new Error(`Unprepared length`)
 
     length.write(binary)
 

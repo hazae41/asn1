@@ -26,8 +26,21 @@ export class Integer {
     return this.class.type
   }
 
+  private _length?: Length
+
   get length() {
-    return new Length(0) // TODO
+    this.prepare()
+
+    const length = this._length
+
+    if (!length)
+      throw new Error(`Unprepared length`)
+
+    return length
+  }
+
+  prepare() {
+    this._length = new Length(0) // TODO
   }
 
   size() {
@@ -37,7 +50,10 @@ export class Integer {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const { length } = this
+    const length = this._length
+
+    if (!length)
+      throw new Error(`Unprepared length`)
 
     length.write(binary)
 
@@ -66,7 +82,7 @@ export class Integer {
     const negative = binary.readUint8(true) > 127
 
     for (let i = 0; i < length.value; i++)
-      value += BigInt(sign(binary.readUint8(), negative)) * (BigInt(256) ** BigInt(length.value - i - 1))
+      value = (value * BigInt(256)) + BigInt(sign(binary.readUint8(), negative))
 
     if (negative)
       value = ~value

@@ -29,15 +29,20 @@ test("Read", async () => {
 
 function checkReadWrite(hex: string) {
   const input = hexToBinary(hex)
-  const output = Binary.allocUnsafe(input.buffer.length)
-  Length.read(input).write(output)
+  const length = Length.read(input)
+
+  const output = Binary.allocUnsafe(length.size())
+  length.write(output)
+
+  console.log("input", input.buffer)
+  console.log("output", output.buffer)
+
   return input.buffer.equals(output.buffer)
 }
 
-// TODO
-// test("Read then write", async () => {
-//   assert(checkReadWrite("82 01 7F"))
-//   assert(checkReadWrite("82 04 92"))
-// })
+test("Read then write", async () => {
+  assert(checkReadWrite("82 01 7F"))
+  assert(checkReadWrite("82 04 92"))
+})
 
 test.run()

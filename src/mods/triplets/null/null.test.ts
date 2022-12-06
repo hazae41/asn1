@@ -18,8 +18,11 @@ function hexToBinary(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToBinary("05 00")
-  const output = Binary.allocUnsafe(input.buffer.length)
-  Null.read(input).write(output)
+  const triplet = Null.read(input)
+
+  const output = Binary.allocUnsafe(triplet.size())
+  triplet.write(output)
+
   return input.buffer.equals(output.buffer)
 }
 

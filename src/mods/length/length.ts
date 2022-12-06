@@ -8,22 +8,55 @@ export class Length {
     readonly value: number
   ) { }
 
+  _values?: Array<number>
+
+  prepare() {
+    if (this.value < 128)
+      return
+
+    let value = this.value
+
+    const values = new Array<number>()
+
+    while (value) {
+      values.push(value % 256)
+      value = Math.floor(value / 256)
+    }
+
+    this._values = values.reverse()
+  }
+
   size() {
     if (this.value < 128)
       return 1
 
-    // TODO
+    this.prepare()
 
-    return 1
+    const values = this._values
+
+    if (!values)
+      throw new Error(`Unprepared size`)
+
+    return 1 + values.length
   }
 
   write(binary: Binary) {
     if (this.value < 128)
       return binary.writeUint8(this.value)
 
-    // TODO
+    const values = this._values
 
-    binary.writeUint8(127)
+    if (!values)
+      throw new Error(`Unprepared write`)
+
+    const count = new Bitset(values.length, 8)
+      .enable(7)
+      .value
+
+    binary.writeUint8(count)
+
+    for (const value of values)
+      binary.writeUint8(value)
 
     return
   }
@@ -41,7 +74,7 @@ export class Length {
     let value = 0
 
     for (let i = 0; i < count; i++)
-      value += binary.readUint8() * (256 ** (count - i - 1))
+      value = (value * 256) + binary.readUint8()
 
     return new this(value)
   }

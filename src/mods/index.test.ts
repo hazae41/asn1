@@ -60,7 +60,7 @@ test("Cert 2", async () => {
   const text = await readFile("./test/cert2.pem", "utf8")
   const triplet = DER.read(new Binary(PEM.parse(text)))
   console.log("Cert 2", triplet.toString())
-  console.log("Write", DER.toBuffer(triplet).toString("hex"))
+  console.log("Write", PEM.parse(text).toString("hex"), DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert 3", async () => {
