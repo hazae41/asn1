@@ -4,13 +4,13 @@ import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
+const bn256 = BigInt(256)
+
 function sign(value: number, negative: boolean) {
   if (negative)
     return new Bitset(value, 8).not().value
   return value
 }
-
-const bn256 = BigInt(256)
 
 export class Integer {
   readonly class = Integer

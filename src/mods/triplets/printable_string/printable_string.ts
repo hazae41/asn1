@@ -32,8 +32,16 @@ export class PrintableString {
     return length
   }
 
+  private _buffer?: Buffer
+
   prepare() {
-    this._length = new Length(Buffer.from(this.value).length)
+    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
+      throw new Error(`Invalid value`)
+
+    const buffer = Buffer.from(this.value)
+
+    this._buffer = buffer
+    this._length = new Length(buffer.length)
   }
 
   size() {
@@ -41,9 +49,6 @@ export class PrintableString {
   }
 
   write(binary: Binary) {
-    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
-      throw new Error(`Invalid value`)
-
     this.type.write(binary)
 
     const length = this._length
@@ -55,7 +60,12 @@ export class PrintableString {
 
     const content = binary.offset
 
-    binary.writeString(this.value)
+    const buffer = this._buffer
+
+    if (!buffer)
+      throw new Error(`Unprepared buffer`)
+
+    binary.write(buffer)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)

@@ -32,8 +32,13 @@ export class UTF8String {
     return length
   }
 
+  private _buffer?: Buffer
+
   prepare() {
-    this._length = new Length(Buffer.from(this.value).length)
+    const buffer = Buffer.from(this.value)
+
+    this._buffer = buffer
+    this._length = new Length(buffer.length)
   }
 
   size() {
@@ -52,7 +57,12 @@ export class UTF8String {
 
     const content = binary.offset
 
-    binary.writeString(this.value)
+    const buffer = this._buffer
+
+    if (!buffer)
+      throw new Error(`Unprepared buffer`)
+
+    binary.write(buffer)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
