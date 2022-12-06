@@ -1,7 +1,8 @@
-import { Binary } from "libs/binary/binary.js"
-import { Bitset } from "libs/bitset/bitset.js"
-import { Length } from "mods/length/length.js"
-import { Type } from "mods/type/type.js"
+import { Binary } from "libs/binary/binary.js";
+import { Bitset } from "libs/bitset/bitset.js";
+import { Length } from "mods/length/length.js";
+import { Triplet } from "mods/triplets/triplet.js";
+import { Type } from "mods/type/type.js";
 
 export namespace VLQ {
 
@@ -45,17 +46,38 @@ export class ObjectIdentifier {
     return this.class.type
   }
 
-  toString() {
-    return `OBJECT IDENTIFIER ${this.value}`
+  get length() {
+    return new Length(0) // TODO
   }
 
-  static fromDER(binary: Binary) {
-    const type = Type.fromDER(binary)
+  size() {
+    return Triplet.size(this.length)
+  }
+
+  write(binary: Binary) {
+    this.type.write(binary)
+
+    const { length } = this
+
+    length.write(binary)
+
+    const content = binary.offset
+
+    // TODO
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return
+  }
+
+  static read(binary: Binary) {
+    const type = Type.read(binary)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.fromDER(binary)
+    const length = Length.read(binary)
 
     const content = binary.offset
 
@@ -72,5 +94,9 @@ export class ObjectIdentifier {
       throw new Error(`Invalid length`)
 
     return new this(values.join("."))
+  }
+
+  toString() {
+    return `OBJECT IDENTIFIER ${this.value}`
   }
 }

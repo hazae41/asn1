@@ -1,6 +1,7 @@
-import { Binary } from "libs/binary/binary.js"
-import { Length } from "mods/length/length.js"
-import { Type } from "mods/type/type.js"
+import { Binary } from "libs/binary/binary.js";
+import { Length } from "mods/length/length.js";
+import { Triplet } from "mods/triplets/triplet.js";
+import { Type } from "mods/type/type.js";
 
 export class UTF8String {
   readonly class = UTF8String
@@ -18,35 +19,38 @@ export class UTF8String {
     return this.class.type
   }
 
-  toString() {
-    return `UTF8String ${this.value}`
+  get length() {
+    return new Length(Buffer.from(this.value).length)
   }
 
-  toDER(binary: Binary) {
-    this.type.toDER(binary)
+  size() {
+    return Triplet.size(this.length)
+  }
 
-    const buffer = Buffer.from(this.value)
-    const length = new Length(buffer.length)
+  write(binary: Binary) {
+    this.type.write(binary)
 
-    length.toDER(binary)
+    const { length } = this
+
+    length.write(binary)
 
     const content = binary.offset
 
-    binary.write(buffer)
+    binary.writeString(this.value)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
-    return binary
+    return
   }
 
-  static fromDER(binary: Binary) {
-    const type = Type.fromDER(binary)
+  static read(binary: Binary) {
+    const type = Type.read(binary)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.fromDER(binary)
+    const length = Length.read(binary)
 
     const content = binary.offset
 
@@ -56,5 +60,9 @@ export class UTF8String {
       throw new Error(`Invalid length`)
 
     return new this(value)
+  }
+
+  toString() {
+    return `UTF8String ${this.value}`
   }
 }

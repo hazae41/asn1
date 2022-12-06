@@ -12,7 +12,7 @@ test.before(async () => {
 
 function hexToOID(hex: string) {
   const buffer = Buffer.from(hex.replaceAll(" ", ""), "hex")
-  return ObjectIdentifier.fromDER(new Binary(buffer)).value
+  return ObjectIdentifier.read(new Binary(buffer)).value
 }
 
 function hexToVLQ(hex: string) {

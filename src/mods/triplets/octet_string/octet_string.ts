@@ -1,6 +1,7 @@
-import { Binary } from "libs/binary/binary.js"
-import { Length } from "mods/length/length.js"
-import { Type } from "mods/type/type.js"
+import { Binary } from "libs/binary/binary.js";
+import { Length } from "mods/length/length.js";
+import { Triplet } from "mods/triplets/triplet.js";
+import { Type } from "mods/type/type.js";
 
 export class OctetString {
   readonly class = OctetString
@@ -18,16 +19,20 @@ export class OctetString {
     return this.class.type
   }
 
-  toString() {
-    return `OCTET STRING ${this.buffer.toString("hex")}`
+  get length() {
+    return new Length(this.buffer.length)
   }
 
-  toDER(binary: Binary) {
-    this.type.toDER(binary)
+  size() {
+    return Triplet.size(this.length)
+  }
 
-    const length = new Length(this.buffer.length)
+  write(binary: Binary) {
+    this.type.write(binary)
 
-    length.toDER(binary)
+    const { length } = this
+
+    length.write(binary)
 
     const content = binary.offset
 
@@ -36,16 +41,16 @@ export class OctetString {
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
-    return binary
+    return
   }
 
-  static fromDER(binary: Binary) {
-    const type = Type.fromDER(binary)
+  static read(binary: Binary) {
+    const type = Type.read(binary)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.fromDER(binary)
+    const length = Length.read(binary)
 
     const content = binary.offset
 
@@ -55,5 +60,9 @@ export class OctetString {
       throw new Error(`Invalid length`)
 
     return new this(buffer)
+  }
+
+  toString() {
+    return `OCTET STRING ${this.buffer.toString("hex")}`
   }
 }

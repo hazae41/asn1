@@ -1,10 +1,10 @@
 import { Binary } from "libs/binary/binary.js";
 import { Length } from "mods/length/length.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
-import { ToStringable } from "mods/types.js";
 
-const stringify = (sequence: Sequence) => `SEQUENCE {
-  ${sequence.inner.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
+const stringify = (parent: Sequence) => `SEQUENCE {
+  ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
 export class Sequence {
@@ -16,35 +16,61 @@ export class Sequence {
     Type.tags.SEQUENCE)
 
   constructor(
-    readonly inner: ToStringable[]
+    readonly triplets: Triplet[]
   ) { }
 
   get type() {
     return this.class.type
   }
 
-  toString() {
-    return stringify(this)
+  get length() {
+    return new Length(this.triplets.reduce((p, c) => p + c.size(), 0))
   }
 
-  static fromDER(binary: Binary, parse: (binary: Binary) => ToStringable) {
-    const type = Type.fromDER(binary)
+  size() {
+    return Triplet.size(this.length)
+  }
 
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
+  write(binary: Binary) {
+    this.type.write(binary)
 
-    const length = Length.fromDER(binary)
+    const { length } = this
+
+    length.write(binary)
 
     const content = binary.offset
 
-    const inner = new Array()
-
-    while (binary.offset - content < length.value)
-      inner.push(parse(binary))
+    for (const triplet of this.triplets)
+      triplet.write(binary)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
-    return new this(inner)
+    return
+  }
+
+  static read(binary: Binary, read: (binary: Binary) => Triplet) {
+    const type = Type.read(binary)
+
+    if (!this.type.equals(type))
+      throw new Error(`Invalid type`)
+
+    const length = Length.read(binary)
+
+    const content = binary.offset
+
+    const triplets = new Array<Triplet>()
+
+    while (binary.offset - content < length.value)
+      triplets.push(read(binary))
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return new this(triplets)
+  }
+
+  toString() {
+    return stringify(this)
   }
 }

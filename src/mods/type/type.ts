@@ -46,7 +46,15 @@ export class Type {
     return true
   }
 
-  toDER(binary: Binary) {
+  static size() {
+    return 1
+  }
+
+  size() {
+    return this.class.size()
+  }
+
+  write(binary: Binary) {
     let value = 0
     value |= this.clazz << 6
     value |= this.wrap << 5
@@ -55,7 +63,7 @@ export class Type {
     binary.writeUint8(value)
   }
 
-  static fromDER(binary: Binary) {
+  static read(binary: Binary) {
     const type = binary.readUint8()
     const bitset = new Bitset(type, 8)
 

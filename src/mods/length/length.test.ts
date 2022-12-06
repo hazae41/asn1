@@ -18,7 +18,7 @@ function hexToBinary(hex: string) {
 
 function hexToLength(hex: string) {
   const binary = hexToBinary(hex)
-  const length = Length.fromDER(binary)
+  const length = Length.read(binary)
   return length.value
 }
 
@@ -30,7 +30,7 @@ test("Read", async () => {
 function checkReadWrite(hex: string) {
   const input = hexToBinary(hex)
   const output = Binary.allocUnsafe(input.buffer.length)
-  Length.fromDER(input).toDER(output)
+  Length.read(input).write(output)
   return input.buffer.equals(output.buffer)
 }
 

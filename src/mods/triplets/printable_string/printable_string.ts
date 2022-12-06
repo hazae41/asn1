@@ -1,6 +1,7 @@
-import { Binary } from "libs/binary/binary.js"
-import { Length } from "mods/length/length.js"
-import { Type } from "mods/type/type.js"
+import { Binary } from "libs/binary/binary.js";
+import { Length } from "mods/length/length.js";
+import { Triplet } from "mods/triplets/triplet.js";
+import { Type } from "mods/type/type.js";
 
 export class PrintableString {
   readonly class = PrintableString
@@ -18,39 +19,41 @@ export class PrintableString {
     return this.class.type
   }
 
-  toString() {
-    return `PrintableString ${this.value}`
+  get length() {
+    return new Length(Buffer.from(this.value).length)
   }
 
-  toDER(binary: Binary) {
+  size() {
+    return Triplet.size(this.length)
+  }
+
+  write(binary: Binary) {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
       throw new Error(`Invalid value`)
 
-    this.type.toDER(binary)
+    this.type.write(binary)
 
-    const buffer = Buffer.from(this.value)
+    const { length } = this
 
-    const length = new Length(buffer.length)
-
-    length.toDER(binary)
+    length.write(binary)
 
     const content = binary.offset
 
-    binary.write(buffer)
+    binary.writeString(this.value)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
-    return binary
+    return
   }
 
-  static fromDER(binary: Binary) {
-    const type = Type.fromDER(binary)
+  static read(binary: Binary) {
+    const type = Type.read(binary)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.fromDER(binary)
+    const length = Length.read(binary)
 
     const content = binary.offset
 
@@ -63,5 +66,9 @@ export class PrintableString {
       throw new Error(`Invalid length`)
 
     return new this(value)
+  }
+
+  toString() {
+    return `PrintableString ${this.value}`
   }
 }

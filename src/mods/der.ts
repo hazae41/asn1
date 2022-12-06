@@ -9,48 +9,65 @@ import { OctetString } from "mods/triplets/octet_string/octet_string.js";
 import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Set } from "mods/triplets/set/set.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Unknown } from "mods/triplets/unknown/unknown.js";
 import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { Type } from "mods/type/type.js";
-import { ToStringable } from "mods/types.js";
 
 export namespace DER {
 
-  export function parse(binary: Binary): ToStringable {
+  export function size(triplet: Triplet) {
+    return triplet.size()
+  }
+
+  export function write(binary: Binary, triplet: Triplet) {
+    triplet.write(binary)
+  }
+
+  export function read(binary: Binary): Triplet {
     const start = binary.offset
-    const type = Type.fromDER(binary)
+    const type = Type.read(binary)
     binary.offset = start
 
     if (type.equals(Boolean.type))
-      return Boolean.fromDER(binary)
+      return Boolean.read(binary)
     if (type.equals(Integer.type))
-      return Integer.fromDER(binary)
+      return Integer.read(binary)
     if (type.equals(BitString.type))
-      return BitString.fromDER(binary)
+      return BitString.read(binary)
     if (type.equals(OctetString.type))
-      return OctetString.fromDER(binary)
+      return OctetString.read(binary)
     if (type.equals(Null.type))
-      return Null.fromDER(binary)
+      return Null.read(binary)
     if (type.equals(ObjectIdentifier.type))
-      return ObjectIdentifier.fromDER(binary)
+      return ObjectIdentifier.read(binary)
     if (type.equals(UTF8String.type))
-      return UTF8String.fromDER(binary)
+      return UTF8String.read(binary)
     if (type.equals(PrintableString.type))
-      return PrintableString.fromDER(binary)
+      return PrintableString.read(binary)
     if (type.equals(Sequence.type))
-      return Sequence.fromDER(binary, parse)
+      return Sequence.read(binary, read)
     if (type.equals(Set.type))
-      return Set.fromDER(binary, parse)
+      return Set.read(binary, read)
     if (type.equals(UTCTime.type))
-      return UTCTime.fromDER(binary)
+      return UTCTime.read(binary)
 
     if (type.clazz === Type.clazzes.UNIVERSAL)
       throw new Error(`Unknown UNIVERSAL type`)
 
     if (type.wrap === Type.wraps.CONSTRUCTED)
-      return Constructed.fromDER(binary, parse)
-    return Unknown.fromDER(binary)
+      return Constructed.read(binary, read)
+    return Unknown.read(binary)
   }
 
+  export function fromBuffer(buffer: Buffer) {
+    return read(new Binary(buffer))
+  }
+
+  export function toBuffer(triplet: Triplet) {
+    const binary = Binary.allocUnsafe(size(triplet))
+    write(binary, triplet)
+    return binary.buffer
+  }
 }

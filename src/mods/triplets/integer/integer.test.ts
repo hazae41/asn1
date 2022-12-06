@@ -18,7 +18,7 @@ function hexToBinary(hex: string) {
 
 function hexToInteger(hex: string) {
   const binary = hexToBinary(hex)
-  const integer = Integer.fromDER(binary)
+  const integer = Integer.read(binary)
   return integer.value
 }
 

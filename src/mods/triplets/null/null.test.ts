@@ -19,7 +19,7 @@ function hexToBinary(hex: string) {
 function checkReadWrite(hex: string) {
   const input = hexToBinary("05 00")
   const output = Binary.allocUnsafe(input.buffer.length)
-  Null.fromDER(input).toDER(output)
+  Null.read(input).write(output)
   return input.buffer.equals(output.buffer)
 }
 

@@ -1,5 +1,6 @@
 import { Binary } from "libs/binary/binary.js";
 import { Length } from "mods/length/length.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class Unknown {
@@ -7,27 +8,50 @@ export class Unknown {
 
   constructor(
     readonly type: Type,
-    readonly length: Length
+    readonly buffer: Buffer,
   ) { }
 
-  toString() {
-    return `UNKNOWN`
+  get length() {
+    return new Length(this.buffer.length)
   }
 
-  static fromDER(binary: Binary) {
-    const type = Type.fromDER(binary)
+  size() {
+    return Triplet.size(this.length)
+  }
 
-    // NO-OP
+  write(binary: Binary) {
+    this.type.write(binary)
 
-    const length = Length.fromDER(binary)
+    const { length } = this
+
+    length.write(binary)
 
     const content = binary.offset
 
-    binary.offset += length.value
+    binary.write(this.buffer)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
-    return new this(type, length)
+    return
+  }
+
+  static read(binary: Binary) {
+    const type = Type.read(binary)
+
+    const length = Length.read(binary)
+
+    const content = binary.offset
+
+    const buffer = binary.read(length.value)
+
+    if (binary.offset - content !== length.value)
+      throw new Error(`Invalid length`)
+
+    return new this(type, buffer)
+  }
+
+  toString() {
+    return `UNKNOWN`
   }
 }

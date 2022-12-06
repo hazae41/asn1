@@ -8,18 +8,27 @@ export class Length {
     readonly value: number
   ) { }
 
-  toDER(binary: Binary) {
-    if (this.value < 128) {
-      binary.writeUint8(this.value)
-      return
-    }
+  size() {
+    if (this.value < 128)
+      return 1
 
     // TODO
 
-    throw new Error(`Unimplemented`)
+    return 1
   }
 
-  static fromDER(binary: Binary) {
+  write(binary: Binary) {
+    if (this.value < 128)
+      return binary.writeUint8(this.value)
+
+    // TODO
+
+    binary.writeUint8(127)
+
+    return
+  }
+
+  static read(binary: Binary) {
     const first = binary.readUint8()
 
     if (first < 128)
