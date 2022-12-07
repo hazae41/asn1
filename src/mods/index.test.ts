@@ -1,6 +1,7 @@
 export * from "./length/length.test.js";
 export * from "./triplets/index.test.js";
 export * from "./type/type.test.js";
+export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
 import { readFile } from "fs/promises";
 import { assert } from "libs/assert/assert.js";
