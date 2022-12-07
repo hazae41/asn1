@@ -3,6 +3,18 @@ import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
+function pad2(value: number) {
+  const text = value.toString()
+
+  if (text.length > 2)
+    throw new Error(`Invalid length`)
+
+  if (text.length === 2)
+    return text
+
+  return "0" + text
+}
+
 export class UTCTime {
   readonly class = UTCTime
 
@@ -32,8 +44,26 @@ export class UTCTime {
     return length
   }
 
+  private _buffer?: Buffer
+
   prepare() {
-    this._length = new Length(0) // TODO
+    const year = this.value.getUTCFullYear()
+
+    const YY = year > 2000
+      ? year - 2000
+      : year - 1900
+
+    const MM = pad2(this.value.getUTCMonth() + 1)
+    const DD = pad2(this.value.getUTCDate())
+    const hh = pad2(this.value.getUTCHours())
+    const mm = pad2(this.value.getUTCMinutes())
+    const ss = pad2(this.value.getUTCSeconds())
+
+    console.log("output", `${YY}${MM}${DD}${hh}${mm}${ss}Z`)
+    const buffer = Buffer.from(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
+
+    this._buffer = buffer
+    this._length = new Length(buffer.length)
   }
 
   size() {
@@ -52,7 +82,12 @@ export class UTCTime {
 
     const content = binary.offset
 
-    // TODO
+    const buffer = this._buffer
+
+    if (!buffer)
+      throw new Error(`Unprepared buffer`)
+
+    binary.write(buffer)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
@@ -72,6 +107,8 @@ export class UTCTime {
 
     const text = binary.readString(length.value)
 
+    console.log("input", text)
+
     if (text.length !== 13)
       throw new Error(`Invalid format`)
     if (!text.endsWith("Z"))
@@ -89,8 +126,9 @@ export class UTCTime {
       : 2000 + YY
 
     const date = new Date()
-    date.setUTCFullYear(year, MM, DD)
+    date.setUTCFullYear(year, MM - 1, DD)
     date.setUTCHours(hh, mm, ss)
+    date.setUTCMilliseconds(0)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
