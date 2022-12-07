@@ -5,7 +5,6 @@ export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
 import { readFile } from "fs/promises";
 import { assert } from "libs/assert/assert.js";
-import { Binary } from "libs/binary/binary.js";
 import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
@@ -54,22 +53,23 @@ test.before(async () => {
 
 test("Cert 1", async () => {
   const text = await readFile("./test/cert.pem", "utf8")
-  const triplet = DER.read(new Binary(PEM.parse(text)))
-  // console.log("Cert 1", asn1.toString())
+  const triplet = DER.fromBuffer(PEM.parse(text))
+
+  assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert 2", async () => {
   const text = await readFile("./test/cert2.pem", "utf8")
-  const triplet = DER.read(new Binary(PEM.parse(text)))
-  console.log("Cert 2", triplet.toString())
+  const triplet = DER.fromBuffer(PEM.parse(text))
 
   assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert 3", async () => {
   const text = await readFile("./test/cert3.pem", "utf8")
-  const triplet = DER.read(new Binary(PKCS7.parse(text)))
-  // console.log("Cert 3", asn1.toString())
+  const triplet = DER.fromBuffer(PKCS7.parse(text))
+
+  assert(PKCS7.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test.run()

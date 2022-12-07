@@ -1,6 +1,6 @@
+import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
-import { assert } from "node:console";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
 
