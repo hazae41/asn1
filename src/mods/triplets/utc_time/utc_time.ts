@@ -59,7 +59,6 @@ export class UTCTime {
     const mm = pad2(this.value.getUTCMinutes())
     const ss = pad2(this.value.getUTCSeconds())
 
-    console.log("output", `${YY}${MM}${DD}${hh}${mm}${ss}Z`)
     const buffer = Buffer.from(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
 
     this._buffer = buffer
@@ -106,8 +105,6 @@ export class UTCTime {
     const content = binary.offset
 
     const text = binary.readString(length.value)
-
-    console.log("input", text)
 
     if (text.length !== 13)
       throw new Error(`Invalid format`)

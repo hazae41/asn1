@@ -37,13 +37,8 @@ function checkReadWrite(hex: string) {
   const input = hexToBinary(hex)
   const triplet = Integer.read(input)
 
-  console.log(triplet.value)
-
   const output = Binary.allocUnsafe(triplet.size())
   triplet.write(output)
-
-  console.log(input.buffer)
-  console.log(output.buffer)
 
   return input.buffer.equals(output.buffer)
 }

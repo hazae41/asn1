@@ -3,6 +3,7 @@ export * from "./triplets/index.test.js";
 export * from "./type/type.test.js";
 
 import { readFile } from "fs/promises";
+import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
 import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
@@ -60,7 +61,8 @@ test("Cert 2", async () => {
   const text = await readFile("./test/cert2.pem", "utf8")
   const triplet = DER.read(new Binary(PEM.parse(text)))
   console.log("Cert 2", triplet.toString())
-  console.log("Write", PEM.parse(text).toString("hex"), DER.toBuffer(triplet).toString("hex"))
+
+  assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert 3", async () => {
