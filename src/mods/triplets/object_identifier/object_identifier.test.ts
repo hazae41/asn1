@@ -1,6 +1,6 @@
+import { assert } from "libs/assert/assert.js";
 import { Binary } from "libs/binary/binary.js";
 import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
-import { assert } from "node:console";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";
 
