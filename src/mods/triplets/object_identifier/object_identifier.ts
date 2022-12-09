@@ -5,7 +5,7 @@ import { Type } from "mods/type/type.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 
 export class ObjectIdentifier {
-  readonly class = ObjectIdentifier
+  readonly #class = ObjectIdentifier
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -17,7 +17,7 @@ export class ObjectIdentifier {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

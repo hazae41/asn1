@@ -8,7 +8,7 @@ const stringify = (parent: Sequence) => `SEQUENCE {
 }`
 
 export class Sequence {
-  readonly class = Sequence
+  readonly #class = Sequence
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -20,7 +20,7 @@ export class Sequence {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

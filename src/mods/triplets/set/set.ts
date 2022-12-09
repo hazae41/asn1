@@ -8,7 +8,7 @@ const stringify = (set: Set) => `SET {
 }`
 
 export class Set {
-  readonly class = Set
+  readonly #class = Set
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -20,7 +20,7 @@ export class Set {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

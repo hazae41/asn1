@@ -13,7 +13,7 @@ function sign(value: number, negative: boolean) {
 }
 
 export class Integer {
-  readonly class = Integer
+  readonly #class = Integer
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -25,7 +25,7 @@ export class Integer {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

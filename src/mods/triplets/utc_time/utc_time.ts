@@ -16,7 +16,7 @@ function pad2(value: number) {
 }
 
 export class UTCTime {
-  readonly class = UTCTime
+  readonly #class = UTCTime
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -28,7 +28,7 @@ export class UTCTime {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

@@ -8,7 +8,7 @@ const stringify = (parent: Constructed) => `[${parent.type.tag}] {
 }`
 
 export class Constructed {
-  readonly class = Constructed
+  readonly #class = Constructed
 
   constructor(
     readonly type: Type,

@@ -2,7 +2,7 @@ import { Binary } from "libs/binary/binary.js";
 import { Bitset } from "libs/bitset/bitset.js";
 
 export class Type {
-  readonly class = Type
+  readonly #class = Type
 
   static clazzes = {
     UNIVERSAL: 0,
@@ -51,7 +51,7 @@ export class Type {
   }
 
   size() {
-    return this.class.size()
+    return this.#class.size()
   }
 
   write(binary: Binary) {

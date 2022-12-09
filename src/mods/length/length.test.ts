@@ -34,9 +34,6 @@ function checkReadWrite(hex: string) {
   const output = Binary.allocUnsafe(length.size())
   length.write(output)
 
-  console.log("input", input.buffer)
-  console.log("output", output.buffer)
-
   return input.buffer.equals(output.buffer)
 }
 

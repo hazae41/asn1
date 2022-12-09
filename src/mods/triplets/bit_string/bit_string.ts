@@ -4,7 +4,7 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class BitString {
-  readonly class = BitString
+  readonly #class = BitString
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -17,7 +17,7 @@ export class BitString {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

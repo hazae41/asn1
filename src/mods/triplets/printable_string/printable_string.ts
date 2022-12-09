@@ -4,7 +4,7 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class PrintableString {
-  readonly class = PrintableString
+  readonly #class = PrintableString
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -16,7 +16,7 @@ export class PrintableString {
   ) { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

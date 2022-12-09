@@ -4,7 +4,7 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class Null {
-  readonly class = Null
+  readonly #class = Null
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -14,7 +14,7 @@ export class Null {
   constructor() { }
 
   get type() {
-    return this.class.type
+    return this.#class.type
   }
 
   private _length?: Length

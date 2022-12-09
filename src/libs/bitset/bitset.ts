@@ -1,5 +1,5 @@
 export class Bitset {
-  readonly class = Bitset
+  readonly #class = Bitset
 
   constructor(
     public value: number,

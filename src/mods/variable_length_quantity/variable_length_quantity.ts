@@ -2,7 +2,7 @@ import { Binary } from "libs/binary/binary.js";
 import { Bitset } from "libs/bitset/bitset.js";
 
 export class VLQ {
-  readonly class = VLQ
+  readonly #class = VLQ
 
   constructor(
     readonly value: number
