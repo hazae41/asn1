@@ -72,8 +72,15 @@ test("Cert PKCS7", async () => {
   assert(PKCS7.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
-test("Cert frank4dd-cacert", async () => {
-  const buffer = await readFile("./test/frank4dd-cacert.der")
+test("Cert frank4dd-rsa", async () => {
+  const buffer = await readFile("./test/frank4dd-rsa.der")
+  const triplet = DER.fromBuffer(buffer)
+
+  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+})
+
+test("Cert frank4dd-dsa", async () => {
+  const buffer = await readFile("./test/frank4dd-dsa.der")
   const triplet = DER.fromBuffer(buffer)
 
   assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
