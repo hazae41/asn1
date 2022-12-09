@@ -86,4 +86,20 @@ test("Cert frank4dd-dsa", async () => {
   assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
+test("Cert Tor", async () => {
+  const text = await readFile("./test/tor.pem", "utf8")
+  const buffer = Buffer.from(text, "base64")
+  const triplet = DER.fromBuffer(buffer)
+
+  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+})
+
+test("Cert Tor 2", async () => {
+  const text = await readFile("./test/tor2.pem", "utf8")
+  const buffer = Buffer.from(text, "base64")
+  const triplet = DER.fromBuffer(buffer)
+
+  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+})
+
 test.run()
