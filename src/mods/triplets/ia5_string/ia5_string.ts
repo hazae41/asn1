@@ -3,28 +3,16 @@ import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
-function pad2(value: number) {
-  const text = value.toString()
-
-  if (text.length > 2)
-    throw new Error(`Invalid length`)
-
-  if (text.length === 2)
-    return text
-
-  return "0" + text
-}
-
-export class UTCTime {
-  readonly #class = UTCTime
+export class IA5String {
+  readonly #class = IA5String
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
-    Type.tags.UTC_TIME)
+    Type.tags.IA5_STRING)
 
   constructor(
-    readonly value: Date
+    readonly value: string
   ) { }
 
   get type() {
@@ -47,19 +35,7 @@ export class UTCTime {
   private _buffer?: Buffer
 
   prepare() {
-    const year = this.value.getUTCFullYear()
-
-    const YY = year > 2000
-      ? pad2(year - 2000)
-      : pad2(year - 1900)
-
-    const MM = pad2(this.value.getUTCMonth() + 1)
-    const DD = pad2(this.value.getUTCDate())
-    const hh = pad2(this.value.getUTCHours())
-    const mm = pad2(this.value.getUTCMinutes())
-    const ss = pad2(this.value.getUTCSeconds())
-
-    const buffer = Buffer.from(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
+    const buffer = Buffer.from(this.value, "ascii")
 
     this._buffer = buffer
     this._length = new Length(buffer.length)
@@ -104,36 +80,16 @@ export class UTCTime {
 
     const content = binary.offset
 
-    const text = binary.readString(length.value)
-
-    if (text.length !== 13)
-      throw new Error(`Invalid format`)
-    if (!text.endsWith("Z"))
-      throw new Error(`Invalid format`)
-
-    const YY = Number(text.slice(0, 2))
-    const MM = Number(text.slice(2, 4))
-    const DD = Number(text.slice(4, 6))
-    const hh = Number(text.slice(6, 8))
-    const mm = Number(text.slice(8, 10))
-    const ss = Number(text.slice(10, 12))
-
-    const year = YY > 50
-      ? 1900 + YY
-      : 2000 + YY
-
-    const date = new Date()
-    date.setUTCFullYear(year, MM - 1, DD)
-    date.setUTCHours(hh, mm, ss)
-    date.setUTCMilliseconds(0)
+    const buffer = binary.read(length.value)
+    const value = buffer.toString("ascii")
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
-    return new this(date)
+    return new this(value)
   }
 
   toString() {
-    return `UTCTime ${this.value.toUTCString()}`
+    return `UTF8String ${this.value}`
   }
 }

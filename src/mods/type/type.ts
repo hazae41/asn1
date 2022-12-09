@@ -27,6 +27,7 @@ export class Type {
     SEQUENCE: 16,
     SET: 17,
     PRINTABLE_STRING: 19,
+    IA5_STRING: 22,
     UTC_TIME: 23
   } as const
 

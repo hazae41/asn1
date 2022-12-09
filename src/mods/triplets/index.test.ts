@@ -1,5 +1,6 @@
 export * from "./bit_string/bit_string.test.js";
 export * from "./boolean/boolean.test.js";
+export * from "./ia5_string/ia5_string.test.js";
 export * from "./integer/integer.test.js";
 export * from "./null/null.test.js";
 export * from "./object_identifier/object_identifier.test.js";

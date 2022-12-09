@@ -51,25 +51,32 @@ test.before(async () => {
   console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 })
 
-test("Cert 1", async () => {
-  const text = await readFile("./test/cert.pem", "utf8")
+test("Cert Ed25519", async () => {
+  const text = await readFile("./test/ed25519.pem", "utf8")
   const triplet = DER.fromBuffer(PEM.parse(text))
 
   assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
-test("Cert 2", async () => {
-  const text = await readFile("./test/cert2.pem", "utf8")
+test("Cert Let's Encrypt", async () => {
+  const text = await readFile("./test/letsencrypt.pem", "utf8")
   const triplet = DER.fromBuffer(PEM.parse(text))
 
   assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
-test("Cert 3", async () => {
-  const text = await readFile("./test/cert3.pem", "utf8")
+test("Cert PKCS7", async () => {
+  const text = await readFile("./test/pkcs7.pem", "utf8")
   const triplet = DER.fromBuffer(PKCS7.parse(text))
 
   assert(PKCS7.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
+})
+
+test("Cert frank4dd-cacert", async () => {
+  const buffer = await readFile("./test/frank4dd-cacert.der")
+  const triplet = DER.fromBuffer(buffer)
+
+  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test.run()

@@ -2,6 +2,7 @@ import { Binary } from "libs/binary/binary.js";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";
+import { IA5String } from "mods/triplets/ia5_string/ia5_string.js";
 import { Integer } from "mods/triplets/integer/integer.js";
 import { Null } from "mods/triplets/null/null.js";
 import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
@@ -50,11 +51,13 @@ export namespace DER {
       return Sequence.read(binary, read)
     if (type.equals(Set.type))
       return Set.read(binary, read)
+    if (type.equals(IA5String.type))
+      return IA5String.read(binary)
     if (type.equals(UTCTime.type))
       return UTCTime.read(binary)
 
     if (type.clazz === Type.clazzes.UNIVERSAL)
-      throw new Error(`Unknown UNIVERSAL type`)
+      throw new Error(`Unknown UNIVERSAL type ${type.tag}`)
 
     if (type.wrap === Type.wraps.CONSTRUCTED)
       return Constructed.read(binary, read)

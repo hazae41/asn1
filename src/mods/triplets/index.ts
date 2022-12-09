@@ -1,6 +1,7 @@
 export * from "./bit_string/bit_string.js";
 export * from "./boolean/boolean.js";
 export * from "./constructed/constructed.js";
+export * from "./ia5_string/ia5_string.js";
 export * from "./integer/integer.js";
 export * from "./null/null.js";
 export * from "./object_identifier/object_identifier.js";

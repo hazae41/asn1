@@ -44,6 +44,7 @@ function checkReadWrite(hex: string) {
 test("Read then write", async () => {
   assert(checkReadWrite("17 0D 31 39 30 39 32 39 31 36 33 33 33 36 5A"))
   assert(checkReadWrite("17 0D 31 39 31 32 32 38 31 36 33 33 33 36 5A"))
+  assert(checkReadWrite("17 0D 30 37 31 32 30 37 31 30 32 31 34 36 5A"))
 })
 
 test.run()
