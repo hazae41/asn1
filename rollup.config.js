@@ -41,7 +41,7 @@ export const config = [
       entryFileNames: "[name].cjs",
     }],
     plugins: [resolve(), ts({ typescript }), commonjs()],
-    external: ["tslib", "uvu", "uvu/assert"]
+    external: ["tslib", "uvu"]
   },
 ]
 
