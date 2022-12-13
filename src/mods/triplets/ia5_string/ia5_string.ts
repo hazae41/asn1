@@ -90,6 +90,6 @@ export class IA5String {
   }
 
   toString() {
-    return `UTF8String ${this.value}`
+    return `IA5String ${this.value}`
   }
 }
