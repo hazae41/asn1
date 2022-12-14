@@ -1,6 +1,7 @@
-# Zero-copy ASN.1 <=> DER 🏎️
-
-Zero-copy ASN.1 <=> DER in pure modern TypeScript
+<p align="center">
+<img width="500"
+src="https://user-images.githubusercontent.com/4405263/207622612-955730cd-e731-4b0c-8d72-e23bdc214988.png" />
+</p>
 
 ```bash
 npm i @hazae41/asn1
