@@ -1,5 +1,5 @@
+import { Binary } from "@hazae41/binary";
 import { assert } from "libs/assert/assert.js";
-import { Binary } from "libs/binary/binary.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";

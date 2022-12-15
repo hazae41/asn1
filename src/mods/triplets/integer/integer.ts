@@ -1,4 +1,4 @@
-import { Binary } from "libs/binary/binary.js";
+import { Binary } from "@hazae41/binary";
 import { Bitset } from "libs/bitset/bitset.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
@@ -111,7 +111,7 @@ export class Integer {
 
     let value = BigInt(0)
 
-    const negative = binary.readUint8(true) > 127
+    const negative = binary.getUint8() > 127
 
     for (let i = 0; i < length.value; i++)
       value = (value * bn256) + BigInt(sign(binary.readUint8(), negative))

@@ -1,4 +1,4 @@
-import { Binary } from "libs/binary/binary.js";
+import { Binary } from "@hazae41/binary";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";

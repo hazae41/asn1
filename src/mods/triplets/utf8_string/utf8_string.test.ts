@@ -1,5 +1,5 @@
+import { Binary } from "@hazae41/binary";
 import { assert } from "libs/assert/assert.js";
-import { Binary } from "libs/binary/binary.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { relative, resolve } from "node:path";
 import { test } from "uvu";

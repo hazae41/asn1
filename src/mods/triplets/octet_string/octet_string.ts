@@ -1,4 +1,4 @@
-import { Binary } from "libs/binary/binary.js";
+import { Binary } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";

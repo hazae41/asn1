@@ -1,4 +1,4 @@
-import { Binary } from "libs/binary/binary.js";
+import { Binary } from "@hazae41/binary";
 import { Bitset } from "libs/bitset/bitset.js";
 
 export class VLQ {
