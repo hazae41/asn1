@@ -47,11 +47,12 @@ test("Toggle then toggle", async () => {
 })
 
 test("Export Int32 to Uint32", async () => {
-  const bitmask = new Bitset(Date.now(), 32)
+  const bitmask = new Bitset(0xFF_FF_FF_FF, 32)
 
-  bitmask.toggle(32)
+  bitmask.toggle(32) // 0x1_FF_FF_FF_FF (33 bits)
 
-  const buffer = Buffer.from([0, 0, 0, 0])
+  const buffer = Buffer.alloc(6)
+
   assert(throws(() => buffer.writeUInt32BE(bitmask.value, 0)), `Writing value should throw`)
   assert(!throws(() => buffer.writeUInt32BE(bitmask.unsigned(), 0)), `Writing unsigned value should not throw`)
 })
