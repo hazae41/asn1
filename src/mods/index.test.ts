@@ -52,42 +52,42 @@ test.before(async () => {
 })
 
 test("Cert Ed25519", async () => {
-  const text = await readFile("./test/ed25519.pem", "utf8")
+  const text = await readFile("./certs/ed25519.pem", "utf8")
   const triplet = DER.fromBuffer(PEM.parse(text))
 
   assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert Let's Encrypt", async () => {
-  const text = await readFile("./test/letsencrypt.pem", "utf8")
+  const text = await readFile("./certs/letsencrypt.pem", "utf8")
   const triplet = DER.fromBuffer(PEM.parse(text))
 
   assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert PKCS7", async () => {
-  const text = await readFile("./test/pkcs7.pem", "utf8")
+  const text = await readFile("./certs/pkcs7.pem", "utf8")
   const triplet = DER.fromBuffer(PKCS7.parse(text))
 
   assert(PKCS7.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert frank4dd-rsa", async () => {
-  const buffer = await readFile("./test/frank4dd-rsa.der")
+  const buffer = await readFile("./certs/frank4dd-rsa.der")
   const triplet = DER.fromBuffer(buffer)
 
   assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert frank4dd-dsa", async () => {
-  const buffer = await readFile("./test/frank4dd-dsa.der")
+  const buffer = await readFile("./certs/frank4dd-dsa.der")
   const triplet = DER.fromBuffer(buffer)
 
   assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
 
 test("Cert Tor", async () => {
-  const text = await readFile("./test/tor.pem", "utf8")
+  const text = await readFile("./certs/tor.pem", "utf8")
   const buffer = Buffer.from(text, "base64")
   const triplet = DER.fromBuffer(buffer)
 
@@ -95,7 +95,7 @@ test("Cert Tor", async () => {
 })
 
 test("Cert Tor 2", async () => {
-  const text = await readFile("./test/tor2.pem", "utf8")
+  const text = await readFile("./certs/tor2.pem", "utf8")
   const buffer = Buffer.from(text, "base64")
   const triplet = DER.fromBuffer(buffer)
 
