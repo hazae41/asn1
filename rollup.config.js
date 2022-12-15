@@ -16,7 +16,7 @@ export const config = [
       entryFileNames: "[name].cjs",
     }],
     plugins: [resolve(), ts({ typescript }), commonjs()],
-    external: ["tslib"]
+    external: ["tslib", "@hazae41/binary"]
   },
   {
     input: "./src/index.ts",
@@ -29,7 +29,7 @@ export const config = [
       entryFileNames: "[name].mjs",
     }],
     plugins: [resolve(), ts({ typescript }), commonjs()],
-    external: ["tslib"]
+    external: ["tslib", "@hazae41/binary"]
   },
   {
     input: "./src/index.ts",
@@ -41,7 +41,7 @@ export const config = [
       entryFileNames: "[name].d.ts",
     }],
     plugins: [dts(), resolve(), ts({ typescript })],
-    external: ["tslib"]
+    external: ["tslib", "@hazae41/binary"]
   },
   {
     input: "./src/index.test.ts",
@@ -54,7 +54,7 @@ export const config = [
       entryFileNames: "[name].cjs",
     }],
     plugins: [resolve(), ts({ typescript }), commonjs()],
-    external: ["tslib", "uvu"]
+    external: ["tslib", "@hazae41/binary", "uvu"]
   },
 ]
 
