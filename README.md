@@ -1,7 +1,9 @@
 <div align="center">
 <img width="500" src="https://user-images.githubusercontent.com/4405263/207936683-26471a94-5b24-435b-a26c-c4803ad6399f.png" />
-<h3 align="center">Zero-copy ASN.1 <=> DER encoding for the web 🏎️</h3>
 </div>
+<h3 align="center">
+Zero-copy ASN.1 <=> DER encoding for the web 🏎️
+</h3>
 
 ```bash
 npm i @hazae41/asn1
