@@ -1,13 +1,10 @@
-import { assert, throws } from "libs/assert/assert.js";
+import { assert, test, throws } from "@hazae41/phobos";
 import { Bitset } from "libs/bitset/bitset.js";
 import { relative, resolve } from "node:path";
-import { test } from "uvu";
 
-test.before(async () => {
-  const directory = resolve("./dist/test/")
-  const { pathname } = new URL(import.meta.url)
-  console.log(relative(directory, pathname))
-})
+const directory = resolve("./dist/test/")
+const { pathname } = new URL(import.meta.url)
+console.log(relative(directory, pathname))
 
 function format(bitmask: Bitset, digits: number) {
   let s = bitmask.unsigned().toString(2)
@@ -70,5 +67,3 @@ test("Last", async () => {
   assert(bitmask.last(2) === 3)
   assert(bitmask.last(3) === 7)
 })
-
-test.run()

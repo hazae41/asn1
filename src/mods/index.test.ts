@@ -3,11 +3,10 @@ export * from "./triplets/index.test.js";
 export * from "./type/type.test.js";
 export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
+import { assert, test } from "@hazae41/phobos";
 import { readFile } from "fs/promises";
-import { assert } from "libs/assert/assert.js";
 import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
-import { test } from "uvu";
 
 export namespace PEM {
   export const header = `-----BEGIN CERTIFICATE-----`
@@ -45,11 +44,9 @@ export namespace PKCS7 {
   }
 }
 
-test.before(async () => {
-  const directory = resolve("./dist/test/")
-  const { pathname } = new URL(import.meta.url)
-  console.log(relative(directory, pathname.replace(".cjs", ".ts")))
-})
+const directory = resolve("./dist/test/")
+const { pathname } = new URL(import.meta.url)
+console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
 test("Cert Ed25519", async () => {
   const text = await readFile("./certs/ed25519.pem", "utf8")
@@ -101,5 +98,3 @@ test("Cert Tor 2", async () => {
 
   assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
 })
-
-test.run()

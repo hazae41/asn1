@@ -1,15 +1,12 @@
 import { Binary } from "@hazae41/binary";
-import { assert } from "libs/assert/assert.js";
+import { assert, test } from "@hazae41/phobos";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Type } from "mods/type/type.js";
 import { relative, resolve } from "node:path";
-import { test } from "uvu";
 
-test.before(async () => {
-  const directory = resolve("./dist/test/")
-  const { pathname } = new URL(import.meta.url)
-  console.log(relative(directory, pathname.replace(".cjs", ".ts")))
-})
+const directory = resolve("./dist/test/")
+const { pathname } = new URL(import.meta.url)
+console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
 function hexToType(hex: string) {
   const buffer = Buffer.from(hex.replaceAll(" ", ""), "hex")
@@ -19,5 +16,3 @@ function hexToType(hex: string) {
 test("Read", async () => {
   assert(hexToType("30").equals(Sequence.type))
 })
-
-test.run()

@@ -1,14 +1,11 @@
 import { Binary } from "@hazae41/binary";
-import { assert } from "libs/assert/assert.js";
+import { assert, test } from "@hazae41/phobos";
 import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
 import { relative, resolve } from "node:path";
-import { test } from "uvu";
 
-test.before(async () => {
-  const directory = resolve("./dist/test/")
-  const { pathname } = new URL(import.meta.url)
-  console.log(relative(directory, pathname.replace(".cjs", ".ts")))
-})
+const directory = resolve("./dist/test/")
+const { pathname } = new URL(import.meta.url)
+console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
 function hexToBinary(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
@@ -46,5 +43,3 @@ test("Read then write", async () => {
   assert(checkReadWrite("17 0D 31 39 31 32 32 38 31 36 33 33 33 36 5A"))
   assert(checkReadWrite("17 0D 30 37 31 32 30 37 31 30 32 31 34 36 5A"))
 })
-
-test.run()
