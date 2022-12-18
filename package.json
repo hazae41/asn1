@@ -12,7 +12,9 @@
   "types": "./dist/types/index.d.ts",
   "sideEffects": false,
   "files": [
-    "/dist"
+    "./dist/esm",
+    "./dist/cjs",
+    "./dist/types"
   ],
   "scripts": {
     "build": "rimraf dist && rollup -c",
