@@ -78,12 +78,16 @@ export class IA5String {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
 
-    const buffer = binary.read(length.value)
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
+
+    const buffer = binary.read(length)
     const value = buffer.toString("ascii")
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(value)

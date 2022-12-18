@@ -70,12 +70,16 @@ export class BitString {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
+
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
 
     const padding = binary.readUint8()
-    const buffer = binary.read(length.value - 1)
+    const buffer = binary.read(length - 1)
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(padding, buffer)

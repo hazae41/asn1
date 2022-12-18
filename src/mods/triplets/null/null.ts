@@ -48,13 +48,6 @@ export class Null {
 
     length.write(binary)
 
-    const content = binary.offset
-
-    // * NO-OP *
-
-    if (binary.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
     return
   }
 
@@ -65,13 +58,6 @@ export class Null {
       throw new Error(`Invalid type`)
 
     const length = Length.read(binary)
-
-    const content = binary.offset
-
-    // * NO-OP *
-
-    if (binary.offset - content !== length.value)
-      throw new Error(`Invalid length`)
 
     return new this()
   }

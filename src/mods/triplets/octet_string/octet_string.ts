@@ -68,11 +68,15 @@ export class OctetString {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
 
-    const buffer = binary.read(length.value)
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
 
-    if (binary.offset - content !== length.value)
+    const buffer = binary.read(length)
+
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(buffer)

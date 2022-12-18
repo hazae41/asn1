@@ -107,20 +107,24 @@ export class Integer {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
+
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
 
     let value = BigInt(0)
 
     const negative = binary.getUint8() > 127
 
-    for (let i = 0; i < length.value; i++)
+    for (let i = 0; i < length; i++)
       value = (value * bn256) + BigInt(sign(binary.readUint8(), negative))
 
     value = negative
       ? ~value
       : value
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(value)

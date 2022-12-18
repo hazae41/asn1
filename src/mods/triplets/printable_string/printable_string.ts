@@ -81,14 +81,18 @@ export class PrintableString {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
 
-    const value = binary.readString(length.value)
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
+
+    const value = binary.readString(length)
 
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       throw new Error(`Invalid value`)
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(value)

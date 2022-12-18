@@ -78,11 +78,15 @@ export class UTF8String {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
 
-    const value = binary.readString(length.value)
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
 
-    if (binary.offset - content !== length.value)
+    const value = binary.readString(length)
+
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(value)

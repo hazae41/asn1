@@ -57,11 +57,11 @@ export class Unknown {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    const start = binary.offset
 
     const buffer = binary.read(length.value)
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length.value)
       throw new Error(`Invalid length`)
 
     return new this(type, buffer)

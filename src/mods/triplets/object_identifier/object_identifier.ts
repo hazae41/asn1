@@ -102,7 +102,11 @@ export class ObjectIdentifier {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
+
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
 
     const header = binary.readUint8()
     const first = Math.floor(header / 40)
@@ -110,10 +114,10 @@ export class ObjectIdentifier {
 
     const values = [first, second]
 
-    while (binary.offset - content < length.value)
+    while (binary.offset - start < length)
       values.push(VLQ.read(binary).value)
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(values.join("."))

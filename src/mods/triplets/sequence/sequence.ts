@@ -73,14 +73,18 @@ export class Sequence {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value, read)
+  }
+
+  static read2(binary: Binary, length: number, read: (binary: Binary) => Triplet) {
+    const start = binary.offset
 
     const triplets = new Array<Triplet>()
 
-    while (binary.offset - content < length.value)
+    while (binary.offset - start < length)
       triplets.push(read(binary))
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(triplets)

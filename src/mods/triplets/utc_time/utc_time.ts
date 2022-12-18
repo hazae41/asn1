@@ -102,9 +102,13 @@ export class UTCTime {
 
     const length = Length.read(binary)
 
-    const content = binary.offset
+    return this.read2(binary, length.value)
+  }
 
-    const text = binary.readString(length.value)
+  static read2(binary: Binary, length: number) {
+    const start = binary.offset
+
+    const text = binary.readString(length)
 
     if (text.length !== 13)
       throw new Error(`Invalid format`)
@@ -127,7 +131,7 @@ export class UTCTime {
     date.setUTCHours(hh, mm, ss)
     date.setUTCMilliseconds(0)
 
-    if (binary.offset - content !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(date)
