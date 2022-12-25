@@ -13,10 +13,13 @@ npm i @hazae41/asn1
 
 ### Current features
 - 100% TypeScript and ESM
-- Zero-copy reading and writing
-- DER decoding and encoding
 - No external dependency
-- Unit tested
+- Zero-copy DER encoding and decoding
+- Almost all universal triplets
+- Implicit and explicit tagged types
+
+### Upcoming features
+- More string types 
 
 ### Usage
 
