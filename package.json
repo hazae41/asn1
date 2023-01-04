@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/asn1",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Zero-copy ASN.1 <=> DER encoding for the web",
   "homepage": "https://github.com/hazae41/asn1",
   "repository": "github:hazae41/asn1",
@@ -18,11 +18,11 @@
   ],
   "scripts": {
     "build": "rimraf dist && rollup -c",
-    "test": "node ./dist/test/index.test.cjs",
+    "test": "node ./dist/test/src/index.test.cjs",
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@hazae41/binary": "^1.0.5",
+    "@hazae41/binary": "^1.0.6",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
