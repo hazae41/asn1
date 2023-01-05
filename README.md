@@ -18,7 +18,7 @@ npm i @hazae41/asn1
 - Almost all universal triplets
 - Implicit and explicit tagged types
 
-### Upcoming features
+### [Upcoming features](https://github.com/sponsors/hazae41)
 - More string types 
 
 ### Usage
