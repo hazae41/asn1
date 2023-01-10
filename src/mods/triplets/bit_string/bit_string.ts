@@ -1,4 +1,5 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "libs/bytes/bytes.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -13,7 +14,7 @@ export class BitString {
 
   constructor(
     readonly padding: number,
-    readonly buffer: Buffer
+    readonly bytes: Uint8Array
   ) { }
 
   get type() {
@@ -34,7 +35,7 @@ export class BitString {
   }
 
   prepare() {
-    this._length = new Length(1 + this.buffer.length)
+    this._length = new Length(1 + this.bytes.length)
   }
 
   size() {
@@ -54,7 +55,7 @@ export class BitString {
     const content = binary.offset
 
     binary.writeUint8(this.padding)
-    binary.write(this.buffer)
+    binary.write(this.bytes)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
@@ -86,8 +87,8 @@ export class BitString {
   }
 
   toString() {
-    const bignum = BigInt("0x" + this.buffer.toString("hex"))
-    const binary = bignum.toString(2).padStart(this.buffer.length * 8, "0")
+    const bignum = BigInt("0x" + Bytes.toHex(this.bytes))
+    const binary = bignum.toString(2).padStart(this.bytes.length * 8, "0")
 
     return `BITSTRING ${binary.slice(0, binary.length - this.padding)}`
   }

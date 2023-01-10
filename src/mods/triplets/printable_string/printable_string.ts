@@ -1,4 +1,5 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "libs/bytes/bytes.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -32,16 +33,16 @@ export class PrintableString {
     return length
   }
 
-  private _buffer?: Buffer
+  private _bytes?: Uint8Array
 
   prepare() {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
       throw new Error(`Invalid value`)
 
-    const buffer = Buffer.from(this.value)
+    const bytes = Bytes.fromUtf8(this.value)
 
-    this._buffer = buffer
-    this._length = new Length(buffer.length)
+    this._bytes = bytes
+    this._length = new Length(bytes.length)
   }
 
   size() {
@@ -60,7 +61,7 @@ export class PrintableString {
 
     const content = binary.offset
 
-    const buffer = this._buffer
+    const buffer = this._bytes
 
     if (!buffer)
       throw new Error(`Unprepared buffer`)

@@ -5,6 +5,7 @@ export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
 import { assert, test } from "@hazae41/phobos";
 import { readFile } from "fs/promises";
+import { Bytes } from "libs/bytes/bytes.js";
 import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
 
@@ -22,7 +23,7 @@ export namespace PEM {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Buffer.from(body, "base64")
+    return Bytes.fromBase64(body)
   }
 }
 
@@ -40,7 +41,7 @@ export namespace PKCS7 {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Buffer.from(body, "base64")
+    return Bytes.fromBase64(body)
   }
 }
 
@@ -48,53 +49,57 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
+function compare(a: Uint8Array, b: Uint8Array) {
+  return Bytes.toHex(a) === Bytes.toHex(b)
+}
+
 test("Cert Ed25519", async () => {
   const text = await readFile("./certs/ed25519.pem", "utf8")
-  const triplet = DER.fromBuffer(PEM.parse(text))
+  const triplet = DER.fromBytes(PEM.parse(text))
 
-  assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(PEM.parse(text), DER.toBytes(triplet)))
 })
 
 test("Cert Let's Encrypt", async () => {
   const text = await readFile("./certs/letsencrypt.pem", "utf8")
-  const triplet = DER.fromBuffer(PEM.parse(text))
+  const triplet = DER.fromBytes(PEM.parse(text))
 
-  assert(PEM.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(PEM.parse(text), DER.toBytes(triplet)))
 })
 
 test("Cert PKCS7", async () => {
   const text = await readFile("./certs/pkcs7.pem", "utf8")
-  const triplet = DER.fromBuffer(PKCS7.parse(text))
+  const triplet = DER.fromBytes(PKCS7.parse(text))
 
-  assert(PKCS7.parse(text).toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(PKCS7.parse(text), DER.toBytes(triplet)))
 })
 
 test("Cert frank4dd-rsa", async () => {
   const buffer = await readFile("./certs/frank4dd-rsa.der")
-  const triplet = DER.fromBuffer(buffer)
+  const triplet = DER.fromBytes(buffer)
 
-  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(buffer, DER.toBytes(triplet)))
 })
 
 test("Cert frank4dd-dsa", async () => {
   const buffer = await readFile("./certs/frank4dd-dsa.der")
-  const triplet = DER.fromBuffer(buffer)
+  const triplet = DER.fromBytes(buffer)
 
-  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(buffer, DER.toBytes(triplet)))
 })
 
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
-  const buffer = Buffer.from(text, "base64")
-  const triplet = DER.fromBuffer(buffer)
+  const buffer = Bytes.fromBase64(text)
+  const triplet = DER.fromBytes(buffer)
 
-  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(buffer, DER.toBytes(triplet)))
 })
 
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
-  const buffer = Buffer.from(text, "base64")
-  const triplet = DER.fromBuffer(buffer)
+  const buffer = Bytes.fromBase64(text)
+  const triplet = DER.fromBytes(buffer)
 
-  assert(buffer.toString("hex") === DER.toBuffer(triplet).toString("hex"))
+  assert(compare(buffer, DER.toBytes(triplet)))
 })

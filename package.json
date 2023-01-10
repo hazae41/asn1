@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/asn1",
-  "version": "1.0.13",
+  "version": "1.0.15",
   "description": "Zero-copy ASN.1 <=> DER encoding for the web",
   "homepage": "https://github.com/hazae41/asn1",
   "repository": "github:hazae41/asn1",
@@ -22,7 +22,7 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@hazae41/binary": "^1.0.6",
+    "@hazae41/binary": "^1.1.2",
     "tslib": "^2.4.1"
   },
   "devDependencies": {
@@ -30,16 +30,16 @@
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-multi-entry": "^6.0.0",
     "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-typescript": "^10.0.1",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.11.18",
     "rimraf": "^3.0.2",
     "rollup": "^3.9.1",
-    "rollup-plugin-dts": "^5.1.0",
+    "rollup-plugin-dts": "^5.1.1",
     "rollup-plugin-node-externals": "^5.0.3",
     "ts-node": "^10.9.1",
     "ttypescript": "^1.5.15",
     "typescript": "^4.9.4",
-    "typescript-transform-paths": "^3.4.4"
+    "typescript-transform-paths": "^3.4.6"
   },
   "exports": {
     ".": {

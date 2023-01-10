@@ -1,4 +1,5 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "libs/bytes/bytes.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -12,7 +13,7 @@ export class OctetString {
     Type.tags.OCTET_STRING)
 
   constructor(
-    readonly buffer: Buffer
+    readonly bytes: Uint8Array
   ) { }
 
   get type() {
@@ -33,7 +34,7 @@ export class OctetString {
   }
 
   prepare() {
-    this._length = new Length(this.buffer.length)
+    this._length = new Length(this.bytes.length)
   }
 
   size() {
@@ -52,7 +53,7 @@ export class OctetString {
 
     const content = binary.offset
 
-    binary.write(this.buffer)
+    binary.write(this.bytes)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)
@@ -83,6 +84,6 @@ export class OctetString {
   }
 
   toString() {
-    return `OCTET STRING ${this.buffer.toString("hex")}`
+    return `OCTET STRING ${Bytes.toHex(this.bytes)}`
   }
 }

@@ -18,16 +18,22 @@ npm i @hazae41/asn1
 - Almost all universal triplets
 - Implicit and explicit tagged types
 
+<<<<<<< HEAD
 ### [Upcoming features](https://github.com/sponsors/hazae41)
+=======
+### Upcoming features
+- More time types
+>>>>>>> 11587d4 (get rid of buffers)
 - More string types 
 
 ### Usage
 
 ```typescript
-const input = Buffer.from([0x01, 0x01, 0xFF])
-const triplet = DER.fromBuffer(buffer)
+const input = new Uint8Array([0x01, 0x01, 0xFF])
 
-console.log(triplet.toString()) // BOOLEAN true
+const triplet = DER.fromBytes(input) // Boolean
 
-const output = DER.toBuffer(triplet)
+console.log(triplet.toString()) // "BOOLEAN true"
+
+const output = DER.toBytes(triplet) // Uint8Array
 ```

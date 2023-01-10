@@ -1,4 +1,5 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "libs/bytes/bytes.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -44,7 +45,7 @@ export class UTCTime {
     return length
   }
 
-  private _buffer?: Buffer
+  private _bytes?: Uint8Array
 
   prepare() {
     const year = this.value.getUTCFullYear()
@@ -59,10 +60,10 @@ export class UTCTime {
     const mm = pad2(this.value.getUTCMinutes())
     const ss = pad2(this.value.getUTCSeconds())
 
-    const buffer = Buffer.from(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
+    const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
 
-    this._buffer = buffer
-    this._length = new Length(buffer.length)
+    this._bytes = bytes
+    this._length = new Length(bytes.length)
   }
 
   size() {
@@ -81,7 +82,7 @@ export class UTCTime {
 
     const content = binary.offset
 
-    const buffer = this._buffer
+    const buffer = this._bytes
 
     if (!buffer)
       throw new Error(`Unprepared buffer`)

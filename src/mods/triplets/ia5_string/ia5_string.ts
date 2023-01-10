@@ -1,4 +1,5 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "libs/bytes/bytes.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -32,13 +33,13 @@ export class IA5String {
     return length
   }
 
-  private _buffer?: Buffer
+  private _bytes?: Uint8Array
 
   prepare() {
-    const buffer = Buffer.from(this.value, "ascii")
+    const bytes = Bytes.fromAscii(this.value)
 
-    this._buffer = buffer
-    this._length = new Length(buffer.length)
+    this._bytes = bytes
+    this._length = new Length(bytes.length)
   }
 
   size() {
@@ -57,7 +58,7 @@ export class IA5String {
 
     const content = binary.offset
 
-    const buffer = this._buffer
+    const buffer = this._bytes
 
     if (!buffer)
       throw new Error(`Unprepared buffer`)
@@ -84,8 +85,8 @@ export class IA5String {
   static read2(binary: Binary, length: number) {
     const start = binary.offset
 
-    const buffer = binary.read(length)
-    const value = buffer.toString("ascii")
+    const bytes = binary.read(length)
+    const value = Bytes.toAscii(bytes)
 
     if (binary.offset - start !== length)
       throw new Error(`Invalid length`)

@@ -1,5 +1,6 @@
 import { Binary } from "@hazae41/binary";
 import { assert, test } from "@hazae41/phobos";
+import { Bytes } from "libs/bytes/bytes.js";
 import { DER } from "mods/der.js";
 import { Set } from "mods/triplets/set/set.js";
 import { relative, resolve } from "node:path";
@@ -10,7 +11,7 @@ console.log(relative(directory, pathname.replace(".cjs", ".ts")))
 
 function hexToBinary(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Buffer.from(hex2, "hex")
+  const buffer = Bytes.fromHex(hex2)
   return new Binary(buffer)
 }
 

@@ -8,7 +8,7 @@ export class Unknown {
 
   constructor(
     readonly type: Type,
-    readonly buffer: Buffer,
+    readonly bytes: Uint8Array,
   ) { }
 
   private _length?: Length
@@ -25,7 +25,7 @@ export class Unknown {
   }
 
   prepare() {
-    this._length = new Length(this.buffer.length)
+    this._length = new Length(this.bytes.length)
   }
 
   size() {
@@ -44,7 +44,7 @@ export class Unknown {
 
     const content = binary.offset
 
-    binary.write(this.buffer)
+    binary.write(this.bytes)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)

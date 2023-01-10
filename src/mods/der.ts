@@ -64,13 +64,13 @@ export namespace DER {
     return Unknown.read(binary)
   }
 
-  export function fromBuffer(buffer: Buffer) {
-    return read(new Binary(buffer))
+  export function fromBytes(bytes: Uint8Array) {
+    return read(new Binary(bytes))
   }
 
-  export function toBuffer(triplet: Triplet) {
+  export function toBytes(triplet: Triplet) {
     const binary = Binary.allocUnsafe(size(triplet))
     write(binary, triplet)
-    return binary.buffer
+    return binary.bytes
   }
 }
