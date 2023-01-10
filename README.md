@@ -18,12 +18,8 @@ npm i @hazae41/asn1
 - Almost all universal triplets
 - Implicit and explicit tagged types
 
-<<<<<<< HEAD
 ### [Upcoming features](https://github.com/sponsors/hazae41)
-=======
-### Upcoming features
 - More time types
->>>>>>> 11587d4 (get rid of buffers)
 - More string types 
 
 ### Usage
