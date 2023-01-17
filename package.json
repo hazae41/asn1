@@ -22,11 +22,10 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@hazae41/binary": "^1.1.4",
-    "tslib": "^2.4.1"
+    "@hazae41/binary": "^1.1.7"
   },
   "devDependencies": {
-    "@hazae41/phobos": "^1.0.7",
+    "@hazae41/phobos": "^1.0.10",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/node": "^18.11.18",
     "rimraf": "^4.1.0",

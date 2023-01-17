@@ -6,7 +6,7 @@ import { relative, resolve } from "node:path";
 
 const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
-console.log(relative(directory, pathname.replace(".cjs", ".ts")))
+console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function hexToBinary(hex: string) {
   const hex2 = hex.replaceAll(" ", "")

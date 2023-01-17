@@ -47,7 +47,7 @@ export namespace PKCS7 {
 
 const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
-console.log(relative(directory, pathname.replace(".cjs", ".ts")))
+console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function compare(a: Uint8Array, b: Uint8Array) {
   return Bytes.toHex(a) === Bytes.toHex(b)
