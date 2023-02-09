@@ -7,7 +7,9 @@ export class Length {
     readonly value: number
   ) { }
 
-  #values?: Array<number>
+  #data?: {
+    values: Array<number>
+  }
 
   prepare() {
     if (this.value < 128)
@@ -22,20 +24,15 @@ export class Length {
       value = Math.floor(value / 256)
     } while (value)
 
-    this.#values = values.reverse()
+    values.reverse()
+
+    return this.#data = { values }
   }
 
   size() {
     if (this.value < 128)
       return 1
-
-    this.prepare()
-
-    const values = this.#values
-
-    if (!values)
-      throw new Error(`Unprepared values`)
-
+    const { values } = this.prepare()!
     return 1 + values.length
   }
 
@@ -43,10 +40,9 @@ export class Length {
     if (this.value < 128)
       return binary.writeUint8(this.value)
 
-    const values = this.#values
-
-    if (!values)
-      throw new Error(`Unprepared values`)
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+    const { values } = this.#data
 
     const count = new Bitset(values.length, 8)
       .enableBE(0)

@@ -7,7 +7,9 @@ export class VLQ {
     readonly value: number
   ) { }
 
-  #values?: Array<number>
+  #data?: {
+    values: Array<number>
+  }
 
   prepare() {
     let value = this.value
@@ -19,25 +21,19 @@ export class VLQ {
       value = Math.floor(value / 128)
     } while (value)
 
-    this.#values = values.reverse()
+    values.reverse()
+    return this.#data = { values }
   }
 
   size() {
-    this.prepare()
-
-    const values = this.#values
-
-    if (!values)
-      throw new Error(`Unprepared values`)
-
+    const { values } = this.prepare()
     return values.length
   }
 
   write(binary: Binary) {
-    const values = this.#values
-
-    if (!values)
-      throw new Error(`Unprepared values`)
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+    const { values } = this.#data
 
     for (let i = 0; i < values.length - 1; i++) {
       const bitset = new Bitset(values[i], 8)

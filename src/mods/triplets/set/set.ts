@@ -24,19 +24,6 @@ export class Set {
     return this.#class.type
   }
 
-  #length?: Length
-
-  get length() {
-    this.prepare()
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
-    return length
-  }
-
   #data?: {
     length: Length
   }
