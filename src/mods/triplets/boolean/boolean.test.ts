@@ -1,6 +1,6 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Bytes } from "libs/bytes/bytes.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { relative, resolve } from "node:path";
 

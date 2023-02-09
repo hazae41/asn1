@@ -1,6 +1,6 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Bytes } from "libs/bytes/bytes.js";
 import { OctetString } from "mods/triplets/octet_string/octet_string.js";
 import { relative, resolve } from "node:path";
 

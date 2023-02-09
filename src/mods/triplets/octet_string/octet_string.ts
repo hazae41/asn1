@@ -1,5 +1,5 @@
 import { Binary } from "@hazae41/binary";
-import { Bytes } from "libs/bytes/bytes.js";
+import { Bytes } from "@hazae41/bytes";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";

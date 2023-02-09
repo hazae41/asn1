@@ -23,7 +23,8 @@
   },
   "dependencies": {
     "@hazae41/binary": "^1.1.7",
-    "@hazae41/bitset": "^1.0.1"
+    "@hazae41/bitset": "^1.0.1",
+    "@hazae41/bytes": "^1.0.3"
   },
   "devDependencies": {
     "@hazae41/phobos": "^1.0.10",

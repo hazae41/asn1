@@ -3,9 +3,9 @@ export * from "./triplets/index.test.js";
 export * from "./type/type.test.js";
 export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
+import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { readFile } from "fs/promises";
-import { Bytes } from "libs/bytes/bytes.js";
 import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
 

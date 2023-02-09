@@ -1,6 +1,6 @@
 import { Binary } from "@hazae41/binary";
+import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Bytes } from "libs/bytes/bytes.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { relative, resolve } from "node:path";
 
