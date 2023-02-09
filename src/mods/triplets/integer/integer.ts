@@ -1,5 +1,5 @@
 import { Binary } from "@hazae41/binary";
-import { Bitset } from "libs/bitset/bitset.js";
+import { Bitset } from "@hazae41/bitset";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -86,7 +86,7 @@ export class Integer {
     const negative = this.value < 0
 
     const first = new Bitset(sign(values[0], negative), 8)
-      .set(7, negative)
+      .setBE(0, negative)
       .value
     binary.writeUint8(first)
 

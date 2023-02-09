@@ -1,5 +1,5 @@
 import { Binary } from "@hazae41/binary";
-import { Bitset } from "libs/bitset/bitset.js";
+import { Bitset } from "@hazae41/bitset";
 
 export class Type {
   readonly #class = Type
@@ -68,9 +68,9 @@ export class Type {
     const type = binary.readUint8()
     const bitset = new Bitset(type, 8)
 
-    const clazz = bitset.first(2)
-    const wrap = bitset.get(5)
-    const tag = bitset.last(5)
+    const clazz = bitset.first(2).value
+    const wrap = Number(bitset.getLE(5))
+    const tag = bitset.last(5).value
 
     if (tag > 30) // TODO
       throw new Error(`Unimplemented tag`)

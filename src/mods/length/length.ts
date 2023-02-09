@@ -1,5 +1,5 @@
 import { Binary } from "@hazae41/binary";
-import { Bitset } from "libs/bitset/bitset.js";
+import { Bitset } from "@hazae41/bitset";
 
 export class Length {
   readonly #class = Length
@@ -8,7 +8,7 @@ export class Length {
     readonly value: number
   ) { }
 
-  _values?: Array<number>
+  private _values?: Array<number>
 
   prepare() {
     if (this.value < 128)
@@ -50,7 +50,7 @@ export class Length {
       throw new Error(`Unprepared values`)
 
     const count = new Bitset(values.length, 8)
-      .enable(7)
+      .enableBE(0)
       .value
 
     binary.writeUint8(count)
@@ -68,7 +68,7 @@ export class Length {
       return new this(first)
 
     const count = new Bitset(first, 8)
-      .disable(7)
+      .disableBE(0)
       .value
 
     let value = 0

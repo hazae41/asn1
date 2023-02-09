@@ -22,7 +22,8 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@hazae41/binary": "^1.1.7"
+    "@hazae41/binary": "^1.1.7",
+    "@hazae41/bitset": "^1.0.1"
   },
   "devDependencies": {
     "@hazae41/phobos": "^1.0.10",

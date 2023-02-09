@@ -1,5 +1,5 @@
 import { Binary } from "@hazae41/binary";
-import { Bitset } from "libs/bitset/bitset.js";
+import { Bitset } from "@hazae41/bitset";
 
 export class VLQ {
   readonly #class = VLQ
@@ -42,7 +42,7 @@ export class VLQ {
 
     for (let i = 0; i < values.length - 1; i++) {
       const bitset = new Bitset(values[i], 8)
-      binary.writeUint8(bitset.enable(7).value)
+      binary.writeUint8(bitset.enableBE(0).value)
     }
 
     binary.writeUint8(values[values.length - 1])
@@ -60,7 +60,7 @@ export class VLQ {
       }
 
       const bitset = new Bitset(current, 8)
-      values.push(bitset.disable(7).value)
+      values.push(bitset.disableBE(0).value)
     }
 
     let value = 0
