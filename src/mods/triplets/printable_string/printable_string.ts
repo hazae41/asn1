@@ -20,12 +20,12 @@ export class PrintableString {
     return this.#class.type
   }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -33,7 +33,7 @@ export class PrintableString {
     return length
   }
 
-  private _bytes?: Uint8Array
+  #bytes?: Uint8Array
 
   prepare() {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
@@ -41,8 +41,8 @@ export class PrintableString {
 
     const bytes = Bytes.fromUtf8(this.value)
 
-    this._bytes = bytes
-    this._length = new Length(bytes.length)
+    this.#bytes = bytes
+    this.#length = new Length(bytes.length)
   }
 
   size() {
@@ -52,7 +52,7 @@ export class PrintableString {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -61,7 +61,7 @@ export class PrintableString {
 
     const content = binary.offset
 
-    const buffer = this._bytes
+    const buffer = this.#bytes
 
     if (!buffer)
       throw new Error(`Unprepared buffer`)

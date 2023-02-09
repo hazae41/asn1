@@ -21,12 +21,12 @@ export class BitString {
     return this.#class.type
   }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -35,7 +35,7 @@ export class BitString {
   }
 
   prepare() {
-    this._length = new Length(1 + this.bytes.length)
+    this.#length = new Length(1 + this.bytes.length)
   }
 
   size() {
@@ -45,7 +45,7 @@ export class BitString {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)

@@ -11,12 +11,12 @@ export class Unknown {
     readonly bytes: Uint8Array,
   ) { }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -25,7 +25,7 @@ export class Unknown {
   }
 
   prepare() {
-    this._length = new Length(this.bytes.length)
+    this.#length = new Length(this.bytes.length)
   }
 
   size() {
@@ -35,7 +35,7 @@ export class Unknown {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)

@@ -17,12 +17,12 @@ export class Null {
     return this.#class.type
   }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -31,7 +31,7 @@ export class Null {
   }
 
   prepare() {
-    this._length = new Length(0)
+    this.#length = new Length(0)
   }
 
   size() {
@@ -41,7 +41,7 @@ export class Null {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)

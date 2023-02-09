@@ -20,12 +20,12 @@ export class OctetString {
     return this.#class.type
   }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -34,7 +34,7 @@ export class OctetString {
   }
 
   prepare() {
-    this._length = new Length(this.bytes.length)
+    this.#length = new Length(this.bytes.length)
   }
 
   size() {
@@ -44,7 +44,7 @@ export class OctetString {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)

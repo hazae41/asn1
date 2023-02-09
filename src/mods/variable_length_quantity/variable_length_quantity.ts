@@ -2,13 +2,12 @@ import { Binary } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class VLQ {
-  readonly #class = VLQ
 
   constructor(
     readonly value: number
   ) { }
 
-  private _values?: Array<number>
+  #values?: Array<number>
 
   prepare() {
     let value = this.value
@@ -20,13 +19,13 @@ export class VLQ {
       value = Math.floor(value / 128)
     } while (value)
 
-    this._values = values.reverse()
+    this.#values = values.reverse()
   }
 
   size() {
     this.prepare()
 
-    const values = this._values
+    const values = this.#values
 
     if (!values)
       throw new Error(`Unprepared values`)
@@ -35,7 +34,7 @@ export class VLQ {
   }
 
   write(binary: Binary) {
-    const values = this._values
+    const values = this.#values
 
     if (!values)
       throw new Error(`Unprepared values`)

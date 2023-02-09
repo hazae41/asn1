@@ -19,12 +19,12 @@ export class Boolean {
     return this.#class.type
   }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -33,7 +33,7 @@ export class Boolean {
   }
 
   prepare() {
-    this._length = new Length(1)
+    this.#length = new Length(1)
   }
 
   size() {
@@ -43,7 +43,7 @@ export class Boolean {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)

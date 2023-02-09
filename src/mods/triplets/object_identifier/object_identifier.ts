@@ -20,12 +20,12 @@ export class ObjectIdentifier {
     return this.#class.type
   }
 
-  private _length?: Length
+  #length?: Length
 
   get length() {
     this.prepare()
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -33,8 +33,8 @@ export class ObjectIdentifier {
     return length
   }
 
-  private _header?: [number, number]
-  private _values?: Array<VLQ>
+  #header?: [number, number]
+  #values?: Array<VLQ>
 
   prepare() {
     const values = new Array<VLQ>()
@@ -42,7 +42,7 @@ export class ObjectIdentifier {
 
     const first = Number(texts[0])
     const second = Number(texts[1])
-    this._header = [first, second]
+    this.#header = [first, second]
 
     let size = 1
 
@@ -52,8 +52,8 @@ export class ObjectIdentifier {
       values.push(vlq)
     }
 
-    this._values = values
-    this._length = new Length(size)
+    this.#values = values
+    this.#length = new Length(size)
   }
 
   size() {
@@ -63,7 +63,7 @@ export class ObjectIdentifier {
   write(binary: Binary) {
     this.type.write(binary)
 
-    const length = this._length
+    const length = this.#length
 
     if (!length)
       throw new Error(`Unprepared length`)
@@ -72,7 +72,7 @@ export class ObjectIdentifier {
 
     const content = binary.offset
 
-    const header = this._header
+    const header = this.#header
 
     if (!header)
       throw new Error(`Unprepared header`)
@@ -80,7 +80,7 @@ export class ObjectIdentifier {
     const [first, second] = header
     binary.writeUint8((first * 40) + second)
 
-    const values = this._values
+    const values = this.#values
 
     if (!values)
       throw new Error(`Unprepared values`)

@@ -8,7 +8,7 @@ export class Length {
     readonly value: number
   ) { }
 
-  private _values?: Array<number>
+  #values?: Array<number>
 
   prepare() {
     if (this.value < 128)
@@ -23,7 +23,7 @@ export class Length {
       value = Math.floor(value / 256)
     } while (value)
 
-    this._values = values.reverse()
+    this.#values = values.reverse()
   }
 
   size() {
@@ -32,7 +32,7 @@ export class Length {
 
     this.prepare()
 
-    const values = this._values
+    const values = this.#values
 
     if (!values)
       throw new Error(`Unprepared values`)
@@ -44,7 +44,7 @@ export class Length {
     if (this.value < 128)
       return binary.writeUint8(this.value)
 
-    const values = this._values
+    const values = this.#values
 
     if (!values)
       throw new Error(`Unprepared values`)
