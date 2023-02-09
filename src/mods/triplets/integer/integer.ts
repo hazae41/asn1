@@ -1,7 +1,7 @@
 import { Binary } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 import { Length } from "mods/length/length.js";
-import { Triplets } from "mods/triplets/triplet.js";
+import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
 const bn256 = BigInt(256)

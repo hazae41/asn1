@@ -1,6 +1,7 @@
 import { Binary } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
-import { Triplet, Triplets } from "mods/triplets/triplet.js";
+import { Triplet } from "mods/triplets/triplet.js";
+import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
 const stringify = (set: Set) => `SET {
