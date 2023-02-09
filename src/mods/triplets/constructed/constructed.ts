@@ -32,11 +32,9 @@ export class Constructed {
   write(binary: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
+    const { length } = this.#data
 
     this.type.write(binary)
-
-    const length = this.#data.length
-
     length.write(binary)
 
     const content = binary.offset
