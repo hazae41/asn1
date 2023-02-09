@@ -15,34 +15,27 @@ export class Constructed {
     readonly triplets: Triplet[]
   ) { }
 
-  #length?: Length
-
-  get length() {
-    this.prepare()
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
-    return length
+  #data?: {
+    length: Length
   }
 
   prepare() {
-    this.#length = new Length(this.triplets.reduce((p, c) => p + c.size(), 0))
+    const length = new Length(this.triplets.reduce((p, c) => p + c.size(), 0))
+    return this.#data = { length }
   }
 
   size() {
-    return Triplets.size(this.length)
+    const { length } = this.prepare()
+    return Triplets.size(length)
   }
 
   write(binary: Binary) {
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+
     this.type.write(binary)
 
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
+    const length = this.#data.length
 
     length.write(binary)
 

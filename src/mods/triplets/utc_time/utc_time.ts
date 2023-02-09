@@ -32,20 +32,10 @@ export class UTCTime {
     return this.#class.type
   }
 
-  #length?: Length
-
-  get length() {
-    this.prepare()
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
-    return length
+  #data?: {
+    length: Length,
+    bytes: Uint8Array
   }
-
-  #bytes?: Uint8Array
 
   prepare() {
     const year = this.value.getUTCFullYear()
@@ -61,33 +51,26 @@ export class UTCTime {
     const ss = pad2(this.value.getUTCSeconds())
 
     const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
-
-    this.#bytes = bytes
-    this.#length = new Length(bytes.length)
+    const length = new Length(bytes.length)
+    return this.#data = { length, bytes }
   }
 
   size() {
-    return Triplets.size(this.length)
+    const { length } = this.prepare()
+    return Triplets.size(length)
   }
 
   write(binary: Binary) {
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+    const { length, bytes } = this.#data
+
     this.type.write(binary)
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
     length.write(binary)
 
     const content = binary.offset
 
-    const buffer = this.#bytes
-
-    if (!buffer)
-      throw new Error(`Unprepared buffer`)
-
-    binary.write(buffer)
+    binary.write(bytes)
 
     if (binary.offset - content !== length.value)
       throw new Error(`Invalid length`)

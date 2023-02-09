@@ -17,35 +17,26 @@ export class Null {
     return this.#class.type
   }
 
-  #length?: Length
-
-  get length() {
-    this.prepare()
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
-    return length
+  #data?: {
+    length: Length
   }
 
   prepare() {
-    this.#length = new Length(0)
+    const length = new Length(0)
+    return this.#data = { length }
   }
 
   size() {
-    return Triplets.size(this.length)
+    const { length } = this.prepare()
+    return Triplets.size(length)
   }
 
   write(binary: Binary) {
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+    const { length } = this.#data
+
     this.type.write(binary)
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
     length.write(binary)
 
     return

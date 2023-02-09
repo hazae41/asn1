@@ -1,13 +1,8 @@
 import { Binary } from "@hazae41/binary"
-import { Length } from "mods/length/length.js"
 import { Type } from "mods/type/type.js"
 
 export interface Typed {
   type: Type
-}
-
-export interface Lengthed {
-  length: Length
 }
 
 export interface Sizeable {
@@ -24,7 +19,6 @@ export interface ToStringable {
 
 export type Triplet =
   & Typed
-  & Lengthed
   & Writeable
   & Sizeable
   & ToStringable

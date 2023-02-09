@@ -10,35 +10,26 @@ export class Unknown {
     readonly bytes: Uint8Array,
   ) { }
 
-  #length?: Length
-
-  get length() {
-    this.prepare()
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
-    return length
+  #data?: {
+    length: Length
   }
 
   prepare() {
-    this.#length = new Length(this.bytes.length)
+    const length = new Length(this.bytes.length)
+    return this.#data = { length }
   }
 
   size() {
-    return Triplets.size(this.length)
+    const { length } = this.prepare()
+    return Triplets.size(length)
   }
 
   write(binary: Binary) {
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+    const { length } = this.#data
+
     this.type.write(binary)
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
     length.write(binary)
 
     const content = binary.offset

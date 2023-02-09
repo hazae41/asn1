@@ -28,20 +28,10 @@ export class Integer {
     return this.#class.type
   }
 
-  #length?: Length
-
-  get length() {
-    this.prepare()
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
-    return length
+  #data?: {
+    length: Length
+    values: Array<number>
   }
-
-  #values?: Array<number>
 
   prepare() {
     let value = this.value < 0
@@ -58,30 +48,26 @@ export class Integer {
     if (values[values.length - 1] > 127)
       values.push(0)
 
-    this.#values = values.reverse()
-    this.#length = new Length(values.length)
+    values.reverse()
+
+    const length = new Length(values.length)
+    return this.#data = { length, values }
   }
 
   size() {
-    return Triplets.size(this.length)
+    const { length } = this.prepare()
+    return Triplets.size(length)
   }
 
   write(binary: Binary) {
+    if (!this.#data)
+      throw new Error(`Unprepared`)
+    const { length, values } = this.#data
+
     this.type.write(binary)
-
-    const length = this.#length
-
-    if (!length)
-      throw new Error(`Unprepared length`)
-
     length.write(binary)
 
     const content = binary.offset
-
-    const values = this.#values
-
-    if (!values)
-      throw new Error(`Unprepared values`)
 
     const negative = this.value < 0
 
