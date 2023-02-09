@@ -1,6 +1,6 @@
 import { Binary } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { Triplets } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 
@@ -57,7 +57,7 @@ export class ObjectIdentifier {
   }
 
   size() {
-    return Triplet.size(this.length)
+    return Triplets.size(this.length)
   }
 
   write(binary: Binary) {

@@ -18,6 +18,10 @@ export interface Writeable {
   write(binary: Binary): void
 }
 
+export interface Exportable {
+  export(): Uint8Array
+}
+
 export interface ToStringable {
   toString(): string
 }
@@ -29,7 +33,7 @@ export type Triplet =
   & Sizeable
   & ToStringable
 
-export namespace Triplet {
+export namespace Triplets {
 
   export function size(length: Length) {
     return Type.size() + length.size() + length.value

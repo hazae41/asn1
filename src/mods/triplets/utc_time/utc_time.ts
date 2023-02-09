@@ -1,7 +1,7 @@
 import { Binary } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { Triplets } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 function pad2(value: number) {
@@ -67,7 +67,7 @@ export class UTCTime {
   }
 
   size() {
-    return Triplet.size(this.length)
+    return Triplets.size(this.length)
   }
 
   write(binary: Binary) {

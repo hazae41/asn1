@@ -1,7 +1,7 @@
 import { Binary } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { Triplets } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 const bn256 = BigInt(256)
@@ -63,7 +63,7 @@ export class Integer {
   }
 
   size() {
-    return Triplet.size(this.length)
+    return Triplets.size(this.length)
   }
 
   write(binary: Binary) {

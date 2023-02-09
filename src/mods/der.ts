@@ -18,14 +18,6 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  export function size(triplet: Triplet) {
-    return triplet.size()
-  }
-
-  export function write(binary: Binary, triplet: Triplet) {
-    triplet.write(binary)
-  }
-
   export function read(binary: Binary): Triplet {
     const start = binary.offset
     const type = Type.read(binary)
@@ -69,8 +61,8 @@ export namespace DER {
   }
 
   export function toBytes(triplet: Triplet) {
-    const binary = Binary.allocUnsafe(size(triplet))
-    write(binary, triplet)
+    const binary = Binary.allocUnsafe(triplet.size())
+    triplet.write(binary)
     return binary.bytes
   }
 }
