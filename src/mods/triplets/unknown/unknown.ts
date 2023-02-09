@@ -4,7 +4,6 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class Unknown {
-  readonly #class = Unknown
 
   constructor(
     readonly type: Type,

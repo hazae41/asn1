@@ -2,7 +2,6 @@ import { Binary } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class Length {
-  readonly #class = Length
 
   constructor(
     readonly value: number
