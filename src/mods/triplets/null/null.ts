@@ -50,6 +50,15 @@ export class Null {
 
     const length = Length.read(binary)
 
+    return this.readl(binary, length.value)
+  }
+
+  static readl(binary: Binary, length: number) {
+    const start = binary.offset
+
+    if (binary.offset - start !== length)
+      throw new Error(`Invalid length`)
+
     return new this()
   }
 

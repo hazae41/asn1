@@ -65,10 +65,10 @@ export class Sequence {
 
     const length = Length.read(binary)
 
-    return this.read2(binary, length.value, read)
+    return this.readl(binary, length.value, read)
   }
 
-  static read2(binary: Binary, length: number, read: (binary: Binary) => Triplet) {
+  static readl(binary: Binary, length: number, read: (binary: Binary) => Triplet) {
     const start = binary.offset
 
     const triplets = new Array<Triplet>()

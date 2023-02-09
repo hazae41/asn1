@@ -56,14 +56,18 @@ export class Constructed {
 
     const length = Length.read(binary)
 
+    return this.readl(type, binary, length.value, read)
+  }
+
+  static readl(type: Type, binary: Binary, length: number, read: (binary: Binary) => Triplet) {
     const start = binary.offset
 
     const triplets = new Array<Triplet>()
 
-    while (binary.offset - start < length.value)
+    while (binary.offset - start < length)
       triplets.push(read(binary))
 
-    if (binary.offset - start !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(type, triplets)

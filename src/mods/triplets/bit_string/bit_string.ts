@@ -62,10 +62,10 @@ export class BitString {
 
     const length = Length.read(binary)
 
-    return this.read2(binary, length.value)
+    return this.readl(binary, length.value)
   }
 
-  static read2(binary: Binary, length: number) {
+  static readl(binary: Binary, length: number) {
     const start = binary.offset
 
     const padding = binary.readUint8()

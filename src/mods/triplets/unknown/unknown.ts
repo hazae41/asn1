@@ -44,14 +44,17 @@ export class Unknown {
 
   static read(binary: Binary) {
     const type = Type.read(binary)
-
     const length = Length.read(binary)
 
+    return this.readl(type, binary, length.value)
+  }
+
+  static readl(type: Type, binary: Binary, length: number) {
     const start = binary.offset
 
-    const buffer = binary.read(length.value)
+    const buffer = binary.read(length)
 
-    if (binary.offset - start !== length.value)
+    if (binary.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(type, buffer)
