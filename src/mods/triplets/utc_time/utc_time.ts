@@ -60,39 +60,39 @@ export class UTCTime {
     return Triplets.size(length)
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length, bytes } = this.#data
 
-    this.type.write(binary)
-    length.write(binary)
+    this.type.write(cursor)
+    length.write(cursor)
 
-    const content = binary.offset
+    const content = cursor.offset
 
-    binary.write(bytes)
+    cursor.write(bytes)
 
-    if (binary.offset - content !== length.value)
+    if (cursor.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
     return
   }
 
-  static read(binary: Binary) {
-    const type = Type.read(binary)
+  static read(cursor: Binary) {
+    const type = Type.read(cursor)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.read(binary)
+    const length = Length.read(cursor)
 
-    return this.readl(binary, length.value)
+    return this.readl(cursor, length.value)
   }
 
-  static readl(binary: Binary, length: number) {
-    const start = binary.offset
+  static readl(cursor: Binary, length: number) {
+    const start = cursor.offset
 
-    const text = binary.readString(length)
+    const text = cursor.readString(length)
 
     if (text.length !== 13)
       throw new Error(`Invalid format`)
@@ -115,7 +115,7 @@ export class UTCTime {
     date.setUTCHours(hh, mm, ss)
     date.setUTCMilliseconds(0)
 
-    if (binary.offset - start !== length)
+    if (cursor.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(date)

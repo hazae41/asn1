@@ -55,17 +55,17 @@ export class Type {
     return this.#class.size()
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     let value = 0
     value |= this.clazz << 6
     value |= this.wrap << 5
     value |= this.tag
 
-    binary.writeUint8(value)
+    cursor.writeUint8(value)
   }
 
-  static read(binary: Binary) {
-    const type = binary.readUint8()
+  static read(cursor: Binary) {
+    const type = cursor.readUint8()
     const bitset = new Bitset(type, 8)
 
     const clazz = bitset.first(2).value

@@ -10,7 +10,7 @@ export interface Sizeable {
 }
 
 export interface Writeable {
-  write(binary: Binary): void
+  write(cursor: Binary): void
 }
 
 export interface ToStringable {

@@ -15,8 +15,8 @@ function hexToBinary(hex: string) {
 }
 
 function hexToVLQ(hex: string) {
-  const binary = hexToBinary(hex)
-  return VLQ.read(binary).value
+  const cursor = hexToBinary(hex)
+  return VLQ.read(cursor).value
 }
 
 test("Read", async () => {

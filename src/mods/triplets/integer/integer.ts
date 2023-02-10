@@ -59,58 +59,58 @@ export class Integer {
     return Triplets.size(length)
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length, values } = this.#data
 
-    this.type.write(binary)
-    length.write(binary)
+    this.type.write(cursor)
+    length.write(cursor)
 
-    const content = binary.offset
+    const content = cursor.offset
 
     const negative = this.value < 0
 
     const first = new Bitset(sign(values[0], negative), 8)
       .setBE(0, negative)
       .value
-    binary.writeUint8(first)
+    cursor.writeUint8(first)
 
     for (let i = 1; i < values.length; i++)
-      binary.writeUint8(sign(values[i], negative))
+      cursor.writeUint8(sign(values[i], negative))
 
-    if (binary.offset - content !== length.value)
+    if (cursor.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
     return
   }
 
-  static read(binary: Binary) {
-    const type = Type.read(binary)
+  static read(cursor: Binary) {
+    const type = Type.read(cursor)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.read(binary)
+    const length = Length.read(cursor)
 
-    return this.readl(binary, length.value)
+    return this.readl(cursor, length.value)
   }
 
-  static readl(binary: Binary, length: number) {
-    const start = binary.offset
+  static readl(cursor: Binary, length: number) {
+    const start = cursor.offset
 
     let value = BigInt(0)
 
-    const negative = binary.getUint8() > 127
+    const negative = cursor.getUint8() > 127
 
     for (let i = 0; i < length; i++)
-      value = (value * bn256) + BigInt(sign(binary.readUint8(), negative))
+      value = (value * bn256) + BigInt(sign(cursor.readUint8(), negative))
 
     value = negative
       ? ~value
       : value
 
-    if (binary.offset - start !== length)
+    if (cursor.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(value)

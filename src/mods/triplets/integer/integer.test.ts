@@ -15,8 +15,8 @@ function hexToBinary(hex: string) {
 }
 
 function hexToInteger(hex: string) {
-  const binary = hexToBinary(hex)
-  const integer = Integer.read(binary)
+  const cursor = hexToBinary(hex)
+  const integer = Integer.read(cursor)
   return integer.value
 }
 

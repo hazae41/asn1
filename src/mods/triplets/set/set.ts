@@ -38,45 +38,45 @@ export class Set {
     return Triplets.size(length)
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length } = this.#data
 
-    this.type.write(binary)
-    length.write(binary)
+    this.type.write(cursor)
+    length.write(cursor)
 
-    const content = binary.offset
+    const content = cursor.offset
 
     for (const triplet of this.triplets)
-      triplet.write(binary)
+      triplet.write(cursor)
 
-    if (binary.offset - content !== length.value)
+    if (cursor.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
     return
   }
 
-  static read(binary: Binary, read: (binary: Binary) => Triplet) {
-    const type = Type.read(binary)
+  static read(cursor: Binary, read: (cursor: Binary) => Triplet) {
+    const type = Type.read(cursor)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.read(binary)
+    const length = Length.read(cursor)
 
-    return this.readl(binary, length.value, read)
+    return this.readl(cursor, length.value, read)
   }
 
-  static readl(binary: Binary, length: number, read: (binary: Binary) => Triplet) {
-    const start = binary.offset
+  static readl(cursor: Binary, length: number, read: (cursor: Binary) => Triplet) {
+    const start = cursor.offset
 
     const inner = new Array<Triplet>()
 
-    while (binary.offset - start < length)
-      inner.push(read(binary))
+    while (cursor.offset - start < length)
+      inner.push(read(cursor))
 
-    if (binary.offset - start !== length)
+    if (cursor.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(inner)

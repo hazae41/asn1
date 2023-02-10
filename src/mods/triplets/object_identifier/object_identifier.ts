@@ -51,52 +51,52 @@ export class ObjectIdentifier {
     return Triplets.size(length)
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length, header, values } = this.#data
 
-    this.type.write(binary)
-    length.write(binary)
+    this.type.write(cursor)
+    length.write(cursor)
 
-    const content = binary.offset
+    const content = cursor.offset
 
     const [first, second] = header
-    binary.writeUint8((first * 40) + second)
+    cursor.writeUint8((first * 40) + second)
 
     for (const value of values)
-      value.write(binary)
+      value.write(cursor)
 
-    if (binary.offset - content !== length.value)
+    if (cursor.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
     return
   }
 
-  static read(binary: Binary) {
-    const type = Type.read(binary)
+  static read(cursor: Binary) {
+    const type = Type.read(cursor)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.read(binary)
+    const length = Length.read(cursor)
 
-    return this.readl(binary, length.value)
+    return this.readl(cursor, length.value)
   }
 
-  static readl(binary: Binary, length: number) {
-    const start = binary.offset
+  static readl(cursor: Binary, length: number) {
+    const start = cursor.offset
 
-    const header = binary.readUint8()
+    const header = cursor.readUint8()
     const first = Math.floor(header / 40)
     const second = header % 40
 
     const values = [first, second]
 
-    while (binary.offset - start < length)
-      values.push(VLQ.read(binary).value)
+    while (cursor.offset - start < length)
+      values.push(VLQ.read(cursor).value)
 
-    if (binary.offset - start !== length)
+    if (cursor.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(values.join("."))

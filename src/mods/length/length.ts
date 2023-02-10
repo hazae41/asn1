@@ -36,9 +36,9 @@ export class Length {
     return 1 + values.length
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (this.value < 128)
-      return binary.writeUint8(this.value)
+      return cursor.writeUint8(this.value)
 
     if (!this.#data)
       throw new Error(`Unprepared`)
@@ -48,16 +48,16 @@ export class Length {
       .enableBE(0)
       .value
 
-    binary.writeUint8(count)
+    cursor.writeUint8(count)
 
     for (const value of values)
-      binary.writeUint8(value)
+      cursor.writeUint8(value)
 
     return
   }
 
-  static read(binary: Binary) {
-    const first = binary.readUint8()
+  static read(cursor: Binary) {
+    const first = cursor.readUint8()
 
     if (first < 128)
       return new this(first)
@@ -69,7 +69,7 @@ export class Length {
     let value = 0
 
     for (let i = 0; i < count; i++)
-      value = (value * 256) + binary.readUint8()
+      value = (value * 256) + cursor.readUint8()
 
     return new this(value)
   }

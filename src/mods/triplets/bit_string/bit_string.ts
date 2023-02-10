@@ -35,43 +35,43 @@ export class BitString {
     return Triplets.size(length)
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length } = this.#data
 
-    this.type.write(binary)
-    length.write(binary)
+    this.type.write(cursor)
+    length.write(cursor)
 
-    const content = binary.offset
+    const content = cursor.offset
 
-    binary.writeUint8(this.padding)
-    binary.write(this.bytes)
+    cursor.writeUint8(this.padding)
+    cursor.write(this.bytes)
 
-    if (binary.offset - content !== length.value)
+    if (cursor.offset - content !== length.value)
       throw new Error(`Invalid length`)
 
     return
   }
 
-  static read(binary: Binary) {
-    const type = Type.read(binary)
+  static read(cursor: Binary) {
+    const type = Type.read(cursor)
 
     if (!this.type.equals(type))
       throw new Error(`Invalid type`)
 
-    const length = Length.read(binary)
+    const length = Length.read(cursor)
 
-    return this.readl(binary, length.value)
+    return this.readl(cursor, length.value)
   }
 
-  static readl(binary: Binary, length: number) {
-    const start = binary.offset
+  static readl(cursor: Binary, length: number) {
+    const start = cursor.offset
 
-    const padding = binary.readUint8()
-    const buffer = binary.read(length - 1)
+    const padding = cursor.readUint8()
+    const buffer = cursor.read(length - 1)
 
-    if (binary.offset - start !== length)
+    if (cursor.offset - start !== length)
       throw new Error(`Invalid length`)
 
     return new this(padding, buffer)
@@ -79,8 +79,8 @@ export class BitString {
 
   toString() {
     const bignum = BigInt("0x" + Bytes.toHex(this.bytes))
-    const binary = bignum.toString(2).padStart(this.bytes.length * 8, "0")
+    const cursor = bignum.toString(2).padStart(this.bytes.length * 8, "0")
 
-    return `BITSTRING ${binary.slice(0, binary.length - this.padding)}`
+    return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`
   }
 }

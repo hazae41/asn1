@@ -30,24 +30,24 @@ export class VLQ {
     return values.length
   }
 
-  write(binary: Binary) {
+  write(cursor: Binary) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { values } = this.#data
 
     for (let i = 0; i < values.length - 1; i++) {
       const bitset = new Bitset(values[i], 8)
-      binary.writeUint8(bitset.enableBE(0).value)
+      cursor.writeUint8(bitset.enableBE(0).value)
     }
 
-    binary.writeUint8(values[values.length - 1])
+    cursor.writeUint8(values[values.length - 1])
   }
 
-  static read(binary: Binary) {
+  static read(cursor: Binary) {
     const values = new Array<number>()
 
     while (true) {
-      const current = binary.readUint8()
+      const current = cursor.readUint8()
 
       if (current <= 127) {
         values.push(current)

@@ -15,8 +15,8 @@ function hexToBinary(hex: string) {
 }
 
 function hexToLength(hex: string) {
-  const binary = hexToBinary(hex)
-  const length = Length.read(binary)
+  const cursor = hexToBinary(hex)
+  const length = Length.read(cursor)
   return length.value
 }
 
