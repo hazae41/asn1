@@ -31,6 +31,12 @@ export namespace DER {
     return new Sequence(type, triplets.map(resolve))
   }
 
+  function resolveSet(set: Set<Opaque>) {
+    const { type, triplets } = set
+
+    return new Set(type, triplets.map(resolve))
+  }
+
   export function read(cursor: Cursor): Triplet {
     const start = cursor.offset
     const type = Type.read(cursor)
@@ -55,7 +61,7 @@ export namespace DER {
     if (type.equals(Sequence.type))
       return resolveSequence(Sequence.read(cursor))
     if (type.equals(Set.type))
-      return Set.read(cursor, read)
+      return resolveSet(Set.read(cursor))
     if (type.equals(IA5String.type))
       return IA5String.read(cursor)
     if (type.equals(UTCTime.type))
