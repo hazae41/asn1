@@ -5,15 +5,7 @@ import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
 function pad2(value: number) {
-  const text = value.toString()
-
-  if (text.length > 2)
-    throw new Error(`Invalid length`)
-
-  if (text.length === 2)
-    return text
-
-  return "0" + text
+  return value.toString().padStart(2, "0")
 }
 
 export class UTCTime {
@@ -25,19 +17,16 @@ export class UTCTime {
     Type.tags.UTC_TIME)
 
   constructor(
+    readonly type: Type,
     readonly value: Date
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length,
     bytes: Uint8Array
   }
 
-  prepare() {
+  #prepare() {
     const year = this.value.getUTCFullYear()
 
     const YY = year > 2000
@@ -52,47 +41,33 @@ export class UTCTime {
 
     const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
     const length = new Length(bytes.length)
+
     return this.#data = { length, bytes }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length, bytes } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     cursor.write(bytes)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
 
-    return this.readl(cursor, length.value)
-  }
-
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
-
-    const text = cursor.readString(length)
+    const text = cursor.readString(length.value)
 
     if (text.length !== 13)
       throw new Error(`Invalid format`)
@@ -110,15 +85,12 @@ export class UTCTime {
       ? 1900 + YY
       : 2000 + YY
 
-    const date = new Date()
-    date.setUTCFullYear(year, MM - 1, DD)
-    date.setUTCHours(hh, mm, ss)
-    date.setUTCMilliseconds(0)
+    const value = new Date()
+    value.setUTCFullYear(year, MM - 1, DD)
+    value.setUTCHours(hh, mm, ss)
+    value.setUTCMilliseconds(0)
 
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
-
-    return new this(date)
+    return new this(type, value)
   }
 
   toString() {

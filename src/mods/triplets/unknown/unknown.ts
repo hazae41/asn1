@@ -4,6 +4,7 @@ import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
 export class Unknown {
+  readonly #class = Unknown
 
   constructor(
     readonly type: Type,
@@ -14,48 +15,35 @@ export class Unknown {
     length: Length
   }
 
-  prepare() {
+  #prepare() {
     const length = new Length(this.bytes.length)
+
     return this.#data = { length }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     cursor.write(this.bytes)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
     const length = Length.read(cursor)
 
-    return this.readl(type, cursor, length.value)
-  }
-
-  static readl(type: Type, cursor: Cursor, length: number) {
-    const start = cursor.offset
-
-    const buffer = cursor.read(length)
-
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
+    const buffer = cursor.read(length.value)
 
     return new this(type, buffer)
   }
