@@ -13,65 +13,45 @@ export class OctetString {
     Type.tags.OCTET_STRING)
 
   constructor(
+    readonly type: Type,
     readonly bytes: Uint8Array
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length
   }
 
-  prepare() {
+  #prepare() {
     const length = new Length(this.bytes.length)
+
     return this.#data = { length }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     cursor.write(this.bytes)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
 
-    return this.readl(cursor, length.value)
-  }
+    const buffer = cursor.read(length.value)
 
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
-
-    const buffer = cursor.read(length)
-
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
-
-    return new this(buffer)
+    return new this(type, buffer)
   }
 
   toString() {
