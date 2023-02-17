@@ -1,8 +1,9 @@
 import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Sequence } from "mods/triplets/sequence/sequence.js";
+import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
+import { Sequence } from "./sequence.js";
 
 const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
@@ -16,7 +17,9 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = Sequence.read(input)
+  const triplet = DER.read(input)
+
+  assert(triplet instanceof Sequence)
 
   const output = Cursor.allocUnsafe(triplet.size())
   triplet.write(output)

@@ -37,6 +37,12 @@ export namespace DER {
     return new Set(type, triplets.map(resolve))
   }
 
+  function resolveConstructed(constructed: Constructed<Opaque>) {
+    const { type, triplets } = constructed
+
+    return new Constructed(type, triplets.map(resolve))
+  }
+
   export function read(cursor: Cursor): Triplet {
     const start = cursor.offset
     const type = Type.read(cursor)
@@ -71,7 +77,7 @@ export namespace DER {
       throw new Error(`Unknown UNIVERSAL type ${type.tag}`)
 
     if (type.wrap === Type.wraps.CONSTRUCTED)
-      return Constructed.read(cursor, read)
+      return resolveConstructed(Constructed.read(cursor))
     return Unknown.read(cursor)
   }
 
