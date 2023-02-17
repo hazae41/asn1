@@ -13,68 +13,50 @@ export class BitString {
     Type.tags.BIT_STRING)
 
   constructor(
+    readonly type: Type,
     readonly padding: number,
     readonly bytes: Uint8Array
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length
   }
 
-  prepare() {
+  #prepare() {
     const length = new Length(1 + this.bytes.length)
+
     return this.#data = { length }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     cursor.writeUint8(this.padding)
     cursor.write(this.bytes)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
 
-    return this.readl(cursor, length.value)
-  }
+    const subcursor = new Cursor(cursor.read(length.value))
 
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
+    const padding = subcursor.readUint8()
+    const buffer = subcursor.read(subcursor.remaining)
 
-    const padding = cursor.readUint8()
-    const buffer = cursor.read(length - 1)
-
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
-
-    return new this(padding, buffer)
+    return new this(type, padding, buffer)
   }
 
   toString() {
@@ -83,4 +65,5 @@ export class BitString {
 
     return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`
   }
+
 }

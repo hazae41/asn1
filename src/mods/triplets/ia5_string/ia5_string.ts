@@ -13,68 +13,48 @@ export class IA5String {
     Type.tags.IA5_STRING)
 
   constructor(
+    readonly type: Type,
     readonly value: string
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length,
     bytes: Uint8Array
   }
 
-  prepare() {
+  #prepare() {
     const bytes = Bytes.fromAscii(this.value)
     const length = new Length(bytes.length)
+
     return this.#data = { length, bytes }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length, bytes } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     cursor.write(bytes)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
 
-    return this.readl(cursor, length.value)
-  }
-
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
-
-    const bytes = cursor.read(length)
+    const bytes = cursor.read(length.value)
     const value = Bytes.toAscii(bytes)
 
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
-
-    return new this(value)
+    return new this(type, value)
   }
 
   toString() {

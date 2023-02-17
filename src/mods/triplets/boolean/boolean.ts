@@ -12,65 +12,48 @@ export class Boolean {
     Type.tags.BOOLEAN)
 
   constructor(
+    readonly type: Type,
     readonly value: number
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length
   }
 
-  prepare() {
+  #prepare() {
     const length = new Length(1)
+
     return this.#data = { length }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     cursor.writeUint8(this.value)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
 
-    return this.readl(cursor, length.value)
-  }
-
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
+    if (length.value !== 1)
+      throw new Error(`Invalid ${this.name} length`)
 
     const value = cursor.readUint8()
 
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
-
-    return new this(value)
+    return new this(type, value)
   }
 
   toString() {
