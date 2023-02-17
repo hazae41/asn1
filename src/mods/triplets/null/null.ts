@@ -15,6 +15,10 @@ export class Null {
     readonly type: Type
   ) { }
 
+  static new() {
+    return new this(this.type)
+  }
+
   #data?: {
     length: Length
   }

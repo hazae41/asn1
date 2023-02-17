@@ -17,6 +17,10 @@ export class UTF8String {
     readonly value: string
   ) { }
 
+  static new(value: string) {
+    return new this(this.type, value)
+  }
+
   #data?: {
     length: Length
     bytes: Uint8Array

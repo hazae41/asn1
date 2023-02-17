@@ -22,6 +22,10 @@ export class Set<T extends Triplet = Triplet> {
     readonly triplets: T[]
   ) { }
 
+  static new<T extends Triplet = Triplet>(triplets: T[]) {
+    return new this<T>(this.type, triplets)
+  }
+
   #data?: {
     length: Length
   }

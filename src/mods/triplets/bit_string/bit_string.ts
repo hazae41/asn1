@@ -18,6 +18,10 @@ export class BitString {
     readonly bytes: Uint8Array
   ) { }
 
+  static new(padding: number, bytes: Uint8Array) {
+    return new this(this.type, padding, bytes)
+  }
+
   #data?: {
     length: Length
   }

@@ -21,6 +21,10 @@ export class UTCTime {
     readonly value: Date
   ) { }
 
+  static new(value: Date) {
+    return new this(this.type, value)
+  }
+
   #data?: {
     length: Length,
     bytes: Uint8Array

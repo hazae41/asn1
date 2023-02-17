@@ -16,6 +16,10 @@ export class Boolean {
     readonly value: number
   ) { }
 
+  static new(value: number) {
+    return new this(this.type, value)
+  }
+
   #data?: {
     length: Length
   }

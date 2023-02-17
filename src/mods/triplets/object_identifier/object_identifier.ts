@@ -17,6 +17,10 @@ export class ObjectIdentifier {
     readonly value: string
   ) { }
 
+  static new(value: string) {
+    return new this(this.type, value)
+  }
+
   #data?: {
     length: Length
     header: readonly [number, number]

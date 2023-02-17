@@ -28,6 +28,10 @@ export class Integer {
     readonly value: bigint
   ) { }
 
+  static new(value: bigint) {
+    return new this(this.type, value)
+  }
+
   #data?: {
     length: Length
     values: Array<number>
