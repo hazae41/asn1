@@ -13,12 +13,9 @@ export class ObjectIdentifier {
     Type.tags.OBJECT_IDENTIFIER)
 
   constructor(
+    readonly type: Type,
     readonly value: string
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length
@@ -26,7 +23,7 @@ export class ObjectIdentifier {
     values: Array<VLQ>
   }
 
-  prepare() {
+  #prepare() {
     const values = new Array<VLQ>()
     const texts = this.value.split(".")
 
@@ -43,66 +40,54 @@ export class ObjectIdentifier {
     }
 
     const length = new Length(size)
+
     return this.#data = { length, header, values }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length, header, values } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
-
-    const content = cursor.offset
 
     const [first, second] = header
     cursor.writeUint8((first * 40) + second)
 
     for (const value of values)
       value.write(cursor)
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
 
-    return this.readl(cursor, length.value)
-  }
+    const subcursor = new Cursor(cursor.read(length.value))
 
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
-
-    const header = cursor.readUint8()
+    const header = subcursor.readUint8()
     const first = Math.floor(header / 40)
     const second = header % 40
 
     const values = [first, second]
 
-    while (cursor.offset - start < length)
-      values.push(VLQ.read(cursor).value)
+    while (subcursor.remaining)
+      values.push(VLQ.read(subcursor).value)
 
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
+    const value = values.join(".")
 
-    return new this(values.join("."))
+    return new this(type, value)
   }
 
   toString() {
     return `OBJECT IDENTIFIER ${this.value}`
   }
+
 }

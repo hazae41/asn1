@@ -2,6 +2,7 @@ import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class Length {
+  readonly #class = Length
 
   constructor(
     readonly value: number
@@ -11,9 +12,9 @@ export class Length {
     values: Array<number>
   }
 
-  prepare() {
+  #prepare() {
     if (this.value < 128)
-      return
+      throw new Error(`${this.#class.name}.prepare value under 128`)
 
     let value = this.value
 
@@ -32,7 +33,9 @@ export class Length {
   size() {
     if (this.value < 128)
       return 1
-    const { values } = this.prepare()!
+
+    const { values } = this.#prepare()
+
     return 1 + values.length
   }
 
@@ -41,7 +44,8 @@ export class Length {
       return cursor.writeUint8(this.value)
 
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { values } = this.#data
 
     const count = new Bitset(values.length, 8)

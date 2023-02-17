@@ -2,6 +2,7 @@ import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class VLQ {
+  readonly #class = VLQ
 
   constructor(
     readonly value: number
@@ -11,7 +12,7 @@ export class VLQ {
     values: Array<number>
   }
 
-  prepare() {
+  #prepare() {
     let value = this.value
 
     const values = new Array<number>()
@@ -26,13 +27,15 @@ export class VLQ {
   }
 
   size() {
-    const { values } = this.prepare()
+    const { values } = this.#prepare()
+
     return values.length
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { values } = this.#data
 
     for (let i = 0; i < values.length - 1; i++) {
