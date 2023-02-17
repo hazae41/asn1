@@ -7,6 +7,7 @@ import { Integer } from "mods/triplets/integer/integer.js";
 import { Null } from "mods/triplets/null/null.js";
 import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
 import { OctetString } from "mods/triplets/octet_string/octet_string.js";
+import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Set } from "mods/triplets/set/set.js";
@@ -18,8 +19,16 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  export function tryRead(cursor: Cursor) {
-    return Readable.tryRead(DER, cursor)
+  function resolve(opaque: Opaque) {
+    const cursor = new Cursor(opaque.bytes)
+
+    return read(cursor)
+  }
+
+  function resolveSequence(sequence: Sequence<Opaque>) {
+    const { type, triplets } = sequence
+
+    return new Sequence(type, triplets.map(resolve))
   }
 
   export function read(cursor: Cursor): Triplet {
@@ -44,7 +53,7 @@ export namespace DER {
     if (type.equals(PrintableString.type))
       return PrintableString.read(cursor)
     if (type.equals(Sequence.type))
-      return Sequence.read(cursor, read)
+      return resolveSequence(Sequence.read(cursor))
     if (type.equals(Set.type))
       return Set.read(cursor, read)
     if (type.equals(IA5String.type))
@@ -60,15 +69,19 @@ export namespace DER {
     return Unknown.read(cursor)
   }
 
-  export function tryFromBytes(bytes: Uint8Array) {
-    return Readable.tryFromBytes(DER, bytes)
-  }
-
   export function fromBytes(bytes: Uint8Array) {
     return Readable.fromBytes(DER, bytes)
   }
 
   export function toBytes(triplet: Triplet) {
     return Writable.toBytes(triplet)
+  }
+
+  export function tryRead(cursor: Cursor) {
+    return Readable.tryRead(DER, cursor)
+  }
+
+  export function tryFromBytes(bytes: Uint8Array) {
+    return Readable.tryFromBytes(DER, bytes)
   }
 }

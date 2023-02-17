@@ -6,6 +6,13 @@ import { Type } from "mods/type/type.js";
 export class Unknown {
   readonly #class = Unknown
 
+  /**
+   * An unknown triplet, not resolved
+   * 
+   * Like Opaque, but the bytes do not contain Type + Length
+   * @param type 
+   * @param bytes 
+   */
   constructor(
     readonly type: Type,
     readonly bytes: Uint8Array,
@@ -43,9 +50,9 @@ export class Unknown {
     const type = Type.read(cursor)
     const length = Length.read(cursor)
 
-    const buffer = cursor.read(length.value)
+    const bytes = cursor.read(length.value)
 
-    return new this(type, buffer)
+    return new this(type, bytes)
   }
 
   toString() {

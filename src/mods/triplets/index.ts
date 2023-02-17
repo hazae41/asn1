@@ -6,6 +6,7 @@ export * from "./integer/integer.js";
 export * from "./null/null.js";
 export * from "./object_identifier/object_identifier.js";
 export * from "./octet_string/octet_string.js";
+export * from "./opaque/opaque.js";
 export * from "./printable_string/printable_string.js";
 export * from "./sequence/sequence.js";
 export * from "./set/set.js";
