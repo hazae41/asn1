@@ -7,9 +7,12 @@ import { Type } from "mods/type/type.js";
 const bn256 = BigInt(256)
 
 function sign(value: number, negative: boolean) {
+  const bitset = new Bitset(value, 8)
+
   if (negative)
-    return new Bitset(value, 8).not().value
-  return value
+    return bitset.not()
+  else
+    return bitset
 }
 
 export class Integer {
@@ -21,19 +24,16 @@ export class Integer {
     Type.tags.INTEGER)
 
   constructor(
+    readonly type: Type,
     readonly value: bigint
   ) { }
-
-  get type() {
-    return this.#class.type
-  }
 
   #data?: {
     length: Length
     values: Array<number>
   }
 
-  prepare() {
+  #prepare() {
     let value = this.value < 0
       ? ~this.value
       : this.value
@@ -51,69 +51,53 @@ export class Integer {
     values.reverse()
 
     const length = new Length(values.length)
+
     return this.#data = { length, values }
   }
 
   size() {
-    const { length } = this.prepare()
+    const { length } = this.#prepare()
+
     return Triplets.size(length)
   }
 
   write(cursor: Cursor) {
     if (!this.#data)
-      throw new Error(`Unprepared`)
+      throw new Error(`Unprepared ${this.#class.name}`)
+
     const { length, values } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    const content = cursor.offset
-
     const negative = this.value < 0
 
-    const first = new Bitset(sign(values[0], negative), 8)
+    const first = sign(values[0], negative)
       .setBE(0, negative)
       .value
     cursor.writeUint8(first)
 
-    for (let i = 1; i < values.length; i++)
-      cursor.writeUint8(sign(values[i], negative))
-
-    if (cursor.offset - content !== length.value)
-      throw new Error(`Invalid length`)
-
-    return
+    for (let i = 1; i < values.length; i++) {
+      cursor.writeUint8(sign(values[i], negative).value)
+    }
   }
 
   static read(cursor: Cursor) {
     const type = Type.read(cursor)
-
-    if (!this.type.equals(type))
-      throw new Error(`Invalid type`)
-
     const length = Length.read(cursor)
-
-    return this.readl(cursor, length.value)
-  }
-
-  static readl(cursor: Cursor, length: number) {
-    const start = cursor.offset
 
     let value = BigInt(0)
 
     const negative = cursor.getUint8() > 127
 
-    for (let i = 0; i < length; i++)
-      value = (value * bn256) + BigInt(sign(cursor.readUint8(), negative))
+    for (let i = 0; i < length.value; i++) {
+      value = (value * bn256) + BigInt(sign(cursor.readUint8(), negative).value)
+    }
 
-    value = negative
-      ? ~value
-      : value
+    if (negative)
+      value = ~value
 
-    if (cursor.offset - start !== length)
-      throw new Error(`Invalid length`)
-
-    return new this(value)
+    return new this(type, value)
   }
 
   toString() {
