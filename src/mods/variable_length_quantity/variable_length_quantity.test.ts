@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
@@ -8,14 +8,14 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
-function hexToBinary(hex: string) {
+function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
   const buffer = Bytes.fromHex(hex2)
-  return new Binary(buffer)
+  return new Cursor(buffer)
 }
 
 function hexToVLQ(hex: string) {
-  const cursor = hexToBinary(hex)
+  const cursor = hexToCursor(hex)
   return VLQ.read(cursor).value
 }
 
@@ -33,10 +33,10 @@ test("Read", async () => {
 })
 
 function checkReadWriteVLQ(hex: string) {
-  const input = hexToBinary(hex)
+  const input = hexToCursor(hex)
   const vlq = VLQ.read(input)
 
-  const output = Binary.allocUnsafe(vlq.size())
+  const output = Cursor.allocUnsafe(vlq.size())
   vlq.write(output)
 
   return input.buffer.equals(output.buffer)

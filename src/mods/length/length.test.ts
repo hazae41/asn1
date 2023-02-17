@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Length } from "mods/length/length.js";
@@ -8,14 +8,14 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
-function hexToBinary(hex: string) {
+function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
   const buffer = Bytes.fromHex(hex2)
-  return new Binary(buffer)
+  return new Cursor(buffer)
 }
 
 function hexToLength(hex: string) {
-  const cursor = hexToBinary(hex)
+  const cursor = hexToCursor(hex)
   const length = Length.read(cursor)
   return length.value
 }
@@ -26,10 +26,10 @@ test("Read", async () => {
 })
 
 function checkReadWrite(hex: string) {
-  const input = hexToBinary(hex)
+  const input = hexToCursor(hex)
   const length = Length.read(input)
 
-  const output = Binary.allocUnsafe(length.size())
+  const output = Cursor.allocUnsafe(length.size())
   length.write(output)
 
   return input.buffer.equals(output.buffer)

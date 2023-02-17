@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class Length {
@@ -36,7 +36,7 @@ export class Length {
     return 1 + values.length
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     if (this.value < 128)
       return cursor.writeUint8(this.value)
 
@@ -56,7 +56,7 @@ export class Length {
     return
   }
 
-  static read(cursor: Binary) {
+  static read(cursor: Cursor) {
     const first = cursor.readUint8()
 
     if (first < 128)

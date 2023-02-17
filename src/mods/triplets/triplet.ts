@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary"
+import { Cursor } from "@hazae41/binary"
 import { Type } from "mods/type/type.js"
 
 export interface Typed {
@@ -10,7 +10,7 @@ export interface Sizeable {
 }
 
 export interface Writeable {
-  write(cursor: Binary): void
+  write(cursor: Cursor): void
 }
 
 export interface ToStringable {

@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";
@@ -18,7 +18,7 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  export function read(cursor: Binary): Triplet {
+  export function read(cursor: Cursor): Triplet {
     const start = cursor.offset
     const type = Type.read(cursor)
     cursor.offset = start
@@ -57,11 +57,11 @@ export namespace DER {
   }
 
   export function fromBytes(bytes: Uint8Array) {
-    return read(new Binary(bytes))
+    return read(new Cursor(bytes))
   }
 
   export function toBytes(triplet: Triplet) {
-    const cursor = Binary.allocUnsafe(triplet.size())
+    const cursor = Cursor.allocUnsafe(triplet.size())
     triplet.write(cursor)
     return cursor.bytes
   }

@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -34,7 +34,7 @@ export class OctetString {
     return Triplets.size(length)
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length } = this.#data
@@ -52,7 +52,7 @@ export class OctetString {
     return
   }
 
-  static read(cursor: Binary) {
+  static read(cursor: Cursor) {
     const type = Type.read(cursor)
 
     if (!this.type.equals(type))
@@ -63,7 +63,7 @@ export class OctetString {
     return this.readl(cursor, length.value)
   }
 
-  static readl(cursor: Binary, length: number) {
+  static readl(cursor: Cursor, length: number) {
     const start = cursor.offset
 
     const buffer = cursor.read(length)

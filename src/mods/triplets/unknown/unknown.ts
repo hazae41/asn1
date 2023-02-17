@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -24,7 +24,7 @@ export class Unknown {
     return Triplets.size(length)
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length } = this.#data
@@ -42,14 +42,14 @@ export class Unknown {
     return
   }
 
-  static read(cursor: Binary) {
+  static read(cursor: Cursor) {
     const type = Type.read(cursor)
     const length = Length.read(cursor)
 
     return this.readl(type, cursor, length.value)
   }
 
-  static readl(type: Type, cursor: Binary, length: number) {
+  static readl(type: Type, cursor: Cursor, length: number) {
     const start = cursor.offset
 
     const buffer = cursor.read(length)

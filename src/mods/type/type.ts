@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class Type {
@@ -55,7 +55,7 @@ export class Type {
     return this.#class.size()
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     let value = 0
     value |= this.clazz << 6
     value |= this.wrap << 5
@@ -64,7 +64,7 @@ export class Type {
     cursor.writeUint8(value)
   }
 
-  static read(cursor: Binary) {
+  static read(cursor: Cursor) {
     const type = cursor.readUint8()
     const bitset = new Bitset(type, 8)
 

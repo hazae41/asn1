@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class VLQ {
@@ -30,7 +30,7 @@ export class VLQ {
     return values.length
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { values } = this.#data
@@ -43,7 +43,7 @@ export class VLQ {
     cursor.writeUint8(values[values.length - 1])
   }
 
-  static read(cursor: Binary) {
+  static read(cursor: Cursor) {
     const values = new Array<number>()
 
     while (true) {

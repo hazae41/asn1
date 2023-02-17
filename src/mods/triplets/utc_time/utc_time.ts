@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -60,7 +60,7 @@ export class UTCTime {
     return Triplets.size(length)
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length, bytes } = this.#data
@@ -78,7 +78,7 @@ export class UTCTime {
     return
   }
 
-  static read(cursor: Binary) {
+  static read(cursor: Cursor) {
     const type = Type.read(cursor)
 
     if (!this.type.equals(type))
@@ -89,7 +89,7 @@ export class UTCTime {
     return this.readl(cursor, length.value)
   }
 
-  static readl(cursor: Binary, length: number) {
+  static readl(cursor: Cursor, length: number) {
     const start = cursor.offset
 
     const text = cursor.readString(length)

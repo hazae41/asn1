@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
@@ -12,7 +12,7 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 function hexToType(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
   const buffer = Bytes.fromHex(hex2)
-  return Type.read(new Binary(buffer))
+  return Type.read(new Cursor(buffer))
 }
 
 test("Read", async () => {

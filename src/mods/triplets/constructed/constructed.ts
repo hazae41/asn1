@@ -1,4 +1,4 @@
-import { Binary } from "@hazae41/binary";
+import { Cursor } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -29,7 +29,7 @@ export class Constructed {
     return Triplets.size(length)
   }
 
-  write(cursor: Binary) {
+  write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared`)
     const { length } = this.#data
@@ -48,7 +48,7 @@ export class Constructed {
     return
   }
 
-  static read(cursor: Binary, read: (cursor: Binary) => Triplet) {
+  static read(cursor: Cursor, read: (cursor: Cursor) => Triplet) {
     const type = Type.read(cursor)
 
     if (type.wrap !== Type.wraps.CONSTRUCTED)
@@ -59,7 +59,7 @@ export class Constructed {
     return this.readl(type, cursor, length.value, read)
   }
 
-  static readl(type: Type, cursor: Binary, length: number, read: (cursor: Binary) => Triplet) {
+  static readl(type: Type, cursor: Cursor, length: number, read: (cursor: Cursor) => Triplet) {
     const start = cursor.offset
 
     const triplets = new Array<Triplet>()
