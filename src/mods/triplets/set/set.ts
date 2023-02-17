@@ -63,9 +63,8 @@ export class Set<T extends Triplet = Triplet> {
 
     const triplets = new Array<Opaque>()
 
-    while (subcursor.remaining) {
+    while (subcursor.remaining)
       triplets.push(Opaque.read(subcursor))
-    }
 
     return new this<Opaque>(type, triplets)
   }

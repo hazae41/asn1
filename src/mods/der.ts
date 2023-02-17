@@ -20,9 +20,7 @@ import { Type } from "mods/type/type.js";
 export namespace DER {
 
   function resolve(opaque: Opaque) {
-    const cursor = new Cursor(opaque.bytes)
-
-    return read(cursor)
+    return opaque.into(DER)
   }
 
   function resolveSequence(sequence: Sequence<Opaque>) {

@@ -1,4 +1,4 @@
-import { Cursor } from "@hazae41/binary"
+import { Cursor, Readable } from "@hazae41/binary"
 import { Length } from "mods/length/length.js"
 import { Type } from "mods/type/type.js"
 
@@ -21,6 +21,10 @@ export class Opaque {
 
   write(cursor: Cursor) {
     cursor.write(this.bytes)
+  }
+
+  into<T>(readable: Readable<T>) {
+    return Readable.fromBytes(readable, this.bytes)
   }
 
   static read(cursor: Cursor) {
