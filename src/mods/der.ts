@@ -12,7 +12,6 @@ import { PrintableString } from "mods/triplets/printable_string/printable_string
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Set } from "mods/triplets/set/set.js";
 import { Triplet } from "mods/triplets/triplet.js";
-import { Unknown } from "mods/triplets/unknown/unknown.js";
 import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { Type } from "mods/type/type.js";
@@ -46,12 +45,12 @@ export namespace DER {
       return opaque.into(UTCTime.DER)
 
     if (opaque.type.clazz === Type.clazzes.UNIVERSAL)
-      return opaque.into(Unknown.DER)
+      throw new Error(`Unknown UNIVERSAL type ${opaque.type.DER.byte}`)
 
     if (opaque.type.wrap === Type.wraps.CONSTRUCTED)
       return resolveConstructed(opaque.into(Constructed.DER))
 
-    return opaque.into(Unknown.DER)
+    return opaque
   }
 
   function resolveSequence(sequence: Sequence<Opaque>) {

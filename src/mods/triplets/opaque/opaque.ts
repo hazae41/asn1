@@ -1,4 +1,5 @@
 import { Cursor, Readable } from "@hazae41/binary"
+import { Bytes } from "@hazae41/bytes"
 import { Length } from "mods/length/length.js"
 import { Type } from "mods/type/type.js"
 
@@ -7,22 +8,29 @@ export class Opaque {
   readonly DER = new Opaque.DER(this)
 
   /**
-   * An opaque triplet, not resolved yet
-   * 
-   * Like Unknown but the bytes also contains Type + Length
+   * An opaque triplet
    * @param bytes 
    */
   constructor(
+    /**
+     * Preread triplet type
+     */
     readonly type: Type,
+    /**
+     * The whole triplet (type + length + value)
+     */
     readonly bytes: Uint8Array
   ) { }
 
+  /**
+   * Zero-copy transform into another type
+   */
   into<T>(readable: Readable<T>) {
     return Readable.fromBytes(readable, this.bytes)
   }
 
   toString() {
-    return `OPAQUE`
+    return `OPAQUE ${Bytes.toHex(this.bytes)}`
   }
 }
 

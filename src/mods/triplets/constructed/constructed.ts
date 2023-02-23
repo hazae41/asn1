@@ -26,6 +26,7 @@ export class Constructed<T extends Triplet = Triplet> {
   toString(): string {
     return stringify(this)
   }
+
 }
 
 export namespace Constructed {

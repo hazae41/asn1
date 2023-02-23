@@ -1,4 +1,4 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor, Writable } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class Type {
@@ -89,6 +89,10 @@ export namespace Type {
         throw new Error(`Unimplemented tag`)
 
       return new this.parent(clazz, wrap, tag)
+    }
+
+    get byte() {
+      return Writable.toBytes(this)[0]
     }
 
   }
