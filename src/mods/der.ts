@@ -7,7 +7,7 @@ import { Integer } from "mods/triplets/integer/integer.js";
 import { Null } from "mods/triplets/null/null.js";
 import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
 import { OctetString } from "mods/triplets/octet_string/octet_string.js";
-import { OpaqueTriplet } from "mods/triplets/opaque/opaque.js";
+import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Set } from "mods/triplets/set/set.js";
@@ -19,64 +19,63 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  function resolve(opaque: OpaqueTriplet) {
-    return opaque.into(DER)
+  function resolve(opaque: Opaque): Triplet {
+    if (opaque.type.equals(Boolean.type))
+      return opaque.into(Boolean.DER)
+    if (opaque.type.equals(Integer.type))
+      return opaque.into(Integer.DER)
+    if (opaque.type.equals(BitString.type))
+      return opaque.into(BitString.DER)
+    if (opaque.type.equals(OctetString.type))
+      return opaque.into(OctetString.DER)
+    if (opaque.type.equals(Null.type))
+      return opaque.into(Null.DER)
+    if (opaque.type.equals(ObjectIdentifier.type))
+      return opaque.into(ObjectIdentifier.DER)
+    if (opaque.type.equals(UTF8String.type))
+      return opaque.into(UTF8String.DER)
+    if (opaque.type.equals(PrintableString.type))
+      return opaque.into(PrintableString.DER)
+    if (opaque.type.equals(Sequence.type))
+      return resolveSequence(opaque.into(Sequence.DER))
+    if (opaque.type.equals(Set.type))
+      return resolveSet(opaque.into(Set.DER))
+    if (opaque.type.equals(IA5String.type))
+      return opaque.into(IA5String.DER)
+    if (opaque.type.equals(UTCTime.type))
+      return opaque.into(UTCTime.DER)
+
+    if (opaque.type.clazz === Type.clazzes.UNIVERSAL)
+      return opaque.into(Unknown.DER)
+
+    if (opaque.type.wrap === Type.wraps.CONSTRUCTED)
+      return resolveConstructed(opaque.into(Constructed.DER))
+
+    return opaque.into(Unknown.DER)
   }
 
-  function resolveSequence(sequence: Sequence<OpaqueTriplet>) {
+  function resolveSequence(sequence: Sequence<Opaque>) {
     const { type, triplets } = sequence
 
     return new Sequence(type, triplets.map(resolve))
   }
 
-  function resolveSet(set: Set<OpaqueTriplet>) {
+  function resolveSet(set: Set<Opaque>) {
     const { type, triplets } = set
 
     return new Set(type, triplets.map(resolve))
   }
 
-  function resolveConstructed(constructed: Constructed<OpaqueTriplet>) {
+  function resolveConstructed(constructed: Constructed<Opaque>) {
     const { type, triplets } = constructed
 
     return new Constructed(type, triplets.map(resolve))
   }
 
   export function read(cursor: Cursor): Triplet {
-    const start = cursor.offset
-    const type = Type.DER.read(cursor)
-    cursor.offset = start
+    const opaque = Opaque.DER.read(cursor)
 
-    if (type.equals(Boolean.type))
-      return Boolean.read(cursor)
-    if (type.equals(Integer.type))
-      return Integer.read(cursor)
-    if (type.equals(BitString.type))
-      return BitString.read(cursor)
-    if (type.equals(OctetString.type))
-      return OctetString.read(cursor)
-    if (type.equals(Null.type))
-      return Null.read(cursor)
-    if (type.equals(ObjectIdentifier.type))
-      return ObjectIdentifier.read(cursor)
-    if (type.equals(UTF8String.type))
-      return UTF8String.read(cursor)
-    if (type.equals(PrintableString.type))
-      return PrintableString.read(cursor)
-    if (type.equals(Sequence.type))
-      return resolveSequence(Sequence.read(cursor))
-    if (type.equals(Set.type))
-      return resolveSet(Set.read(cursor))
-    if (type.equals(IA5String.type))
-      return IA5String.read(cursor)
-    if (type.equals(UTCTime.type))
-      return UTCTime.read(cursor)
-
-    if (type.clazz === Type.clazzes.UNIVERSAL)
-      throw new Error(`Unknown UNIVERSAL type ${type.tag}`)
-
-    if (type.wrap === Type.wraps.CONSTRUCTED)
-      return resolveConstructed(Constructed.read(cursor))
-    return Unknown.read(cursor)
+    return resolve(opaque)
   }
 
   export function fromBytes(bytes: Uint8Array) {
@@ -84,7 +83,7 @@ export namespace DER {
   }
 
   export function toBytes(triplet: Triplet) {
-    return Preparable.toBytes(triplet)
+    return Preparable.toBytes(triplet.DER)
   }
 
   export function tryRead(cursor: Cursor) {

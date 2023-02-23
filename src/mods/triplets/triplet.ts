@@ -9,7 +9,8 @@ export interface ToStringable {
   toString(): string
 }
 
-export type Triplet =
-  & Typed
-  & Preparable
-  & ToStringable
+export interface Triplet {
+  type: Type
+  DER: Preparable
+  toString(): string
+}

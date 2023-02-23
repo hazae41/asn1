@@ -14,7 +14,7 @@ npm i @hazae41/asn1
 - 100% TypeScript and ESM
 - No external dependency
 - Zero-copy reading and writing
-- Encoding agnostic (only DER is currently supported)
+- Encoding agnostic (even though only DER is currently implemented)
 - Almost all universal triplets
 - Implicit and explicit tagged types
 

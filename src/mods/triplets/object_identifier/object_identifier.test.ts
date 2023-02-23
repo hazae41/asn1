@@ -17,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function checkReadWriteOID(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = ObjectIdentifier.read(input)
+  const triplet = ObjectIdentifier.DER.read(input)
 
   const output = DER.toBytes(triplet)
   return input.buffer.equals(output)

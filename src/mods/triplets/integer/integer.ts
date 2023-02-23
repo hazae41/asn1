@@ -23,6 +23,8 @@ export class Integer {
     Type.wraps.PRIMITIVE,
     Type.tags.INTEGER)
 
+  readonly DER = new Integer.DER(this)
+
   constructor(
     readonly type: Type,
     readonly value: bigint
@@ -32,81 +34,97 @@ export class Integer {
     return new this(this.type, value)
   }
 
-  #data?: {
-    length: Length
-    values: Array<number>
-  }
-
-  prepare() {
-    let value = this.value < 0
-      ? ~this.value
-      : this.value
-
-    const values = new Array<number>()
-
-    do {
-      values.push(Number(value % bn256))
-      value = value / bn256
-    } while (value)
-
-    if (values[values.length - 1] > 127)
-      values.push(0)
-
-    values.reverse()
-
-    const length = new Length(values.length).DER.prepare().parent
-
-    this.#data = { length, values }
-    return this
-  }
-
-  size() {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { length } = this.#data
-
-    return Triplets.size(length)
-  }
-
-  write(cursor: Cursor) {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { length, values } = this.#data
-
-    this.type.DER.write(cursor)
-    length.DER.write(cursor)
-
-    const negative = this.value < 0
-
-    const first = sign(values[0], negative)
-      .setBE(0, negative)
-      .value
-    cursor.writeUint8(first)
-
-    for (let i = 1; i < values.length; i++) {
-      cursor.writeUint8(sign(values[i], negative).value)
-    }
-  }
-
-  static read(cursor: Cursor) {
-    const type = Type.DER.read(cursor)
-    const length = Length.DER.read(cursor)
-
-    let value = BigInt(0)
-
-    const negative = cursor.getUint8() > 127
-
-    for (let i = 0; i < length.value; i++) {
-      value = (value * bn256) + BigInt(sign(cursor.readUint8(), negative).value)
-    }
-
-    if (negative)
-      value = ~value
-
-    return new this(type, value)
+  get class() {
+    return this.#class
   }
 
   toString() {
     return `INTEGER ${this.value}`
+  }
+}
+
+export namespace Integer {
+
+  export class DER {
+    static parent = Integer
+
+    constructor(
+      readonly parent: Integer
+    ) { }
+
+    #data?: {
+      length: Length
+      values: Array<number>
+    }
+
+    prepare() {
+      let value = this.parent.value < 0
+        ? ~this.parent.value
+        : this.parent.value
+
+      const values = new Array<number>()
+
+      do {
+        values.push(Number(value % bn256))
+        value = value / bn256
+      } while (value)
+
+      if (values[values.length - 1] > 127)
+        values.push(0)
+
+      values.reverse()
+
+      const length = new Length(values.length).DER.prepare().parent
+
+      this.#data = { length, values }
+      return this
+    }
+
+    size() {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { length } = this.#data
+
+      return Triplets.size(length)
+    }
+
+    write(cursor: Cursor) {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { length, values } = this.#data
+
+      this.parent.type.DER.write(cursor)
+      length.DER.write(cursor)
+
+      const negative = this.parent.value < 0
+
+      const first = sign(values[0], negative)
+        .setBE(0, negative)
+        .value
+      cursor.writeUint8(first)
+
+      for (let i = 1; i < values.length; i++) {
+        cursor.writeUint8(sign(values[i], negative).value)
+      }
+    }
+
+    static read(cursor: Cursor) {
+      const type = Type.DER.read(cursor)
+      const length = Length.DER.read(cursor)
+
+      let value = BigInt(0)
+
+      const negative = cursor.getUint8() > 127
+
+      for (let i = 0; i < length.value; i++) {
+        value = (value * bn256) + BigInt(sign(cursor.readUint8(), negative).value)
+      }
+
+      if (negative)
+        value = ~value
+
+      return new this.parent(type, value)
+    }
+
   }
 }

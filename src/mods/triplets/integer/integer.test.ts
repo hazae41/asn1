@@ -17,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function hexToInteger(hex: string) {
   const cursor = hexToCursor(hex)
-  const integer = Integer.read(cursor)
+  const integer = Integer.DER.read(cursor)
   return integer.value
 }
 
@@ -34,7 +34,7 @@ test("Read", async () => {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = Integer.read(input)
+  const triplet = Integer.DER.read(input)
 
   const output = DER.toBytes(triplet)
   return input.buffer.equals(output)

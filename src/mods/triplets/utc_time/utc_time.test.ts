@@ -17,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function hexToDate(hex: string) {
   const input = hexToCursor(hex)
-  return UTCTime.read(input).value.toUTCString()
+  return UTCTime.DER.read(input).value.toUTCString()
 }
 
 function reformatDate(text: string) {
@@ -32,7 +32,7 @@ test("Read", async () => {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = UTCTime.read(input)
+  const triplet = UTCTime.DER.read(input)
 
   const output = DER.toBytes(triplet)
   return input.buffer.equals(output)

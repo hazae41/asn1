@@ -1,6 +1,6 @@
 import { Cursor, Writable } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
-import { OpaqueTriplet } from "mods/triplets/opaque/opaque.js";
+import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -17,6 +17,8 @@ export class Sequence<T extends Triplet = Triplet> {
     Type.wraps.CONSTRUCTED,
     Type.tags.SEQUENCE)
 
+  readonly DER = new Sequence.DER<T>(this)
+
   constructor(
     readonly type: Type,
     readonly triplets: T[]
@@ -26,55 +28,71 @@ export class Sequence<T extends Triplet = Triplet> {
     return new this<T>(this.type, triplets)
   }
 
-  #data?: {
-    length: Length,
-    triplets: Writable[]
-  }
-
-  prepare() {
-    const triplets = this.triplets.map(it => it.prepare())
-    const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).DER.prepare().parent
-
-    this.#data = { length, triplets }
-    return this
-  }
-
-  size() {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { length } = this.#data
-
-    return Triplets.size(length)
-  }
-
-  write(cursor: Cursor) {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { length, triplets } = this.#data
-
-    this.type.DER.write(cursor)
-    length.DER.write(cursor)
-
-    for (const triplet of triplets)
-      triplet.write(cursor)
-  }
-
-  static read(cursor: Cursor) {
-    const type = Type.DER.read(cursor)
-    const length = Length.DER.read(cursor)
-
-    const subcursor = new Cursor(cursor.read(length.value))
-
-    const triplets = new Array<OpaqueTriplet>()
-
-    while (subcursor.remaining)
-      triplets.push(OpaqueTriplet.read(subcursor))
-
-    return new this<OpaqueTriplet>(type, triplets)
+  get class() {
+    return this.#class
   }
 
   toString(): string {
     return stringify(this)
   }
 
+}
+
+export namespace Sequence {
+
+  export class DER<T extends Triplet = Triplet> {
+    static parent = Sequence
+
+    constructor(
+      readonly parent: Sequence<T>
+    ) { }
+
+    #data?: {
+      length: Length,
+      triplets: Writable[]
+    }
+
+    prepare() {
+      const triplets = this.parent.triplets.map(it => it.DER.prepare())
+      const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).DER.prepare().parent
+
+      this.#data = { length, triplets }
+      return this
+    }
+
+    size() {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { length } = this.#data
+
+      return Triplets.size(length)
+    }
+
+    write(cursor: Cursor) {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { length, triplets } = this.#data
+
+      this.parent.type.DER.write(cursor)
+      length.DER.write(cursor)
+
+      for (const triplet of triplets)
+        triplet.write(cursor)
+    }
+
+    static read(cursor: Cursor) {
+      const type = Type.DER.read(cursor)
+      const length = Length.DER.read(cursor)
+
+      const subcursor = new Cursor(cursor.read(length.value))
+
+      const triplets = new Array<Opaque>()
+
+      while (subcursor.remaining)
+        triplets.push(Opaque.DER.read(subcursor))
+
+      return new this.parent<Opaque>(type, triplets)
+    }
+
+  }
 }

@@ -12,6 +12,8 @@ export class BitString {
     Type.wraps.PRIMITIVE,
     Type.tags.BIT_STRING)
 
+  readonly DER = new BitString.DER(this)
+
   constructor(
     readonly type: Type,
     readonly padding: number,
@@ -22,47 +24,8 @@ export class BitString {
     return new this(this.type, padding, bytes)
   }
 
-  #data?: {
-    length: Length
-  }
-
-  prepare() {
-    const length = new Length(1 + this.bytes.length).DER.prepare().parent
-
-    this.#data = { length }
-    return this
-  }
-
-  size() {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { length } = this.#data
-
-    return Triplets.size(length)
-  }
-
-  write(cursor: Cursor) {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { length } = this.#data
-
-    this.type.DER.write(cursor)
-    length.DER.write(cursor)
-
-    cursor.writeUint8(this.padding)
-    cursor.write(this.bytes)
-  }
-
-  static read(cursor: Cursor) {
-    const type = Type.DER.read(cursor)
-    const length = Length.DER.read(cursor)
-
-    const subcursor = new Cursor(cursor.read(length.value))
-
-    const padding = subcursor.readUint8()
-    const buffer = subcursor.read(subcursor.remaining)
-
-    return new this(type, padding, buffer)
+  get class() {
+    return this.#class
   }
 
   toString() {
@@ -72,4 +35,59 @@ export class BitString {
     return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`
   }
 
+}
+
+export namespace BitString {
+
+  export class DER {
+    static parent = BitString
+
+    constructor(
+      readonly parent: BitString
+    ) { }
+
+    #data?: {
+      length: Length
+    }
+
+    prepare() {
+      const length = new Length(1 + this.parent.bytes.length).DER.prepare().parent
+
+      this.#data = { length }
+      return this
+    }
+
+    size() {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { length } = this.#data
+
+      return Triplets.size(length)
+    }
+
+    write(cursor: Cursor) {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { length } = this.#data
+
+      this.parent.type.DER.write(cursor)
+      length.DER.write(cursor)
+
+      cursor.writeUint8(this.parent.padding)
+      cursor.write(this.parent.bytes)
+    }
+
+    static read(cursor: Cursor) {
+      const type = Type.DER.read(cursor)
+      const length = Length.DER.read(cursor)
+
+      const subcursor = new Cursor(cursor.read(length.value))
+
+      const padding = subcursor.readUint8()
+      const buffer = subcursor.read(subcursor.remaining)
+
+      return new this.parent(type, padding, buffer)
+    }
+
+  }
 }

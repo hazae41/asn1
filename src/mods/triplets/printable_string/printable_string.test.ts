@@ -17,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = PrintableString.read(input)
+  const triplet = PrintableString.DER.read(input)
 
   const output = DER.toBytes(triplet)
   return input.buffer.equals(output)
