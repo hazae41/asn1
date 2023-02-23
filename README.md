@@ -26,11 +26,13 @@ npm i @hazae41/asn1
 ## Usage
 
 ```typescript
+import { DER } from "@hazae41/asn1"
+
 const input = new Uint8Array([0x01, 0x01, 0xFF])
 
 const triplet = DER.fromBytes(input) // Boolean
 
 console.log(triplet.toString()) // "BOOLEAN true"
 
-const output = DER.toBytes(triplet) // Uint8Array
+const output = DER.toBytes(triplet) // Uint8Array([0x01, 0x01, 0xFF])
 ```
