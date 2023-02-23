@@ -13,13 +13,15 @@ npm i @hazae41/asn1
 ### Current features
 - 100% TypeScript and ESM
 - No external dependency
-- Zero-copy DER encoding and decoding
+- Zero-copy reading and writing
+- Encoding agnostic (only DER is currently supported)
 - Almost all universal triplets
 - Implicit and explicit tagged types
 
 ### [Upcoming features](https://github.com/sponsors/hazae41)
 - More time types
-- More string types 
+- More string types
+- More encodings
 
 ## Usage
 
