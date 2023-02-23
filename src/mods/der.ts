@@ -43,7 +43,7 @@ export namespace DER {
 
   export function read(cursor: Cursor): Triplet {
     const start = cursor.offset
-    const type = Type.read(cursor)
+    const type = Type.DER.read(cursor)
     cursor.offset = start
 
     if (type.equals(Boolean.type))

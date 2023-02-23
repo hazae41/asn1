@@ -24,7 +24,7 @@ export class Constructed<T extends Triplet = Triplet> {
 
   prepare() {
     const triplets = this.triplets.map(it => it.prepare())
-    const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).prepare()
+    const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).DER.prepare().parent
 
     this.#data = { length, triplets }
     return this
@@ -43,20 +43,20 @@ export class Constructed<T extends Triplet = Triplet> {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length, triplets } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     for (const triplet of triplets)
       triplet.write(cursor)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
+    const type = Type.DER.read(cursor)
 
     if (type.wrap !== Type.wraps.CONSTRUCTED)
       throw new Error(`Invalid type`)
 
-    const length = Length.read(cursor)
+    const length = Length.DER.read(cursor)
 
     const subcursor = new Cursor(cursor.read(length.value))
 

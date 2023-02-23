@@ -31,6 +31,8 @@ export class Type {
     UTC_TIME: 23
   } as const
 
+  readonly DER = new Type.DER(this)
+
   constructor(
     readonly clazz: number,
     readonly wrap: number,
@@ -47,34 +49,48 @@ export class Type {
     return true
   }
 
-  static size() {
-    return 1
+}
+
+export namespace Type {
+
+  export class DER {
+    static parent = Type
+
+    constructor(
+      readonly parent: Type
+    ) { }
+
+    static size() {
+      return 1
+    }
+
+    size() {
+      return 1
+    }
+
+    write(cursor: Cursor) {
+      let value = 0
+      value |= this.parent.clazz << 6
+      value |= this.parent.wrap << 5
+      value |= this.parent.tag
+
+      cursor.writeUint8(value)
+    }
+
+    static read(cursor: Cursor) {
+      const type = cursor.readUint8()
+      const bitset = new Bitset(type, 8)
+
+      const clazz = bitset.first(2).value
+      const wrap = Number(bitset.getLE(5))
+      const tag = bitset.last(5).value
+
+      if (tag > 30) // TODO
+        throw new Error(`Unimplemented tag`)
+
+      return new this.parent(clazz, wrap, tag)
+    }
+
   }
 
-  size() {
-    return this.#class.size()
-  }
-
-  write(cursor: Cursor) {
-    let value = 0
-    value |= this.clazz << 6
-    value |= this.wrap << 5
-    value |= this.tag
-
-    cursor.writeUint8(value)
-  }
-
-  static read(cursor: Cursor) {
-    const type = cursor.readUint8()
-    const bitset = new Bitset(type, 8)
-
-    const clazz = bitset.first(2).value
-    const wrap = Number(bitset.getLE(5))
-    const tag = bitset.last(5).value
-
-    if (tag > 30) // TODO
-      throw new Error(`Unimplemented tag`)
-
-    return new this(clazz, wrap, tag)
-  }
 }

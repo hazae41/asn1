@@ -54,7 +54,7 @@ export class Integer {
 
     values.reverse()
 
-    const length = new Length(values.length).prepare()
+    const length = new Length(values.length).DER.prepare().parent
 
     this.#data = { length, values }
     return this
@@ -73,8 +73,8 @@ export class Integer {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length, values } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     const negative = this.value < 0
 
@@ -89,8 +89,8 @@ export class Integer {
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     let value = BigInt(0)
 

@@ -4,7 +4,7 @@ import { Type } from "mods/type/type.js";
 export namespace Triplets {
 
   export function size(length: Length) {
-    return Type.size() + length.size() + length.value
+    return Type.DER.size() + length.DER.size() + length.value
   }
 
 }

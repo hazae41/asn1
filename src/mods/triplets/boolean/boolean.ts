@@ -25,7 +25,7 @@ export class Boolean {
   }
 
   prepare() {
-    const length = new Length(1).prepare()
+    const length = new Length(1).DER.prepare().parent
 
     this.#data = { length }
     return this
@@ -45,15 +45,15 @@ export class Boolean {
 
     const { length } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     cursor.writeUint8(this.value)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     if (length.value !== 1)
       throw new Error(`Invalid ${this.name} length`)

@@ -34,8 +34,8 @@ export class OpaqueTriplet {
   static read(cursor: Cursor) {
     const start = cursor.offset
 
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     const end = cursor.offset
 

@@ -4,71 +4,90 @@ import { Bitset } from "@hazae41/bitset";
 export class VLQ {
   readonly #class = VLQ
 
+  readonly DER = new VLQ.DER(this)
+
   constructor(
     readonly value: number
   ) { }
 
-  #data?: {
-    values: Array<number>
+  get class() {
+    return this.#class
   }
 
-  prepare() {
-    let value = this.value
+}
 
-    const values = new Array<number>()
+export namespace VLQ {
 
-    do {
-      values.push(value % 128)
-      value = Math.floor(value / 128)
-    } while (value)
+  export class DER {
+    static parent = VLQ
 
-    values.reverse()
-    this.#data = { values }
-    return this
-  }
+    constructor(
+      readonly parent: VLQ
+    ) { }
 
-  size() {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { values } = this.#data
-
-    return values.length
-  }
-
-  write(cursor: Cursor) {
-    if (!this.#data)
-      throw new Error(`Unprepared ${this.#class.name}`)
-    const { values } = this.#data
-
-    for (let i = 0; i < values.length - 1; i++) {
-      const bitset = new Bitset(values[i], 8)
-      cursor.writeUint8(bitset.enableBE(0).value)
+    #data?: {
+      values: Array<number>
     }
 
-    cursor.writeUint8(values[values.length - 1])
-  }
+    prepare() {
+      let value = this.parent.value
 
-  static read(cursor: Cursor) {
-    const values = new Array<number>()
+      const values = new Array<number>()
 
-    while (true) {
-      const current = cursor.readUint8()
+      do {
+        values.push(value % 128)
+        value = Math.floor(value / 128)
+      } while (value)
 
-      if (current <= 127) {
-        values.push(current)
-        break
+      values.reverse()
+      this.#data = { values }
+      return this
+    }
+
+    size() {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { values } = this.#data
+
+      return values.length
+    }
+
+    write(cursor: Cursor) {
+      if (!this.#data)
+        throw new Error(`Unprepared ${this.parent.class.name}`)
+      const { values } = this.#data
+
+      for (let i = 0; i < values.length - 1; i++) {
+        const bitset = new Bitset(values[i], 8)
+        cursor.writeUint8(bitset.enableBE(0).value)
       }
 
-      const bitset = new Bitset(current, 8)
-      values.push(bitset.disableBE(0).value)
+      cursor.writeUint8(values[values.length - 1])
     }
 
-    let value = 0
+    static read(cursor: Cursor) {
+      const values = new Array<number>()
 
-    for (let i = 0; i < values.length; i++)
-      value = (value * 128) + values[i]
+      while (true) {
+        const current = cursor.readUint8()
 
-    return new this(value)
+        if (current <= 127) {
+          values.push(current)
+          break
+        }
+
+        const bitset = new Bitset(current, 8)
+        values.push(bitset.disableBE(0).value)
+      }
+
+      let value = 0
+
+      for (let i = 0; i < values.length; i++)
+        value = (value * 128) + values[i]
+
+      return new this.parent(value)
+    }
+
   }
 
 }

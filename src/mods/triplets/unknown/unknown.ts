@@ -23,7 +23,7 @@ export class Unknown {
   }
 
   prepare() {
-    const length = new Length(this.bytes.length).prepare()
+    const length = new Length(this.bytes.length).DER.prepare().parent
 
     this.#data = { length }
     return this
@@ -42,15 +42,15 @@ export class Unknown {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     cursor.write(this.bytes)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     const bytes = cursor.read(length.value)
 

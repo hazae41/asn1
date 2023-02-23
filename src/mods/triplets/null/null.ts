@@ -24,7 +24,7 @@ export class Null {
   }
 
   prepare() {
-    const length = new Length(0).prepare()
+    const length = new Length(0).DER.prepare().parent
 
     this.#data = { length }
     return this
@@ -43,13 +43,13 @@ export class Null {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     if (length.value !== 0)
       throw new Error(`Invalid ${this.name} length`)

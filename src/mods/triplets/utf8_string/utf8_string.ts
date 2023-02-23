@@ -28,7 +28,7 @@ export class UTF8String {
 
   prepare() {
     const bytes = Bytes.fromUtf8(this.value)
-    const length = new Length(bytes.length).prepare()
+    const length = new Length(bytes.length).DER.prepare().parent
 
     this.#data = { length, bytes }
     return this
@@ -47,15 +47,15 @@ export class UTF8String {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length, bytes } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     cursor.write(bytes)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     const value = cursor.readString(length.value)
 

@@ -27,7 +27,7 @@ export class BitString {
   }
 
   prepare() {
-    const length = new Length(1 + this.bytes.length).prepare()
+    const length = new Length(1 + this.bytes.length).DER.prepare().parent
 
     this.#data = { length }
     return this
@@ -46,16 +46,16 @@ export class BitString {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     cursor.writeUint8(this.padding)
     cursor.write(this.bytes)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     const subcursor = new Cursor(cursor.read(length.value))
 

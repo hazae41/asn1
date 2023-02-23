@@ -44,7 +44,7 @@ export class UTCTime {
     const ss = pad2(this.value.getUTCSeconds())
 
     const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
-    const length = new Length(bytes.length).prepare()
+    const length = new Length(bytes.length).DER.prepare().parent
 
     this.#data = { length, bytes }
     return this
@@ -63,15 +63,15 @@ export class UTCTime {
       throw new Error(`Unprepared ${this.#class.name}`)
     const { length, bytes } = this.#data
 
-    this.type.write(cursor)
-    length.write(cursor)
+    this.type.DER.write(cursor)
+    length.DER.write(cursor)
 
     cursor.write(bytes)
   }
 
   static read(cursor: Cursor) {
-    const type = Type.read(cursor)
-    const length = Length.read(cursor)
+    const type = Type.DER.read(cursor)
+    const length = Length.DER.read(cursor)
 
     const text = cursor.readString(length.value)
 
