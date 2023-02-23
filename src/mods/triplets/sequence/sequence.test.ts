@@ -21,10 +21,8 @@ function checkReadWrite(hex: string) {
 
   assert(triplet instanceof Sequence)
 
-  const output = Cursor.allocUnsafe(triplet.size())
-  triplet.write(output)
-
-  return input.buffer.equals(output.buffer)
+  const output = DER.toBytes(triplet)
+  return input.buffer.equals(output)
 }
 
 test("Read then write", async () => {

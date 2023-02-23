@@ -1,6 +1,6 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor, Writable } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
-import { Opaque } from "mods/triplets/opaque/opaque.js";
+import { OpaqueTriplet } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -18,17 +18,22 @@ export class Constructed<T extends Triplet = Triplet> {
   ) { }
 
   #data?: {
-    length: Length
+    length: Length,
+    triplets: Writable[]
   }
 
-  #prepare() {
-    const length = new Length(this.triplets.reduce((p, c) => p + c.size(), 0))
+  prepare() {
+    const triplets = this.triplets.map(it => it.prepare())
+    const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).prepare()
 
-    return this.#data = { length }
+    this.#data = { length, triplets }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -36,13 +41,12 @@ export class Constructed<T extends Triplet = Triplet> {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
-    const { length } = this.#data
+    const { length, triplets } = this.#data
 
     this.type.write(cursor)
     length.write(cursor)
 
-    for (const triplet of this.triplets)
+    for (const triplet of triplets)
       triplet.write(cursor)
   }
 
@@ -56,12 +60,12 @@ export class Constructed<T extends Triplet = Triplet> {
 
     const subcursor = new Cursor(cursor.read(length.value))
 
-    const triplets = new Array<Opaque>()
+    const triplets = new Array<OpaqueTriplet>()
 
     while (subcursor.remaining)
-      triplets.push(Opaque.read(subcursor))
+      triplets.push(OpaqueTriplet.read(subcursor))
 
-    return new this<Opaque>(type, triplets)
+    return new this<OpaqueTriplet>(type, triplets)
   }
 
   toString(): string {

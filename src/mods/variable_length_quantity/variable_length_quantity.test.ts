@@ -1,4 +1,4 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor, Preparable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
@@ -36,10 +36,8 @@ function checkReadWriteVLQ(hex: string) {
   const input = hexToCursor(hex)
   const vlq = VLQ.read(input)
 
-  const output = Cursor.allocUnsafe(vlq.size())
-  vlq.write(output)
-
-  return input.buffer.equals(output.buffer)
+  const output = Preparable.toBytes(vlq)
+  return input.buffer.equals(output)
 }
 
 test("Read then write", async () => {

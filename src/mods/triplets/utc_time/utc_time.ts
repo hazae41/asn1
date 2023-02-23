@@ -30,7 +30,7 @@ export class UTCTime {
     bytes: Uint8Array
   }
 
-  #prepare() {
+  prepare() {
     const year = this.value.getUTCFullYear()
 
     const YY = year > 2000
@@ -44,13 +44,16 @@ export class UTCTime {
     const ss = pad2(this.value.getUTCSeconds())
 
     const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
-    const length = new Length(bytes.length)
+    const length = new Length(bytes.length).prepare()
 
-    return this.#data = { length, bytes }
+    this.#data = { length, bytes }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -58,7 +61,6 @@ export class UTCTime {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length, bytes } = this.#data
 
     this.type.write(cursor)

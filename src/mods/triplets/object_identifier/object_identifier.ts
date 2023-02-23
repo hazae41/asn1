@@ -1,4 +1,4 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor, Writable } from "@hazae41/binary";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -24,10 +24,10 @@ export class ObjectIdentifier {
   #data?: {
     length: Length
     header: readonly [number, number]
-    values: Array<VLQ>
+    values: Writable[]
   }
 
-  #prepare() {
+  prepare() {
     const values = new Array<VLQ>()
     const texts = this.value.split(".")
 
@@ -38,18 +38,21 @@ export class ObjectIdentifier {
     let size = 1
 
     for (let i = 2; i < texts.length; i++) {
-      const vlq = new VLQ(Number(texts[i]))
+      const vlq = new VLQ(Number(texts[i])).prepare()
       size += vlq.size()
       values.push(vlq)
     }
 
-    const length = new Length(size)
+    const length = new Length(size).prepare()
 
-    return this.#data = { length, header, values }
+    this.#data = { length, header, values }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -57,7 +60,6 @@ export class ObjectIdentifier {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length, header, values } = this.#data
 
     this.type.write(cursor)

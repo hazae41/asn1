@@ -1,4 +1,4 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor, Preparable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Length } from "mods/length/length.js";
@@ -29,10 +29,8 @@ function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
   const length = Length.read(input)
 
-  const output = Cursor.allocUnsafe(length.size())
-  length.write(output)
-
-  return input.buffer.equals(output.buffer)
+  const output = Preparable.toBytes(length)
+  return input.buffer.equals(output)
 }
 
 test("Read then write", async () => {

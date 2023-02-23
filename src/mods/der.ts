@@ -1,4 +1,4 @@
-import { Cursor, Readable, Writable } from "@hazae41/binary";
+import { Cursor, Preparable, Readable } from "@hazae41/binary";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";
@@ -7,7 +7,7 @@ import { Integer } from "mods/triplets/integer/integer.js";
 import { Null } from "mods/triplets/null/null.js";
 import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
 import { OctetString } from "mods/triplets/octet_string/octet_string.js";
-import { Opaque } from "mods/triplets/opaque/opaque.js";
+import { OpaqueTriplet } from "mods/triplets/opaque/opaque.js";
 import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Set } from "mods/triplets/set/set.js";
@@ -19,23 +19,23 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  function resolve(opaque: Opaque) {
+  function resolve(opaque: OpaqueTriplet) {
     return opaque.into(DER)
   }
 
-  function resolveSequence(sequence: Sequence<Opaque>) {
+  function resolveSequence(sequence: Sequence<OpaqueTriplet>) {
     const { type, triplets } = sequence
 
     return new Sequence(type, triplets.map(resolve))
   }
 
-  function resolveSet(set: Set<Opaque>) {
+  function resolveSet(set: Set<OpaqueTriplet>) {
     const { type, triplets } = set
 
     return new Set(type, triplets.map(resolve))
   }
 
-  function resolveConstructed(constructed: Constructed<Opaque>) {
+  function resolveConstructed(constructed: Constructed<OpaqueTriplet>) {
     const { type, triplets } = constructed
 
     return new Constructed(type, triplets.map(resolve))
@@ -84,7 +84,7 @@ export namespace DER {
   }
 
   export function toBytes(triplet: Triplet) {
-    return Writable.toBytes(triplet)
+    return Preparable.toBytes(triplet)
   }
 
   export function tryRead(cursor: Cursor) {

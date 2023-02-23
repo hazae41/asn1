@@ -23,14 +23,17 @@ export class Null {
     length: Length
   }
 
-  #prepare() {
-    const length = new Length(0)
+  prepare() {
+    const length = new Length(0).prepare()
 
-    return this.#data = { length }
+    this.#data = { length }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -38,7 +41,6 @@ export class Null {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length } = this.#data
 
     this.type.write(cursor)

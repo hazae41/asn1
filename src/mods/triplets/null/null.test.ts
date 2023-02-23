@@ -1,6 +1,7 @@
 import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
+import { DER } from "mods/der.js";
 import { Null } from "mods/triplets/null/null.js";
 import { relative, resolve } from "node:path";
 
@@ -18,10 +19,8 @@ function checkReadWrite(hex: string) {
   const input = hexToCursor("05 00")
   const triplet = Null.read(input)
 
-  const output = Cursor.allocUnsafe(triplet.size())
-  triplet.write(output)
-
-  return input.buffer.equals(output.buffer)
+  const output = DER.toBytes(triplet)
+  return input.buffer.equals(output)
 }
 
 test("Read then write", async () => {

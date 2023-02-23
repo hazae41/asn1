@@ -2,7 +2,7 @@ import { Cursor, Readable } from "@hazae41/binary"
 import { Length } from "mods/length/length.js"
 import { Type } from "mods/type/type.js"
 
-export class Opaque {
+export class OpaqueTriplet {
 
   /**
    * An opaque triplet, not resolved yet
@@ -14,6 +14,10 @@ export class Opaque {
     readonly type: Type,
     readonly bytes: Uint8Array
   ) { }
+
+  prepare() {
+    return this
+  }
 
   size() {
     return this.bytes.length

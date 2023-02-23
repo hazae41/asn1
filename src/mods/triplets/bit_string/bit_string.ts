@@ -26,14 +26,17 @@ export class BitString {
     length: Length
   }
 
-  #prepare() {
-    const length = new Length(1 + this.bytes.length)
+  prepare() {
+    const length = new Length(1 + this.bytes.length).prepare()
 
-    return this.#data = { length }
+    this.#data = { length }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -41,7 +44,6 @@ export class BitString {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length } = this.#data
 
     this.type.write(cursor)

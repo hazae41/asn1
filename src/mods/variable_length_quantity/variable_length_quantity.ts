@@ -12,7 +12,7 @@ export class VLQ {
     values: Array<number>
   }
 
-  #prepare() {
+  prepare() {
     let value = this.value
 
     const values = new Array<number>()
@@ -23,11 +23,14 @@ export class VLQ {
     } while (value)
 
     values.reverse()
-    return this.#data = { values }
+    this.#data = { values }
+    return this
   }
 
   size() {
-    const { values } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { values } = this.#data
 
     return values.length
   }
@@ -35,7 +38,6 @@ export class VLQ {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { values } = this.#data
 
     for (let i = 0; i < values.length - 1; i++) {

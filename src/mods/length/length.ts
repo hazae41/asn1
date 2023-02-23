@@ -12,9 +12,9 @@ export class Length {
     values: Array<number>
   }
 
-  #prepare() {
+  prepare() {
     if (this.value < 128)
-      throw new Error(`${this.#class.name}.prepare value under 128`)
+      return this
 
     let value = this.value
 
@@ -27,14 +27,17 @@ export class Length {
 
     values.reverse()
 
-    return this.#data = { values }
+    this.#data = { values }
+    return this
   }
 
   size() {
     if (this.value < 128)
       return 1
 
-    const { values } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { values } = this.#data
 
     return 1 + values.length
   }
@@ -45,7 +48,6 @@ export class Length {
 
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { values } = this.#data
 
     const count = new Bitset(values.length, 8)

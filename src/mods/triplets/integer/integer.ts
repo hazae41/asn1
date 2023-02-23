@@ -37,7 +37,7 @@ export class Integer {
     values: Array<number>
   }
 
-  #prepare() {
+  prepare() {
     let value = this.value < 0
       ? ~this.value
       : this.value
@@ -54,13 +54,16 @@ export class Integer {
 
     values.reverse()
 
-    const length = new Length(values.length)
+    const length = new Length(values.length).prepare()
 
-    return this.#data = { length, values }
+    this.#data = { length, values }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -68,7 +71,6 @@ export class Integer {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length, values } = this.#data
 
     this.type.write(cursor)

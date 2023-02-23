@@ -26,17 +26,20 @@ export class PrintableString {
     bytes: Uint8Array
   }
 
-  #prepare() {
+  prepare() {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
       throw new Error(`Invalid value`)
 
     const bytes = Bytes.fromUtf8(this.value)
-    const length = new Length(bytes.length)
-    return this.#data = { length, bytes }
+    const length = new Length(bytes.length).prepare()
+    this.#data = { length, bytes }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -44,7 +47,6 @@ export class PrintableString {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length, bytes } = this.#data
 
     this.type.write(cursor)

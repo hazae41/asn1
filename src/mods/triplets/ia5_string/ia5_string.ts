@@ -26,15 +26,18 @@ export class IA5String {
     bytes: Uint8Array
   }
 
-  #prepare() {
+  prepare() {
     const bytes = Bytes.fromAscii(this.value)
-    const length = new Length(bytes.length)
+    const length = new Length(bytes.length).prepare()
 
-    return this.#data = { length, bytes }
+    this.#data = { length, bytes }
+    return this
   }
 
   size() {
-    const { length } = this.#prepare()
+    if (!this.#data)
+      throw new Error(`Unprepared ${this.#class.name}`)
+    const { length } = this.#data
 
     return Triplets.size(length)
   }
@@ -42,7 +45,6 @@ export class IA5String {
   write(cursor: Cursor) {
     if (!this.#data)
       throw new Error(`Unprepared ${this.#class.name}`)
-
     const { length, bytes } = this.#data
 
     this.type.write(cursor)
