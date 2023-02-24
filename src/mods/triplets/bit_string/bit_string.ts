@@ -15,13 +15,13 @@ export class BitString {
   readonly DER = new BitString.DER(this)
 
   constructor(
-    readonly type: Type,
+    readonly type: Type.DER,
     readonly padding: number,
     readonly bytes: Uint8Array
   ) { }
 
   static new(padding: number, bytes: Uint8Array) {
-    return new this(this.type, padding, bytes)
+    return new this(this.type.toDER(), padding, bytes)
   }
 
   get class() {
@@ -47,11 +47,11 @@ export namespace BitString {
     ) { }
 
     #data?: {
-      length: Length
+      length: Length.DER
     }
 
     prepare() {
-      const length = new Length(1 + this.parent.bytes.length).DER.prepare().parent
+      const length = Length.DER.new(1 + this.parent.bytes.length).prepare()
 
       this.#data = { length }
       return this
@@ -70,8 +70,8 @@ export namespace BitString {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
 
       cursor.writeUint8(this.parent.padding)
       cursor.write(this.parent.bytes)
@@ -81,12 +81,13 @@ export namespace BitString {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const subcursor = new Cursor(cursor.read(length.value))
+      const content = cursor.read(length.inner.value)
+      const subcursor = new Cursor(content)
 
       const padding = subcursor.readUint8()
-      const buffer = subcursor.read(subcursor.remaining)
+      const bytes = subcursor.read(subcursor.remaining)
 
-      return new this.parent(type, padding, buffer)
+      return new this.parent(type, padding, bytes)
     }
 
   }

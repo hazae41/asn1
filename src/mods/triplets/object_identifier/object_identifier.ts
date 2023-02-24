@@ -15,12 +15,12 @@ export class ObjectIdentifier {
   readonly DER = new ObjectIdentifier.DER(this)
 
   constructor(
-    readonly type: Type,
+    readonly type: Type.DER,
     readonly value: string
   ) { }
 
   static new(value: string) {
-    return new this(this.type, value)
+    return new this(this.type.toDER(), value)
   }
 
   get class() {
@@ -43,13 +43,13 @@ export namespace ObjectIdentifier {
     ) { }
 
     #data?: {
-      length: Length
+      length: Length.DER
       header: readonly [number, number]
-      values: VLQ[]
+      values: VLQ.DER[]
     }
 
     prepare() {
-      const values = new Array<VLQ>()
+      const values = new Array<VLQ.DER>()
       const texts = this.parent.value.split(".")
 
       const first = Number(texts[0])
@@ -59,12 +59,12 @@ export namespace ObjectIdentifier {
       let size = 1
 
       for (let i = 2; i < texts.length; i++) {
-        const vlq = new VLQ(Number(texts[i])).DER.prepare().parent
-        size += vlq.DER.size()
+        const vlq = VLQ.DER.new(Number(texts[i])).prepare()
+        size += vlq.size()
         values.push(vlq)
       }
 
-      const length = new Length(size).DER.prepare().parent
+      const length = Length.DER.new(size).prepare()
 
       this.#data = { length, header, values }
       return this
@@ -83,21 +83,22 @@ export namespace ObjectIdentifier {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, header, values } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
 
       const [first, second] = header
       cursor.writeUint8((first * 40) + second)
 
       for (const value of values)
-        value.DER.write(cursor)
+        value.write(cursor)
     }
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const subcursor = new Cursor(cursor.read(length.value))
+      const content = cursor.read(length.inner.value)
+      const subcursor = new Cursor(content)
 
       const header = subcursor.readUint8()
       const first = Math.floor(header / 40)
@@ -106,7 +107,7 @@ export namespace ObjectIdentifier {
       const values = [first, second]
 
       while (subcursor.remaining)
-        values.push(VLQ.DER.read(subcursor).value)
+        values.push(VLQ.DER.read(subcursor).inner.value)
 
       const value = values.join(".")
 

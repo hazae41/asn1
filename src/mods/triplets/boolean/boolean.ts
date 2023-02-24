@@ -14,12 +14,12 @@ export class Boolean {
   readonly DER = new Boolean.DER(this)
 
   constructor(
-    readonly type: Type,
+    readonly type: Type.DER,
     readonly value: number
   ) { }
 
   static new(value: number) {
-    return new this(this.type, value)
+    return new this(this.type.toDER(), value)
   }
 
   get class() {
@@ -42,11 +42,11 @@ export namespace Boolean {
     ) { }
 
     #data?: {
-      length: Length
+      length: Length.DER
     }
 
     prepare() {
-      const length = new Length(1).DER.prepare().parent
+      const length = new Length(1).toDER().prepare()
 
       this.#data = { length }
       return this
@@ -66,8 +66,8 @@ export namespace Boolean {
 
       const { length } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
 
       cursor.writeUint8(this.parent.value)
     }
@@ -76,7 +76,7 @@ export namespace Boolean {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      if (length.value !== 1)
+      if (length.inner.value !== 1)
         throw new Error(`Invalid ${this.name} length`)
 
       const value = cursor.readUint8()

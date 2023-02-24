@@ -2,7 +2,6 @@ import { Cursor, Writable } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 
 export class Type {
-  readonly #class = Type
 
   static clazzes = {
     UNIVERSAL: 0,
@@ -31,8 +30,6 @@ export class Type {
     UTC_TIME: 23
   } as const
 
-  readonly DER = new Type.DER(this)
-
   constructor(
     readonly clazz: number,
     readonly wrap: number,
@@ -49,16 +46,26 @@ export class Type {
     return true
   }
 
+  toDER() {
+    return new Type.DER(this)
+  }
+
 }
 
 export namespace Type {
 
   export class DER {
-    static parent = Type
+    static inner = Type
 
     constructor(
-      readonly parent: Type
+      readonly inner: Type
     ) { }
+
+    static new(clazz: number, wrap: number, tag: number) {
+      const inner = new this.inner(clazz, wrap, tag)
+
+      return new this(inner)
+    }
 
     static size() {
       return 1
@@ -70,9 +77,9 @@ export namespace Type {
 
     write(cursor: Cursor) {
       let value = 0
-      value |= this.parent.clazz << 6
-      value |= this.parent.wrap << 5
-      value |= this.parent.tag
+      value |= this.inner.clazz << 6
+      value |= this.inner.wrap << 5
+      value |= this.inner.tag
 
       cursor.writeUint8(value)
     }
@@ -88,7 +95,7 @@ export namespace Type {
       if (tag > 30) // TODO
         throw new Error(`Unimplemented tag`)
 
-      return new this.parent(clazz, wrap, tag)
+      return this.new(clazz, wrap, tag)
     }
 
     get byte() {

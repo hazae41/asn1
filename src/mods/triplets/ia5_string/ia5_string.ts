@@ -15,12 +15,12 @@ export class IA5String {
   readonly DER = new IA5String.DER(this)
 
   constructor(
-    readonly type: Type,
+    readonly type: Type.DER,
     readonly value: string
   ) { }
 
   static new(value: string) {
-    return new this(this.type, value)
+    return new this(this.type.toDER(), value)
   }
 
   get class() {
@@ -42,13 +42,13 @@ export namespace IA5String {
     ) { }
 
     #data?: {
-      length: Length,
+      length: Length.DER,
       bytes: Uint8Array
     }
 
     prepare() {
       const bytes = Bytes.fromAscii(this.parent.value)
-      const length = new Length(bytes.length).DER.prepare().parent
+      const length = Length.DER.new(bytes.length).prepare()
 
       this.#data = { length, bytes }
       return this
@@ -67,8 +67,8 @@ export namespace IA5String {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
 
       cursor.write(bytes)
     }
@@ -77,7 +77,7 @@ export namespace IA5String {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const bytes = cursor.read(length.value)
+      const bytes = cursor.read(length.inner.value)
       const value = Bytes.toAscii(bytes)
 
       return new this.parent(type, value)

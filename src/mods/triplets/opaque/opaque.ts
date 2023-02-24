@@ -15,7 +15,7 @@ export class Opaque {
     /**
      * Preread triplet type
      */
-    readonly type: Type,
+    readonly type: Type.DER,
     /**
      * The whole triplet (type + length + value)
      */
@@ -65,7 +65,7 @@ export namespace Opaque {
 
       cursor.offset = start
 
-      const bytes = cursor.read(end - start + length.value)
+      const bytes = cursor.read(end - start + length.inner.value)
 
       return new this.parent(type, bytes)
     }

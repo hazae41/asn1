@@ -4,8 +4,6 @@ import { Bitset } from "@hazae41/bitset";
 export class VLQ {
   readonly #class = VLQ
 
-  readonly DER = new VLQ.DER(this)
-
   constructor(
     readonly value: number
   ) { }
@@ -14,23 +12,33 @@ export class VLQ {
     return this.#class
   }
 
+  toDER() {
+    return new VLQ.DER(this)
+  }
+
 }
 
 export namespace VLQ {
 
   export class DER {
-    static parent = VLQ
+    static inner = VLQ
 
     constructor(
-      readonly parent: VLQ
+      readonly inner: VLQ
     ) { }
+
+    static new(value: number) {
+      const inner = new this.inner(value)
+
+      return new this(inner)
+    }
 
     #data?: {
       values: Array<number>
     }
 
     prepare() {
-      let value = this.parent.value
+      let value = this.inner.value
 
       const values = new Array<number>()
 
@@ -46,7 +54,7 @@ export namespace VLQ {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { values } = this.#data
 
       return values.length
@@ -54,7 +62,7 @@ export namespace VLQ {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { values } = this.#data
 
       for (let i = 0; i < values.length - 1; i++) {
@@ -85,7 +93,8 @@ export namespace VLQ {
       for (let i = 0; i < values.length; i++)
         value = (value * 128) + values[i]
 
-      return new this.parent(value)
+      const inner = new this.inner(value)
+      return new this(inner)
     }
 
   }

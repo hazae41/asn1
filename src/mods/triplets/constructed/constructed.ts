@@ -5,7 +5,7 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
-const stringify = (parent: Constructed) => `[${parent.type.tag}] {
+const stringify = (parent: Constructed) => `[${parent.type.inner.tag}] {
   ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
@@ -15,7 +15,7 @@ export class Constructed<T extends Triplet = Triplet> {
   readonly DER = new Constructed.DER<T>(this)
 
   constructor(
-    readonly type: Type,
+    readonly type: Type.DER,
     readonly triplets: T[]
   ) { }
 
@@ -39,13 +39,13 @@ export namespace Constructed {
     ) { }
 
     #data?: {
-      length: Length,
+      length: Length.DER,
       triplets: Writable[]
     }
 
     prepare() {
       const triplets = this.parent.triplets.map(it => it.DER.prepare())
-      const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).DER.prepare().parent
+      const length = Length.DER.new(triplets.reduce((p, c) => p + c.size(), 0)).prepare()
 
       this.#data = { length, triplets }
       return this
@@ -64,8 +64,8 @@ export namespace Constructed {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, triplets } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
 
       for (const triplet of triplets)
         triplet.write(cursor)
@@ -74,12 +74,13 @@ export namespace Constructed {
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
 
-      if (type.wrap !== Type.wraps.CONSTRUCTED)
+      if (type.inner.wrap !== Type.wraps.CONSTRUCTED)
         throw new Error(`Invalid type`)
 
       const length = Length.DER.read(cursor)
 
-      const subcursor = new Cursor(cursor.read(length.value))
+      const content = cursor.read(length.inner.value)
+      const subcursor = new Cursor(content)
 
       const triplets = new Array<Opaque>()
 

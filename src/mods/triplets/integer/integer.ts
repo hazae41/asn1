@@ -26,12 +26,12 @@ export class Integer {
   readonly DER = new Integer.DER(this)
 
   constructor(
-    readonly type: Type,
+    readonly type: Type.DER,
     readonly value: bigint
   ) { }
 
   static new(value: bigint) {
-    return new this(this.type, value)
+    return new this(this.type.toDER(), value)
   }
 
   get class() {
@@ -53,7 +53,7 @@ export namespace Integer {
     ) { }
 
     #data?: {
-      length: Length
+      length: Length.DER
       values: Array<number>
     }
 
@@ -74,7 +74,7 @@ export namespace Integer {
 
       values.reverse()
 
-      const length = new Length(values.length).DER.prepare().parent
+      const length = Length.DER.new(values.length).prepare()
 
       this.#data = { length, values }
       return this
@@ -93,8 +93,8 @@ export namespace Integer {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, values } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
 
       const negative = this.parent.value < 0
 
@@ -116,7 +116,7 @@ export namespace Integer {
 
       const negative = cursor.getUint8() > 127
 
-      for (let i = 0; i < length.value; i++) {
+      for (let i = 0; i < length.inner.value; i++) {
         value = (value * bn256) + BigInt(sign(cursor.readUint8(), negative).value)
       }
 

@@ -14,11 +14,11 @@ export class Null {
   readonly DER = new Null.DER(this)
 
   constructor(
-    readonly type: Type
+    readonly type: Type.DER
   ) { }
 
   static new() {
-    return new this(this.type)
+    return new this(this.type.toDER())
   }
 
   get class() {
@@ -40,11 +40,11 @@ export namespace Null {
     ) { }
 
     #data?: {
-      length: Length
+      length: Length.DER
     }
 
     prepare() {
-      const length = new Length(0).DER.prepare().parent
+      const length = Length.DER.new(0).prepare()
 
       this.#data = { length }
       return this
@@ -63,15 +63,15 @@ export namespace Null {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.DER.write(cursor)
-      length.DER.write(cursor)
+      this.parent.type.write(cursor)
+      length.write(cursor)
     }
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      if (length.value !== 0)
+      if (length.inner.value !== 0)
         throw new Error(`Invalid ${this.name} length`)
 
       return new this.parent(type)
