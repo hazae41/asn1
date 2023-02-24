@@ -12,19 +12,21 @@ export class ObjectIdentifier {
     Type.wraps.PRIMITIVE,
     Type.tags.OBJECT_IDENTIFIER)
 
-  readonly DER = new ObjectIdentifier.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly value: string
   ) { }
 
   static new(value: string) {
-    return new this(this.type.toDER(), value)
+    return new this(this.type, value)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new ObjectIdentifier.DER(this)
   }
 
   toString() {
@@ -59,12 +61,12 @@ export namespace ObjectIdentifier {
       let size = 1
 
       for (let i = 2; i < texts.length; i++) {
-        const vlq = VLQ.DER.new(Number(texts[i])).prepare()
+        const vlq = new VLQ(Number(texts[i])).toDER().prepare()
         size += vlq.size()
         values.push(vlq)
       }
 
-      const length = Length.DER.new(size).prepare()
+      const length = new Length(size).toDER().prepare()
 
       this.#data = { length, header, values }
       return this
@@ -83,7 +85,7 @@ export namespace ObjectIdentifier {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, header, values } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       const [first, second] = header
@@ -97,7 +99,7 @@ export namespace ObjectIdentifier {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const content = cursor.read(length.inner.value)
+      const content = cursor.read(length.value)
       const subcursor = new Cursor(content)
 
       const header = subcursor.readUint8()
@@ -107,7 +109,7 @@ export namespace ObjectIdentifier {
       const values = [first, second]
 
       while (subcursor.remaining)
-        values.push(VLQ.DER.read(subcursor).inner.value)
+        values.push(VLQ.DER.read(subcursor).value)
 
       const value = values.join(".")
 

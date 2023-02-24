@@ -11,19 +11,21 @@ export class Boolean {
     Type.wraps.PRIMITIVE,
     Type.tags.BOOLEAN)
 
-  readonly DER = new Boolean.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly value: number
   ) { }
 
   static new(value: number) {
-    return new this(this.type.toDER(), value)
+    return new this(this.type, value)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new Boolean.DER(this)
   }
 
   toString() {
@@ -35,10 +37,10 @@ export class Boolean {
 export namespace Boolean {
 
   export class DER {
-    static parent = Boolean
+    static inner = Boolean
 
     constructor(
-      readonly parent: Boolean
+      readonly inner: Boolean
     ) { }
 
     #data?: {
@@ -54,7 +56,7 @@ export namespace Boolean {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -62,26 +64,26 @@ export namespace Boolean {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
 
       const { length } = this.#data
 
-      this.parent.type.write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
-      cursor.writeUint8(this.parent.value)
+      cursor.writeUint8(this.inner.value)
     }
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      if (length.inner.value !== 1)
+      if (length.value !== 1)
         throw new Error(`Invalid ${this.name} length`)
 
       const value = cursor.readUint8()
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
   }
 }

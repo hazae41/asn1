@@ -61,12 +61,6 @@ export namespace Type {
       readonly inner: Type
     ) { }
 
-    static new(clazz: number, wrap: number, tag: number) {
-      const inner = new this.inner(clazz, wrap, tag)
-
-      return new this(inner)
-    }
-
     static size() {
       return 1
     }
@@ -95,7 +89,7 @@ export namespace Type {
       if (tag > 30) // TODO
         throw new Error(`Unimplemented tag`)
 
-      return this.new(clazz, wrap, tag)
+      return new this.inner(clazz, wrap, tag)
     }
 
     get byte() {

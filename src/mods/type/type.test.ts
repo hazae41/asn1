@@ -16,5 +16,5 @@ function hexToType(hex: string) {
 }
 
 test("Read", async () => {
-  assert(hexToType("30").inner.equals(Sequence.type))
+  assert(hexToType("30").equals(Sequence.type))
 })

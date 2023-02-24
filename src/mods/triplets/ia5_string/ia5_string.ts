@@ -12,24 +12,27 @@ export class IA5String {
     Type.wraps.PRIMITIVE,
     Type.tags.IA5_STRING)
 
-  readonly DER = new IA5String.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly value: string
   ) { }
 
   static new(value: string) {
-    return new this(this.type.toDER(), value)
+    return new this(this.type, value)
   }
 
   get class() {
     return this.#class
   }
 
+  toDER() {
+    return new IA5String.DER(this)
+  }
+
   toString() {
     return `IA5String ${this.value}`
   }
+
 }
 
 export namespace IA5String {
@@ -48,7 +51,7 @@ export namespace IA5String {
 
     prepare() {
       const bytes = Bytes.fromAscii(this.parent.value)
-      const length = Length.DER.new(bytes.length).prepare()
+      const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
       return this
@@ -67,7 +70,7 @@ export namespace IA5String {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -77,7 +80,7 @@ export namespace IA5String {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const bytes = cursor.read(length.inner.value)
+      const bytes = cursor.read(length.value)
       const value = Bytes.toAscii(bytes)
 
       return new this.parent(type, value)

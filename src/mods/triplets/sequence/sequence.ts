@@ -17,19 +17,21 @@ export class Sequence<T extends Triplet = Triplet> {
     Type.wraps.CONSTRUCTED,
     Type.tags.SEQUENCE)
 
-  readonly DER = new Sequence.DER<T>(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly triplets: T[]
   ) { }
 
   static new<T extends Triplet = Triplet>(triplets: T[]) {
-    return new this<T>(this.type.toDER(), triplets)
+    return new this<T>(this.type, triplets)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new Sequence.DER<T>(this)
   }
 
   toString(): string {
@@ -53,8 +55,8 @@ export namespace Sequence {
     }
 
     prepare() {
-      const triplets = this.parent.triplets.map(it => it.DER.prepare())
-      const length = Length.DER.new(triplets.reduce((p, c) => p + c.size(), 0)).prepare()
+      const triplets = this.parent.triplets.map(it => it.toDER().prepare())
+      const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).toDER().prepare()
 
       this.#data = { length, triplets }
       return this
@@ -73,7 +75,7 @@ export namespace Sequence {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, triplets } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       for (const triplet of triplets)
@@ -84,7 +86,7 @@ export namespace Sequence {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const content = cursor.read(length.inner.value)
+      const content = cursor.read(length.value)
       const subcursor = new Cursor(content)
 
       const triplets = new Array<Opaque>()

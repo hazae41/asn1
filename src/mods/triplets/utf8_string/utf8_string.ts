@@ -12,19 +12,21 @@ export class UTF8String {
     Type.wraps.PRIMITIVE,
     Type.tags.UTF8_STRING)
 
-  readonly DER = new UTF8String.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly value: string
   ) { }
 
   static new(value: string) {
-    return new this(this.type.toDER(), value)
+    return new this(this.type, value)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new UTF8String.DER(this)
   }
 
   toString() {
@@ -41,7 +43,6 @@ export namespace UTF8String {
       readonly parent: UTF8String
     ) { }
 
-
     #data?: {
       length: Length.DER
       bytes: Uint8Array
@@ -49,7 +50,7 @@ export namespace UTF8String {
 
     prepare() {
       const bytes = Bytes.fromUtf8(this.parent.value)
-      const length = Length.DER.new(bytes.length).prepare()
+      const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
       return this
@@ -68,7 +69,7 @@ export namespace UTF8String {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -78,7 +79,7 @@ export namespace UTF8String {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const value = cursor.readString(length.inner.value)
+      const value = cursor.readString(length.value)
 
       return new this.parent(type, value)
     }

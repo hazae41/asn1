@@ -12,19 +12,21 @@ export class PrintableString {
     Type.wraps.PRIMITIVE,
     Type.tags.PRINTABLE_STRING)
 
-  readonly DER = new PrintableString.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly value: string
   ) { }
 
   static new(value: string) {
-    return new this(this.type.toDER(), value)
+    return new this(this.type, value)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new PrintableString.DER(this)
   }
 
   toString() {
@@ -51,7 +53,7 @@ export namespace PrintableString {
         throw new Error(`Invalid value`)
 
       const bytes = Bytes.fromUtf8(this.parent.value)
-      const length = Length.DER.new(bytes.length).prepare()
+      const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
       return this
@@ -70,7 +72,7 @@ export namespace PrintableString {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -80,7 +82,7 @@ export namespace PrintableString {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const value = cursor.readString(length.inner.value)
+      const value = cursor.readString(length.value)
 
       if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
         throw new Error(`Invalid value`)

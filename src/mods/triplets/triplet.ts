@@ -10,7 +10,7 @@ export interface ToStringable {
 }
 
 export interface Triplet {
-  type: Type.DER
-  DER: Preparable
+  type: Type
+  toDER(): Preparable
   toString(): string
 }

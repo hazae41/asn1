@@ -12,20 +12,22 @@ export class BitString {
     Type.wraps.PRIMITIVE,
     Type.tags.BIT_STRING)
 
-  readonly DER = new BitString.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly padding: number,
     readonly bytes: Uint8Array
   ) { }
 
   static new(padding: number, bytes: Uint8Array) {
-    return new this(this.type.toDER(), padding, bytes)
+    return new this(this.type, padding, bytes)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new BitString.DER(this)
   }
 
   toString() {
@@ -40,10 +42,10 @@ export class BitString {
 export namespace BitString {
 
   export class DER {
-    static parent = BitString
+    static inner = BitString
 
     constructor(
-      readonly parent: BitString
+      readonly inner: BitString
     ) { }
 
     #data?: {
@@ -51,7 +53,7 @@ export namespace BitString {
     }
 
     prepare() {
-      const length = Length.DER.new(1 + this.parent.bytes.length).prepare()
+      const length = new Length(1 + this.inner.bytes.length).toDER().prepare()
 
       this.#data = { length }
       return this
@@ -59,7 +61,7 @@ export namespace BitString {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -67,27 +69,27 @@ export namespace BitString {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
-      cursor.writeUint8(this.parent.padding)
-      cursor.write(this.parent.bytes)
+      cursor.writeUint8(this.inner.padding)
+      cursor.write(this.inner.bytes)
     }
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const content = cursor.read(length.inner.value)
+      const content = cursor.read(length.value)
       const subcursor = new Cursor(content)
 
       const padding = subcursor.readUint8()
       const bytes = subcursor.read(subcursor.remaining)
 
-      return new this.parent(type, padding, bytes)
+      return new this.inner(type, padding, bytes)
     }
 
   }

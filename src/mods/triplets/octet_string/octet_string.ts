@@ -12,19 +12,21 @@ export class OctetString {
     Type.wraps.PRIMITIVE,
     Type.tags.OCTET_STRING)
 
-  readonly DER = new OctetString.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly bytes: Uint8Array
   ) { }
 
   static new(bytes: Uint8Array) {
-    return new this(this.type.toDER(), bytes)
+    return new this(this.type, bytes)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new OctetString.DER(this)
   }
 
   toString() {
@@ -46,7 +48,7 @@ export namespace OctetString {
     }
 
     prepare() {
-      const length = Length.DER.new(this.parent.bytes.length).prepare()
+      const length = new Length(this.parent.bytes.length).toDER().prepare()
 
       this.#data = { length }
       return this
@@ -65,7 +67,7 @@ export namespace OctetString {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(this.parent.bytes)
@@ -75,7 +77,7 @@ export namespace OctetString {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const buffer = cursor.read(length.inner.value)
+      const buffer = cursor.read(length.value)
 
       return new this.parent(type, buffer)
     }

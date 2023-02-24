@@ -18,7 +18,7 @@ function bytesToTriplet(bytes: Uint8Array) {
 
   if (!(opaque instanceof Opaque))
     throw new Error(`Not an opaque`)
-  if (opaque.type.inner.tag !== 1)
+  if (opaque.type.tag !== 1)
     throw new Error(`Not a custom integer`)
   return opaque.into(Integer.DER)
 }

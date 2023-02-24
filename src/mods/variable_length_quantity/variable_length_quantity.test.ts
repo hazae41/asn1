@@ -16,7 +16,7 @@ function hexToCursor(hex: string) {
 
 function hexToVLQ(hex: string) {
   const cursor = hexToCursor(hex)
-  return VLQ.DER.read(cursor).inner.value
+  return VLQ.DER.read(cursor).value
 }
 
 test("Read", async () => {
@@ -36,7 +36,7 @@ function checkReadWriteVLQ(hex: string) {
   const input = hexToCursor(hex)
   const vlq = VLQ.DER.read(input)
 
-  const output = Preparable.toBytes(vlq)
+  const output = Preparable.toBytes(vlq.toDER())
   return input.buffer.equals(output)
 }
 

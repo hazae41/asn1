@@ -2,8 +2,8 @@ import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { DER } from "mods/der.js";
-import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { relative, resolve } from "node:path";
+import { IA5String } from "./ia5_string.js";
 
 const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
@@ -17,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = UTF8String.DER.read(input)
+  const triplet = IA5String.DER.read(input)
 
   const output = DER.toBytes(triplet)
   return input.buffer.equals(output)

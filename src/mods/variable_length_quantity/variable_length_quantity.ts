@@ -27,12 +27,6 @@ export namespace VLQ {
       readonly inner: VLQ
     ) { }
 
-    static new(value: number) {
-      const inner = new this.inner(value)
-
-      return new this(inner)
-    }
-
     #data?: {
       values: Array<number>
     }
@@ -93,8 +87,7 @@ export namespace VLQ {
       for (let i = 0; i < values.length; i++)
         value = (value * 128) + values[i]
 
-      const inner = new this.inner(value)
-      return new this(inner)
+      return new this.inner(value)
     }
 
   }

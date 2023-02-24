@@ -27,12 +27,6 @@ export namespace Length {
       readonly inner: Length
     ) { }
 
-    static new(value: number) {
-      const inner = new this.inner(value)
-
-      return new this(inner)
-    }
-
     #data?: {
       values: Array<number>
     }
@@ -91,7 +85,7 @@ export namespace Length {
       const first = cursor.readUint8()
 
       if (first < 128)
-        return this.new(first)
+        return new this.inner(first)
 
       const count = new Bitset(first, 8)
         .disableBE(0)
@@ -102,7 +96,7 @@ export namespace Length {
       for (let i = 0; i < count; i++)
         value = (value * 256) + cursor.readUint8()
 
-      return this.new(value)
+      return new this.inner(value)
     }
   }
 

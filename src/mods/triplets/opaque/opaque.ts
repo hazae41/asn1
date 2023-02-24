@@ -5,8 +5,6 @@ import { Type } from "mods/type/type.js"
 
 export class Opaque {
 
-  readonly DER = new Opaque.DER(this)
-
   /**
    * An opaque triplet
    * @param bytes 
@@ -15,7 +13,7 @@ export class Opaque {
     /**
      * Preread triplet type
      */
-    readonly type: Type.DER,
+    readonly type: Type,
     /**
      * The whole triplet (type + length + value)
      */
@@ -27,6 +25,10 @@ export class Opaque {
    */
   into<T>(readable: Readable<T>) {
     return Readable.fromBytes(readable, this.bytes)
+  }
+
+  toDER() {
+    return new Opaque.DER(this)
   }
 
   toString() {
@@ -65,7 +67,7 @@ export namespace Opaque {
 
       cursor.offset = start
 
-      const bytes = cursor.read(end - start + length.inner.value)
+      const bytes = cursor.read(end - start + length.value)
 
       return new this.parent(type, bytes)
     }

@@ -5,22 +5,24 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
-const stringify = (parent: Constructed) => `[${parent.type.inner.tag}] {
+const stringify = (parent: Constructed) => `[${parent.type.tag}] {
   ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
 export class Constructed<T extends Triplet = Triplet> {
   readonly #class = Constructed
 
-  readonly DER = new Constructed.DER<T>(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly triplets: T[]
   ) { }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new Constructed.DER<T>(this)
   }
 
   toString(): string {
@@ -44,8 +46,8 @@ export namespace Constructed {
     }
 
     prepare() {
-      const triplets = this.parent.triplets.map(it => it.DER.prepare())
-      const length = Length.DER.new(triplets.reduce((p, c) => p + c.size(), 0)).prepare()
+      const triplets = this.parent.triplets.map(it => it.toDER().prepare())
+      const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).toDER().prepare()
 
       this.#data = { length, triplets }
       return this
@@ -64,7 +66,7 @@ export namespace Constructed {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, triplets } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       for (const triplet of triplets)
@@ -74,12 +76,12 @@ export namespace Constructed {
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
 
-      if (type.inner.wrap !== Type.wraps.CONSTRUCTED)
+      if (type.wrap !== Type.wraps.CONSTRUCTED)
         throw new Error(`Invalid type`)
 
       const length = Length.DER.read(cursor)
 
-      const content = cursor.read(length.inner.value)
+      const content = cursor.read(length.value)
       const subcursor = new Cursor(content)
 
       const triplets = new Array<Opaque>()

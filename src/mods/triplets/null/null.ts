@@ -11,18 +11,20 @@ export class Null {
     Type.wraps.PRIMITIVE,
     Type.tags.NULL)
 
-  readonly DER = new Null.DER(this)
-
   constructor(
-    readonly type: Type.DER
+    readonly type: Type
   ) { }
 
   static new() {
-    return new this(this.type.toDER())
+    return new this(this.type)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new Null.DER(this)
   }
 
   toString() {
@@ -44,7 +46,7 @@ export namespace Null {
     }
 
     prepare() {
-      const length = Length.DER.new(0).prepare()
+      const length = new Length(0).toDER().prepare()
 
       this.#data = { length }
       return this
@@ -63,7 +65,7 @@ export namespace Null {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
     }
 
@@ -71,7 +73,7 @@ export namespace Null {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      if (length.inner.value !== 0)
+      if (length.value !== 0)
         throw new Error(`Invalid ${this.name} length`)
 
       return new this.parent(type)

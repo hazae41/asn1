@@ -16,19 +16,21 @@ export class UTCTime {
     Type.wraps.PRIMITIVE,
     Type.tags.UTC_TIME)
 
-  readonly DER = new UTCTime.DER(this)
-
   constructor(
-    readonly type: Type.DER,
+    readonly type: Type,
     readonly value: Date
   ) { }
 
   static new(value: Date) {
-    return new this(this.type.toDER(), value)
+    return new this(this.type, value)
   }
 
   get class() {
     return this.#class
+  }
+
+  toDER() {
+    return new UTCTime.DER(this)
   }
 
   toString() {
@@ -64,7 +66,7 @@ export namespace UTCTime {
       const ss = pad2(this.parent.value.getUTCSeconds())
 
       const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
-      const length = Length.DER.new(bytes.length).prepare()
+      const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
       return this
@@ -83,7 +85,7 @@ export namespace UTCTime {
         throw new Error(`Unprepared ${this.parent.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.write(cursor)
+      this.parent.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -93,7 +95,7 @@ export namespace UTCTime {
       const type = Type.DER.read(cursor)
       const length = Length.DER.read(cursor)
 
-      const text = cursor.readString(length.inner.value)
+      const text = cursor.readString(length.value)
 
       if (text.length !== 13)
         throw new Error(`Invalid format`)
