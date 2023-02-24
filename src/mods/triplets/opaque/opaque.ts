@@ -39,10 +39,10 @@ export class Opaque {
 export namespace Opaque {
 
   export class DER {
-    static parent = Opaque
+    static inner = Opaque
 
     constructor(
-      readonly parent: Opaque
+      readonly inner: Opaque
     ) { }
 
     prepare() {
@@ -50,11 +50,11 @@ export namespace Opaque {
     }
 
     size() {
-      return this.parent.bytes.length
+      return this.inner.bytes.length
     }
 
     write(cursor: Cursor) {
-      cursor.write(this.parent.bytes)
+      cursor.write(this.inner.bytes)
     }
 
     static read(cursor: Cursor) {
@@ -69,7 +69,7 @@ export namespace Opaque {
 
       const bytes = cursor.read(end - start + length.value)
 
-      return new this.parent(type, bytes)
+      return new this.inner(type, bytes)
     }
   }
 }

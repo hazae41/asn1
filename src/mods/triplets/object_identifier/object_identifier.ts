@@ -38,10 +38,10 @@ export class ObjectIdentifier {
 export namespace ObjectIdentifier {
 
   export class DER {
-    static parent = ObjectIdentifier
+    static inner = ObjectIdentifier
 
     constructor(
-      readonly parent: ObjectIdentifier
+      readonly inner: ObjectIdentifier
     ) { }
 
     #data?: {
@@ -52,7 +52,7 @@ export namespace ObjectIdentifier {
 
     prepare() {
       const values = new Array<VLQ.DER>()
-      const texts = this.parent.value.split(".")
+      const texts = this.inner.value.split(".")
 
       const first = Number(texts[0])
       const second = Number(texts[1])
@@ -74,7 +74,7 @@ export namespace ObjectIdentifier {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -82,10 +82,10 @@ export namespace ObjectIdentifier {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, header, values } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
       const [first, second] = header
@@ -113,7 +113,7 @@ export namespace ObjectIdentifier {
 
       const value = values.join(".")
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
   }
 

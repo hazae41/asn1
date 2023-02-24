@@ -48,10 +48,10 @@ export class Integer {
 export namespace Integer {
 
   export class DER {
-    static parent = Integer
+    static inner = Integer
 
     constructor(
-      readonly parent: Integer
+      readonly inner: Integer
     ) { }
 
     #data?: {
@@ -60,9 +60,9 @@ export namespace Integer {
     }
 
     prepare() {
-      let value = this.parent.value < 0
-        ? ~this.parent.value
-        : this.parent.value
+      let value = this.inner.value < 0
+        ? ~this.inner.value
+        : this.inner.value
 
       const values = new Array<number>()
 
@@ -84,7 +84,7 @@ export namespace Integer {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -92,13 +92,13 @@ export namespace Integer {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, values } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
-      const negative = this.parent.value < 0
+      const negative = this.inner.value < 0
 
       const first = sign(values[0], negative)
         .setBE(0, negative)
@@ -125,7 +125,7 @@ export namespace Integer {
       if (negative)
         value = ~value
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
 
   }

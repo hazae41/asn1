@@ -41,10 +41,10 @@ export class UTCTime {
 export namespace UTCTime {
 
   export class DER {
-    static parent = UTCTime
+    static inner = UTCTime
 
     constructor(
-      readonly parent: UTCTime
+      readonly inner: UTCTime
     ) { }
 
     #data?: {
@@ -53,17 +53,17 @@ export namespace UTCTime {
     }
 
     prepare() {
-      const year = this.parent.value.getUTCFullYear()
+      const year = this.inner.value.getUTCFullYear()
 
       const YY = year > 2000
         ? pad2(year - 2000)
         : pad2(year - 1900)
 
-      const MM = pad2(this.parent.value.getUTCMonth() + 1)
-      const DD = pad2(this.parent.value.getUTCDate())
-      const hh = pad2(this.parent.value.getUTCHours())
-      const mm = pad2(this.parent.value.getUTCMinutes())
-      const ss = pad2(this.parent.value.getUTCSeconds())
+      const MM = pad2(this.inner.value.getUTCMonth() + 1)
+      const DD = pad2(this.inner.value.getUTCDate())
+      const hh = pad2(this.inner.value.getUTCHours())
+      const mm = pad2(this.inner.value.getUTCMinutes())
+      const ss = pad2(this.inner.value.getUTCSeconds())
 
       const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
       const length = new Length(bytes.length).toDER().prepare()
@@ -74,7 +74,7 @@ export namespace UTCTime {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -82,10 +82,10 @@ export namespace UTCTime {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -118,7 +118,7 @@ export namespace UTCTime {
       value.setUTCHours(hh, mm, ss)
       value.setUTCMilliseconds(0)
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
 
   }

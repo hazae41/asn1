@@ -37,10 +37,10 @@ export class OctetString {
 export namespace OctetString {
 
   export class DER {
-    static parent = OctetString
+    static inner = OctetString
 
     constructor(
-      readonly parent: OctetString
+      readonly inner: OctetString
     ) { }
 
     #data?: {
@@ -48,7 +48,7 @@ export namespace OctetString {
     }
 
     prepare() {
-      const length = new Length(this.parent.bytes.length).toDER().prepare()
+      const length = new Length(this.inner.bytes.length).toDER().prepare()
 
       this.#data = { length }
       return this
@@ -56,7 +56,7 @@ export namespace OctetString {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -64,13 +64,13 @@ export namespace OctetString {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
-      cursor.write(this.parent.bytes)
+      cursor.write(this.inner.bytes)
     }
 
     static read(cursor: Cursor) {
@@ -79,7 +79,7 @@ export namespace OctetString {
 
       const buffer = cursor.read(length.value)
 
-      return new this.parent(type, buffer)
+      return new this.inner(type, buffer)
     }
   }
 }

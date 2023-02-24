@@ -37,10 +37,10 @@ export class UTF8String {
 export namespace UTF8String {
 
   export class DER {
-    static parent = UTF8String
+    static inner = UTF8String
 
     constructor(
-      readonly parent: UTF8String
+      readonly inner: UTF8String
     ) { }
 
     #data?: {
@@ -49,7 +49,7 @@ export namespace UTF8String {
     }
 
     prepare() {
-      const bytes = Bytes.fromUtf8(this.parent.value)
+      const bytes = Bytes.fromUtf8(this.inner.value)
       const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
@@ -58,7 +58,7 @@ export namespace UTF8String {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -66,10 +66,10 @@ export namespace UTF8String {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -81,7 +81,7 @@ export namespace UTF8String {
 
       const value = cursor.readString(length.value)
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
   }
 }

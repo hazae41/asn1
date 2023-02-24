@@ -37,10 +37,10 @@ export class PrintableString {
 export namespace PrintableString {
 
   export class DER {
-    static parent = PrintableString
+    static inner = PrintableString
 
     constructor(
-      readonly parent: PrintableString
+      readonly inner: PrintableString
     ) { }
 
     #data?: {
@@ -49,10 +49,10 @@ export namespace PrintableString {
     }
 
     prepare() {
-      if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.parent.value))
+      if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.inner.value))
         throw new Error(`Invalid value`)
 
-      const bytes = Bytes.fromUtf8(this.parent.value)
+      const bytes = Bytes.fromUtf8(this.inner.value)
       const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
@@ -61,7 +61,7 @@ export namespace PrintableString {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -69,10 +69,10 @@ export namespace PrintableString {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -87,7 +87,7 @@ export namespace PrintableString {
       if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
         throw new Error(`Invalid value`)
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
   }
 }

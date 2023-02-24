@@ -38,10 +38,10 @@ export class IA5String {
 export namespace IA5String {
 
   export class DER {
-    static parent = IA5String
+    static inner = IA5String
 
     constructor(
-      readonly parent: IA5String
+      readonly inner: IA5String
     ) { }
 
     #data?: {
@@ -50,7 +50,7 @@ export namespace IA5String {
     }
 
     prepare() {
-      const bytes = Bytes.fromAscii(this.parent.value)
+      const bytes = Bytes.fromAscii(this.inner.value)
       const length = new Length(bytes.length).toDER().prepare()
 
       this.#data = { length, bytes }
@@ -59,7 +59,7 @@ export namespace IA5String {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -67,10 +67,10 @@ export namespace IA5String {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, bytes } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
       cursor.write(bytes)
@@ -83,7 +83,7 @@ export namespace IA5String {
       const bytes = cursor.read(length.value)
       const value = Bytes.toAscii(bytes)
 
-      return new this.parent(type, value)
+      return new this.inner(type, value)
     }
   }
 }

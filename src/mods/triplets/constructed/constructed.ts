@@ -34,10 +34,10 @@ export class Constructed<T extends Triplet = Triplet> {
 export namespace Constructed {
 
   export class DER<T extends Triplet = Triplet> {
-    static parent = Constructed
+    static inner = Constructed
 
     constructor(
-      readonly parent: Constructed<T>
+      readonly inner: Constructed<T>
     ) { }
 
     #data?: {
@@ -46,7 +46,7 @@ export namespace Constructed {
     }
 
     prepare() {
-      const triplets = this.parent.triplets.map(it => it.toDER().prepare())
+      const triplets = this.inner.triplets.map(it => it.toDER().prepare())
       const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).toDER().prepare()
 
       this.#data = { length, triplets }
@@ -55,7 +55,7 @@ export namespace Constructed {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -63,10 +63,10 @@ export namespace Constructed {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length, triplets } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
 
       for (const triplet of triplets)
@@ -89,7 +89,7 @@ export namespace Constructed {
       while (subcursor.remaining)
         triplets.push(Opaque.DER.read(subcursor))
 
-      return new this.parent<Opaque>(type, triplets)
+      return new this.inner<Opaque>(type, triplets)
     }
   }
 

@@ -35,10 +35,10 @@ export class Null {
 export namespace Null {
 
   export class DER {
-    static parent = Null
+    static inner = Null
 
     constructor(
-      readonly parent: Null
+      readonly inner: Null
     ) { }
 
     #data?: {
@@ -54,7 +54,7 @@ export namespace Null {
 
     size() {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
       return Triplets.size(length)
@@ -62,10 +62,10 @@ export namespace Null {
 
     write(cursor: Cursor) {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.parent.class.name}`)
+        throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
-      this.parent.type.toDER().write(cursor)
+      this.inner.type.toDER().write(cursor)
       length.write(cursor)
     }
 
@@ -76,7 +76,7 @@ export namespace Null {
       if (length.value !== 0)
         throw new Error(`Invalid ${this.name} length`)
 
-      return new this.parent(type)
+      return new this.inner(type)
     }
 
   }
