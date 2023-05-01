@@ -3,8 +3,13 @@ import { Type } from "mods/type/type.js";
 
 export namespace Triplets {
 
-  export function size(length: Length.DER) {
-    return Type.DER.size() + length.size() + length.inner.value
+  export function trySize(length: Length.DER) {
+    const lengthSizeResult = length.trySize()
+
+    if (lengthSizeResult.isErr())
+      return lengthSizeResult
+
+    return Type.DER.size() + lengthSizeResult.inner + length.inner.value
   }
 
 }

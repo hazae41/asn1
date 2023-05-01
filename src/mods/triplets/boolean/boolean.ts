@@ -59,7 +59,7 @@ export namespace Boolean {
         throw new Error(`Unprepared ${this.inner.class.name}`)
       const { length } = this.#data
 
-      return Triplets.size(length)
+      return Triplets.trySize(length)
     }
 
     write(cursor: Cursor) {

@@ -1,5 +1,6 @@
-import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Ok, Result } from "@hazae41/result";
 
 export class Length {
   readonly #class = Length
@@ -31,9 +32,9 @@ export namespace Length {
       values: Array<number>
     }
 
-    prepare() {
+    tryPrepare(): Result<DER, Error> {
       if (this.inner.value < 128)
-        return this
+        return new Ok(this)
 
       let value = this.inner.value
 
@@ -47,56 +48,66 @@ export namespace Length {
       values.reverse()
 
       this.#data = { values }
-      return this
+      return new Ok(this)
     }
 
-    size() {
+    trySize(): Result<number, Error> {
       if (this.inner.value < 128)
-        return 1
+        return new Ok(1)
 
       if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
+        return Err.error(`Unprepared ${this.inner.class.name}`)
+
       const { values } = this.#data
 
-      return 1 + values.length
+      return new Ok(1 + values.length)
     }
 
-    write(cursor: Cursor) {
+    tryWrite(cursor: Cursor): Result<void, Error> {
       if (this.inner.value < 128)
-        return cursor.writeUint8(this.inner.value)
+        return cursor.tryWriteUint8(this.inner.value)
 
       if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
+        return Err.error(`Unprepared ${this.inner.class.name}`)
+
       const { values } = this.#data
 
       const count = new Bitset(values.length, 8)
         .enableBE(0)
         .value
 
-      cursor.writeUint8(count)
+      try {
+        cursor.tryWriteUint8(count).throw()
 
-      for (const value of values)
-        cursor.writeUint8(value)
+        for (const value of values)
+          cursor.tryWriteUint8(value).throw()
 
-      return
+        return Ok.void()
+      } catch (e: unknown) {
+        return Err.catch(e, Error)
+      }
     }
 
-    static read(cursor: Cursor) {
-      const first = cursor.readUint8()
+    static tryRead(cursor: Cursor): Result<Length, Error> {
+      try {
+        const first = cursor.tryReadUint8().throw()
 
-      if (first < 128)
-        return new this.inner(first)
+        if (first < 128)
+          return new Ok(new this.inner(first))
 
-      const count = new Bitset(first, 8)
-        .disableBE(0)
-        .value
+        const count = new Bitset(first, 8)
+          .disableBE(0)
+          .value
 
-      let value = 0
+        let value = 0
 
-      for (let i = 0; i < count; i++)
-        value = (value * 256) + cursor.readUint8()
+        for (let i = 0; i < count; i++)
+          value = (value * 256) + cursor.tryReadUint8().throw()
 
-      return new this.inner(value)
+        return new Ok(new this.inner(value))
+      } catch (e: unknown) {
+        return Err.catch(e, Error)
+      }
     }
   }
 

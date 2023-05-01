@@ -1,5 +1,6 @@
-import { Cursor, Preparable } from "@hazae41/binary";
+import { Preparable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 import { relative, resolve } from "node:path";
@@ -16,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function hexToVLQ(hex: string) {
   const cursor = hexToCursor(hex)
-  return VLQ.DER.read(cursor).value
+  return VLQ.DER.tryRead(cursor).unwrap().value
 }
 
 test("Read", async () => {
@@ -34,9 +35,9 @@ test("Read", async () => {
 
 function checkReadWriteVLQ(hex: string) {
   const input = hexToCursor(hex)
-  const vlq = VLQ.DER.read(input)
+  const vlq = VLQ.DER.tryRead(input).unwrap()
 
-  const output = Preparable.toBytes(vlq.toDER())
+  const output = Preparable.tryPreparetoBytes(vlq.toDER()).unwrap()
   return input.buffer.equals(output)
 }
 

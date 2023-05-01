@@ -1,5 +1,6 @@
-import { Cursor } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Ok, Result } from "@hazae41/result";
 
 export class VLQ {
   readonly #class = VLQ
@@ -31,7 +32,7 @@ export namespace VLQ {
       values: Array<number>
     }
 
-    prepare() {
+    tryPrepare(): Result<DER, Error> {
       let value = this.inner.value
 
       const values = new Array<number>()
@@ -43,51 +44,63 @@ export namespace VLQ {
 
       values.reverse()
       this.#data = { values }
-      return this
+      return new Ok(this)
     }
 
-    size() {
+    trySize(): Result<number, Error> {
       if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
+        return Err.error(`Unprepared ${this.inner.class.name}`)
+
       const { values } = this.#data
 
-      return values.length
+      return new Ok(values.length)
     }
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { values } = this.#data
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      try {
+        if (!this.#data)
+          return Err.error(`Unprepared ${this.inner.class.name}`)
 
-      for (let i = 0; i < values.length - 1; i++) {
-        const bitset = new Bitset(values[i], 8)
-        cursor.writeUint8(bitset.enableBE(0).value)
-      }
+        const { values } = this.#data
 
-      cursor.writeUint8(values[values.length - 1])
-    }
-
-    static read(cursor: Cursor) {
-      const values = new Array<number>()
-
-      while (true) {
-        const current = cursor.readUint8()
-
-        if (current <= 127) {
-          values.push(current)
-          break
+        for (let i = 0; i < values.length - 1; i++) {
+          const bitset = new Bitset(values[i], 8)
+          cursor.tryWriteUint8(bitset.enableBE(0).value).throw()
         }
 
-        const bitset = new Bitset(current, 8)
-        values.push(bitset.disableBE(0).value)
+        cursor.tryWriteUint8(values[values.length - 1]).throw()
+
+        return Ok.void()
+      } catch (e: unknown) {
+        return Err.catch(e, Error)
       }
+    }
 
-      let value = 0
+    static tryRead(cursor: Cursor): Result<VLQ, Error> {
+      try {
+        const values = new Array<number>()
 
-      for (let i = 0; i < values.length; i++)
-        value = (value * 128) + values[i]
+        while (true) {
+          const current = cursor.tryReadUint8().throw()
 
-      return new this.inner(value)
+          if (current <= 127) {
+            values.push(current)
+            break
+          }
+
+          const bitset = new Bitset(current, 8)
+          values.push(bitset.disableBE(0).value)
+        }
+
+        let value = 0
+
+        for (let i = 0; i < values.length; i++)
+          value = (value * 128) + values[i]
+
+        return new Ok(new this.inner(value))
+      } catch (e: unknown) {
+        return Err.catch(e, Error)
+      }
     }
 
   }

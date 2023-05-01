@@ -1,5 +1,6 @@
-import { Cursor, Preparable } from "@hazae41/binary";
+import { Preparable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Length } from "mods/length/length.js";
 import { relative, resolve } from "node:path";
@@ -16,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function hexToLength(hex: string) {
   const cursor = hexToCursor(hex)
-  const length = Length.DER.read(cursor)
+  const length = Length.DER.tryRead(cursor).unwrap()
   return length.value
 }
 
@@ -27,9 +28,9 @@ test("Read", async () => {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const length = Length.DER.read(input)
+  const length = Length.DER.tryRead(input).unwrap()
 
-  const output = Preparable.toBytes(length.toDER())
+  const output = Preparable.tryPreparetoBytes(length.toDER()).unwrap()
   return input.buffer.equals(output)
 }
 

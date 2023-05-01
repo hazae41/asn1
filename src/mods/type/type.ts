@@ -1,5 +1,7 @@
-import { Cursor, Writable } from "@hazae41/binary";
+import { Writable } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Ok, Result } from "@hazae41/result";
 
 export class Type {
 
@@ -65,35 +67,39 @@ export namespace Type {
       return 1
     }
 
-    size() {
-      return 1
+    trySize(): Result<number, never> {
+      return new Ok(1)
     }
 
-    write(cursor: Cursor) {
+    tryWrite(cursor: Cursor): Result<void, Error> {
       let value = 0
       value |= this.inner.clazz << 6
       value |= this.inner.wrap << 5
       value |= this.inner.tag
 
-      cursor.writeUint8(value)
+      return cursor.tryWriteUint8(value)
     }
 
-    static read(cursor: Cursor) {
-      const type = cursor.readUint8()
-      const bitset = new Bitset(type, 8)
+    static tryRead(cursor: Cursor): Result<Type, Error> {
+      try {
+        const type = cursor.tryReadUint8().throw()
+        const bitset = new Bitset(type, 8)
 
-      const clazz = bitset.first(2).value
-      const wrap = Number(bitset.getLE(5))
-      const tag = bitset.last(5).value
+        const clazz = bitset.first(2).value
+        const wrap = Number(bitset.getLE(5))
+        const tag = bitset.last(5).value
 
-      if (tag > 30) // TODO
-        throw new Error(`Unimplemented tag`)
+        if (tag > 30) // TODO
+          return Err.error(`Unimplemented tag`)
 
-      return new this.inner(clazz, wrap, tag)
+        return new Ok(new this.inner(clazz, wrap, tag))
+      } catch (e: unknown) {
+        return Err.catch(e, Error)
+      }
     }
 
-    get byte() {
-      return Writable.toBytes(this)[0]
+    get byte(): Result<number, Error> {
+      return Writable.tryToBytes(this).mapSync(x => x[0])
     }
 
   }
