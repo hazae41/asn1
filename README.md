@@ -13,8 +13,8 @@ npm i @hazae41/asn1
 ### Current features
 - 100% TypeScript and ESM
 - No external dependency
-- Zero-copy reading and writing
-- Encoding agnostic (even though only DER is currently implemented)
+- Rust-like patterns
+- Zero-copy DER reading and writing
 - Almost all universal triplets
 - Implicit and explicit tagged types
 
@@ -30,9 +30,9 @@ import { DER } from "@hazae41/asn1"
 
 const input = new Uint8Array([0x01, 0x01, 0xFF])
 
-const triplet = DER.fromBytes(input) // Boolean
+const triplet = DER.tryFromBytes(input).unwrap() // Boolean
 
 console.log(triplet.toString()) // "BOOLEAN true"
 
-const output = DER.toBytes(triplet) // Uint8Array([0x01, 0x01, 0xFF])
+const output = DER.tryToBytes(triplet).unwrap() // Uint8Array([0x01, 0x01, 0xFF])
 ```
