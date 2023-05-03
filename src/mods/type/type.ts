@@ -81,7 +81,7 @@ export namespace Type {
     }
 
     static tryRead(cursor: Cursor): Result<Type, Error> {
-      try {
+      return Result.unthrowSync(() => {
         const type = cursor.tryReadUint8().throw()
         const bitset = new Bitset(type, 8)
 
@@ -93,13 +93,11 @@ export namespace Type {
           return Err.error(`Unimplemented tag`)
 
         return new Ok(new this.inner(clazz, wrap, tag))
-      } catch (e: unknown) {
-        return Err.catch(e, Error)
-      }
+      }, Error)
     }
 
     get byte(): Result<number, Error> {
-      return Writable.tryToBytes(this).mapSync(x => x[0])
+      return Writable.tryWriteToBytes(this).mapSync(x => x[0])
     }
 
   }

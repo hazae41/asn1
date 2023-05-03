@@ -32,7 +32,7 @@ export namespace VLQ {
       values: Array<number>
     }
 
-    tryPrepare(): Result<DER, Error> {
+    tryPrepare(): Result<DER, never> {
       let value = this.inner.value
 
       const values = new Array<number>()
@@ -57,7 +57,7 @@ export namespace VLQ {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      try {
+      return Result.unthrowSync(() => {
         if (!this.#data)
           return Err.error(`Unprepared ${this.inner.class.name}`)
 
@@ -71,13 +71,11 @@ export namespace VLQ {
         cursor.tryWriteUint8(values[values.length - 1]).throw()
 
         return Ok.void()
-      } catch (e: unknown) {
-        return Err.catch(e, Error)
-      }
+      }, Error)
     }
 
     static tryRead(cursor: Cursor): Result<VLQ, Error> {
-      try {
+      return Result.unthrowSync(() => {
         const values = new Array<number>()
 
         while (true) {
@@ -98,9 +96,7 @@ export namespace VLQ {
           value = (value * 128) + values[i]
 
         return new Ok(new this.inner(value))
-      } catch (e: unknown) {
-        return Err.catch(e, Error)
-      }
+      }, Error)
     }
 
   }

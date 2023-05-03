@@ -37,7 +37,7 @@ function checkReadWriteVLQ(hex: string) {
   const input = hexToCursor(hex)
   const vlq = VLQ.DER.tryRead(input).unwrap()
 
-  const output = Preparable.tryPreparetoBytes(vlq.toDER()).unwrap()
+  const output = Preparable.tryPrepareToBytes(vlq.toDER()).unwrap()
   return input.buffer.equals(output)
 }
 
