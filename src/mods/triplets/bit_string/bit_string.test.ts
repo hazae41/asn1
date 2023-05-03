@@ -17,7 +17,7 @@ function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
   const triplet = BitString.DER.tryRead(input).unwrap()
 
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return input.buffer.equals(output)
 }
 

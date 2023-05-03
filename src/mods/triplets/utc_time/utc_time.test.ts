@@ -1,5 +1,5 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { DER } from "mods/der.js";
 import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
@@ -17,7 +17,7 @@ function hexToCursor(hex: string) {
 
 function hexToDate(hex: string) {
   const input = hexToCursor(hex)
-  return UTCTime.DER.read(input).value.toUTCString()
+  return UTCTime.DER.tryRead(input).unwrap().value.toUTCString()
 }
 
 function reformatDate(text: string) {
@@ -32,9 +32,9 @@ test("Read", async () => {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = UTCTime.DER.read(input)
+  const triplet = UTCTime.DER.tryRead(input).unwrap()
 
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return input.buffer.equals(output)
 }
 

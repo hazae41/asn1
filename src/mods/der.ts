@@ -1,4 +1,7 @@
-import { Preparable, Readable } from "@hazae41/binary";
+import { BinaryReadUnderflowError, BinaryWriteUnderflowError, Readable, Writable } from "@hazae41/binary";
+import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
+import { Ok, Result } from "@hazae41/result";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";
@@ -18,7 +21,7 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  function resolve(opaque: Opaque): Triplet {
+  export function tryResolve(opaque: Opaque): Result<Triplet, Error> {
     if (opaque.type.equals(Boolean.type))
       return opaque.tryInto(Boolean.DER)
     if (opaque.type.equals(Integer.type))
@@ -36,9 +39,9 @@ export namespace DER {
     if (opaque.type.equals(PrintableString.type))
       return opaque.tryInto(PrintableString.DER)
     if (opaque.type.equals(Sequence.type))
-      return resolveSequence(opaque.tryInto(Sequence.DER))
+      return opaque.tryInto(Sequence.DER).andThenSync(it => Sequence.tryResolve(it, DER))
     if (opaque.type.equals(Set.type))
-      return resolveSet(opaque.tryInto(Set.DER))
+      return opaque.tryInto(Set.DER).andThenSync(it => Set.tryResolve(it, DER))
     if (opaque.type.equals(IA5String.type))
       return opaque.tryInto(IA5String.DER)
     if (opaque.type.equals(UTCTime.type))
@@ -48,48 +51,25 @@ export namespace DER {
       throw new Error(`Unknown UNIVERSAL type`)
 
     if (opaque.type.wrap === Type.wraps.CONSTRUCTED)
-      return resolveConstructed(opaque.tryInto(Constructed.DER))
+      return opaque.tryInto(Constructed.DER).andThenSync(it => Constructed.tryResolve(it, DER))
 
-    return opaque
+    return new Ok(opaque)
   }
 
-  function resolveSequence(sequence: Sequence<Opaque>) {
-    const { type, triplets } = sequence
-
-    return new Sequence(type, triplets.map(resolve))
+  export function tryRead(cursor: Cursor): Result<Triplet, Error> {
+    return Opaque.DER.tryRead(cursor).andThenSync(tryResolve)
   }
 
-  function resolveSet(set: Set<Opaque>) {
-    const { type, triplets } = set
-
-    return new Set(type, triplets.map(resolve))
+  export function tryReadOrRollback(cursor: Cursor): Result<Triplet, Error> {
+    return Readable.tryReadOrRollback(DER, cursor)
   }
 
-  function resolveConstructed(constructed: Constructed<Opaque>) {
-    const { type, triplets } = constructed
-
-    return new Constructed(type, triplets.map(resolve))
+  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, Error | BinaryReadUnderflowError> {
+    return Readable.tryReadFromBytes(DER, bytes)
   }
 
-  export function read(cursor: Cursor): Triplet {
-    const opaque = Opaque.DER.read(cursor)
-
-    return resolve(opaque)
+  export function tryWriteToBytes(triplet: Triplet): Result<Bytes, Error | BinaryWriteUnderflowError> {
+    return triplet.tryToDER().andThenSync(Writable.tryWriteToBytes)
   }
 
-  export function fromBytes(bytes: Uint8Array) {
-    return Readable.fromBytes(DER, bytes)
-  }
-
-  export function toBytes(triplet: Triplet) {
-    return Preparable.toBytes(triplet.toDER())
-  }
-
-  export function tryRead(cursor: Cursor) {
-    return Readable.tryRead(DER, cursor)
-  }
-
-  export function tryFromBytes(bytes: Uint8Array) {
-    return Readable.tryFromBytes(DER, bytes)
-  }
 }

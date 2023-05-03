@@ -1,5 +1,8 @@
-import { Cursor, Writable } from "@hazae41/binary";
+import { Writable } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
+import { Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
+import { Resolvable } from "mods/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -26,12 +29,28 @@ export class Set<T extends Triplet = Triplet> {
     return new this<T>(this.type, triplets)
   }
 
+  static tryResolve(sequence: Set<Opaque>, resolvable: Resolvable): Result<Set<Triplet>, Error> {
+    return Result.unthrowSync(() => {
+      const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw())
+
+      return new Ok(new Set(sequence.type, resolveds))
+    }, Error)
+  }
+
   get class() {
     return this.#class
   }
 
-  toDER() {
-    return new Set.DER<T>(this)
+  tryToDER(): Result<Set.DER, Error> {
+    return Result.unthrowSync(() => {
+      const triplets = this.triplets.map(it => it.tryToDER().throw())
+      const size = triplets.reduce((p, c) => p + c.trySize().throw(), 0)
+
+      const type = this.type.tryToDER().inner
+      const length = new Length(size).tryToDER().inner
+
+      return new Ok(new Set.DER(type, length, triplets))
+    }, Error)
   }
 
   toString(): string {
@@ -41,59 +60,46 @@ export class Set<T extends Triplet = Triplet> {
 
 export namespace Set {
 
-  export class DER<T extends Triplet = Triplet> {
+  export class DER {
     static inner = Set
 
     constructor(
-      readonly inner: Set<T>
+      readonly type: Type.DER,
+      readonly length: Length.DER,
+      readonly triplets: Writable[]
     ) { }
 
-    #data?: {
-      length: Length.LengthDER,
-      triplets: Writable[]
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      const triplets = this.inner.triplets.map(it => it.toDER().prepare())
-      const length = new Length(triplets.reduce((p, c) => p + c.size(), 0)).toDER().prepare()
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      this.#data = { length, triplets }
-      return this
+        for (const triplet of this.triplets)
+          triplet.tryWrite(cursor).throw()
+
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<Set<Opaque>, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        const content = cursor.tryRead(length.value).throw()
+        const subcursor = new Cursor(content)
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length, triplets } = this.#data
+        const triplets = new Array<Opaque>()
 
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
+        while (subcursor.remaining)
+          triplets.push(Opaque.DER.tryRead(subcursor).throw())
 
-      for (const triplet of triplets)
-        triplet.write(cursor)
-    }
-
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.LengthDER.read(cursor)
-
-      const content = cursor.read(length.value)
-      const subcursor = new Cursor(content)
-
-      const triplets = new Array<Opaque>()
-
-      while (subcursor.remaining)
-        triplets.push(Opaque.DER.read(subcursor))
-
-      return new this.inner<Opaque>(type, triplets)
+        return new Ok(new Set<Opaque>(type, triplets))
+      }, Error)
     }
   }
 }

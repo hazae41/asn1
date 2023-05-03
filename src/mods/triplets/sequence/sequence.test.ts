@@ -1,5 +1,5 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { DER } from "mods/der.js";
 import { relative, resolve } from "node:path";
@@ -17,11 +17,11 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = DER.read(input)
+  const triplet = DER.tryRead(input).unwrap()
 
   assert(triplet instanceof Sequence)
 
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return input.buffer.equals(output)
 }
 

@@ -1,5 +1,5 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { DER } from "mods/der.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
@@ -17,9 +17,9 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = UTF8String.DER.read(input)
+  const triplet = UTF8String.DER.tryRead(input).unwrap()
 
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return input.buffer.equals(output)
 }
 

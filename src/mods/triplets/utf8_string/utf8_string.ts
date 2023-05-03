@@ -1,5 +1,6 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
+import { Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -25,8 +26,13 @@ export class UTF8String {
     return this.#class
   }
 
-  toDER() {
-    return new UTF8String.DER(this)
+  tryToDER(): Result<UTF8String.DER, never> {
+    const bytes = Bytes.fromUtf8(this.value)
+
+    const type = this.type.tryToDER().inner
+    const length = new Length(bytes.length).tryToDER().inner
+
+    return new Ok(new UTF8String.DER(type, length, bytes))
   }
 
   toString() {
@@ -40,48 +46,35 @@ export namespace UTF8String {
     static inner = UTF8String
 
     constructor(
-      readonly inner: UTF8String
+      readonly type: Type.DER,
+      readonly length: Length.DER,
+      readonly bytes: Bytes
     ) { }
 
-    #data?: {
-      length: Length.LengthDER
-      bytes: Uint8Array
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      const bytes = Bytes.fromUtf8(this.inner.value)
-      const length = new Length(bytes.length).toDER().prepare()
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      this.#data = { length, bytes }
-      return this
+        cursor.tryWrite(this.bytes).throw()
+
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<UTF8String, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        const value = cursor.tryReadString(length.value).throw()
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length, bytes } = this.#data
-
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
-
-      cursor.write(bytes)
-    }
-
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.LengthDER.read(cursor)
-
-      const value = cursor.readString(length.value)
-
-      return new this.inner(type, value)
+        return new Ok(new UTF8String(type, value))
+      }, Error)
     }
   }
 }

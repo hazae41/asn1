@@ -2,6 +2,7 @@ import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
+import { Resolvable } from "mods/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -18,6 +19,14 @@ export class Constructed<T extends Triplet = Triplet> {
     readonly type: Type,
     readonly triplets: T[]
   ) { }
+
+  static tryResolve(sequence: Constructed<Opaque>, resolvable: Resolvable): Result<Constructed<Triplet>, Error> {
+    return Result.unthrowSync(() => {
+      const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw())
+
+      return new Ok(new Constructed(sequence.type, resolveds))
+    }, Error)
+  }
 
   get class() {
     return this.#class

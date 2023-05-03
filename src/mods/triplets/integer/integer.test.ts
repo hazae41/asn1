@@ -14,7 +14,7 @@ function hexToBytes(hex: string) {
 }
 
 function bytesToTriplet(bytes: Uint8Array) {
-  return Readable.fromBytes(Integer.DER, bytes)
+  return Readable.tryReadFromBytes(Integer.DER, bytes).unwrap()
 }
 
 function hexToTriplet(hex: string) {
@@ -35,7 +35,7 @@ test("Read", async () => {
 function checkReadWrite(hex: string) {
   const input = hexToBytes(hex)
   const triplet = bytesToTriplet(input)
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return Bytes.equals(input, output)
 }
 

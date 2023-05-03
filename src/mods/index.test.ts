@@ -55,51 +55,51 @@ function compare(a: Uint8Array, b: Uint8Array) {
 
 test("Cert Ed25519", async () => {
   const text = await readFile("./certs/ed25519.pem", "utf8")
-  const triplet = DER.fromBytes(PEM.parse(text))
+  const triplet = DER.tryReadFromBytes(PEM.parse(text)).unwrap()
 
-  assert(compare(PEM.parse(text), DER.toBytes(triplet)))
+  assert(compare(PEM.parse(text), DER.tryWriteToBytes(triplet).unwrap()))
 })
 
 test("Cert Let's Encrypt", async () => {
   const text = await readFile("./certs/letsencrypt.pem", "utf8")
-  const triplet = DER.fromBytes(PEM.parse(text))
+  const triplet = DER.tryReadFromBytes(PEM.parse(text)).unwrap()
 
-  assert(compare(PEM.parse(text), DER.toBytes(triplet)))
+  assert(compare(PEM.parse(text), DER.tryWriteToBytes(triplet).unwrap()))
 })
 
 test("Cert PKCS7", async () => {
   const text = await readFile("./certs/pkcs7.pem", "utf8")
-  const triplet = DER.fromBytes(PKCS7.parse(text))
+  const triplet = DER.tryReadFromBytes(PKCS7.parse(text)).unwrap()
 
-  assert(compare(PKCS7.parse(text), DER.toBytes(triplet)))
+  assert(compare(PKCS7.parse(text), DER.tryWriteToBytes(triplet).unwrap()))
 })
 
 test("Cert frank4dd-rsa", async () => {
   const buffer = await readFile("./certs/frank4dd-rsa.der")
-  const triplet = DER.fromBytes(buffer)
+  const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.toBytes(triplet)))
+  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
 })
 
 test("Cert frank4dd-dsa", async () => {
   const buffer = await readFile("./certs/frank4dd-dsa.der")
-  const triplet = DER.fromBytes(buffer)
+  const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.toBytes(triplet)))
+  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
 })
 
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
   const buffer = Bytes.fromBase64(text)
-  const triplet = DER.fromBytes(buffer)
+  const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.toBytes(triplet)))
+  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
 })
 
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
   const buffer = Bytes.fromBase64(text)
-  const triplet = DER.fromBytes(buffer)
+  const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.toBytes(triplet)))
+  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
 })

@@ -1,5 +1,5 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { DER } from "mods/der.js";
 import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
@@ -17,9 +17,9 @@ function hexToCursor(hex: string) {
 
 function checkReadWriteOID(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = ObjectIdentifier.DER.read(input)
+  const triplet = ObjectIdentifier.DER.tryRead(input).unwrap()
 
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return input.buffer.equals(output)
 }
 

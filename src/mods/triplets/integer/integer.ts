@@ -64,6 +64,7 @@ export class Integer {
   toString() {
     return `INTEGER ${this.value}`
   }
+
 }
 
 export namespace Integer {
@@ -82,7 +83,7 @@ export namespace Integer {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor) {
+    tryWrite(cursor: Cursor): Result<void, Error> {
       return Result.unthrowSync(() => {
         this.type.tryWrite(cursor).throw()
         this.length.tryWrite(cursor).throw()
@@ -101,7 +102,7 @@ export namespace Integer {
       }, Error)
     }
 
-    static read(cursor: Cursor) {
+    static tryRead(cursor: Cursor): Result<Integer, Error> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
         const length = Length.DER.tryRead(cursor).throw()

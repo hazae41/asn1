@@ -14,13 +14,13 @@ function hexToBytes(hex: string) {
 }
 
 function bytesToTriplet(bytes: Uint8Array) {
-  const opaque = DER.fromBytes(bytes)
+  const opaque = DER.tryReadFromBytes(bytes).unwrap()
 
   if (!(opaque instanceof Opaque))
     throw new Error(`Not an opaque`)
   if (opaque.type.tag !== 1)
     throw new Error(`Not a custom integer`)
-  return opaque.tryInto(Integer.DER)
+  return opaque.tryInto(Integer.DER).unwrap()
 }
 
 function hexToTriplet(hex: string) {
@@ -41,7 +41,7 @@ test("Read", async () => {
 function checkReadWrite(hex: string) {
   const input = hexToBytes(hex)
   const triplet = bytesToTriplet(input)
-  const output = DER.toBytes(triplet)
+  const output = DER.tryWriteToBytes(triplet).unwrap()
   return Bytes.equals(input, output)
 }
 
