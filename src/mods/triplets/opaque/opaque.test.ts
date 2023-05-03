@@ -20,7 +20,7 @@ function bytesToTriplet(bytes: Uint8Array) {
     throw new Error(`Not an opaque`)
   if (opaque.type.tag !== 1)
     throw new Error(`Not a custom integer`)
-  return opaque.into(Integer.DER)
+  return opaque.tryInto(Integer.DER)
 }
 
 function hexToTriplet(hex: string) {

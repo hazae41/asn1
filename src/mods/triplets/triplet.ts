@@ -1,4 +1,5 @@
-import { Preparable } from "@hazae41/binary"
+import { Writable } from "@hazae41/binary"
+import { Result } from "@hazae41/result"
 import { Type } from "mods/type/type.js"
 
 export interface Typed {
@@ -11,6 +12,6 @@ export interface ToStringable {
 
 export interface Triplet {
   type: Type
-  toDER(): Preparable
+  tryToDER(): Result<Writable, Error>
   toString(): string
 }

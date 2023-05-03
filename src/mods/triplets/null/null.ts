@@ -1,4 +1,5 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -23,13 +24,17 @@ export class Null {
     return this.#class
   }
 
-  toDER() {
-    return new Null.DER(this)
+  tryToDER(): Result<Null.DER, never> {
+    const type = this.type.tryToDER().inner
+    const length = new Length(0).tryToDER().inner
+
+    return new Ok(new Null.DER(type, length))
   }
 
   toString() {
     return `NULL`
   }
+
 }
 
 export namespace Null {
@@ -38,45 +43,33 @@ export namespace Null {
     static inner = Null
 
     constructor(
-      readonly inner: Null
+      readonly type: Type.DER,
+      readonly length: Length.DER
     ) { }
 
-    #data?: {
-      length: Length.LengthDER
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      const length = new Length(0).toDER().prepare()
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      this.#data = { length }
-      return this
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<Null, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        if (length.value !== 0)
+          return Err.error(`Invalid length for Null`)
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
-
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
-    }
-
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.LengthDER.read(cursor)
-
-      if (length.value !== 0)
-        throw new Error(`Invalid ${this.name} length`)
-
-      return new this.inner(type)
+        return new Ok(new Null(type))
+      }, Error)
     }
 
   }

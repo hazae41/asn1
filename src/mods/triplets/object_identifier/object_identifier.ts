@@ -1,4 +1,5 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
+import { Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -25,8 +26,28 @@ export class ObjectIdentifier {
     return this.#class
   }
 
-  toDER() {
-    return new ObjectIdentifier.DER(this)
+  tryToDER(): Result<ObjectIdentifier.DER, Error> {
+    return Result.unthrowSync(() => {
+      const values = new Array<VLQ.DER>()
+      const texts = this.value.split(".")
+
+      const first = Number(texts[0])
+      const second = Number(texts[1])
+      const header = [first, second] as const
+
+      let size = 1
+
+      for (let i = 2; i < texts.length; i++) {
+        const vlq = new VLQ(Number(texts[i])).tryToDER().throw()
+        size += vlq.trySize().throw()
+        values.push(vlq)
+      }
+
+      const type = this.type.tryToDER().inner
+      const length = new Length(size).tryToDER().inner
+
+      return new Ok(new ObjectIdentifier.DER(type, length, header, values))
+    }, Error)
   }
 
   toString() {
@@ -41,79 +62,53 @@ export namespace ObjectIdentifier {
     static inner = ObjectIdentifier
 
     constructor(
-      readonly inner: ObjectIdentifier
+      readonly type: Type.DER,
+      readonly length: Length.DER,
+      readonly header: readonly [number, number],
+      readonly values: VLQ.DER[]
     ) { }
 
-    #data?: {
-      length: Length.LengthDER
-      header: readonly [number, number]
-      values: VLQ.DER[]
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      const values = new Array<VLQ.DER>()
-      const texts = this.inner.value.split(".")
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      const first = Number(texts[0])
-      const second = Number(texts[1])
-      const header = [first, second] as const
+        const [first, second] = this.header
 
-      let size = 1
+        cursor.tryWriteUint8((first * 40) + second).throw()
 
-      for (let i = 2; i < texts.length; i++) {
-        const vlq = new VLQ(Number(texts[i])).toDER().prepare()
-        size += vlq.size()
-        values.push(vlq)
-      }
+        for (const value of this.values)
+          value.tryWrite(cursor).throw()
 
-      const length = new Length(size).toDER().prepare()
-
-      this.#data = { length, header, values }
-      return this
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<ObjectIdentifier, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        const content = cursor.tryRead(length.value).throw()
+        const subcursor = new Cursor(content)
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length, header, values } = this.#data
+        const header = subcursor.tryReadUint8().throw()
+        const first = Math.floor(header / 40)
+        const second = header % 40
 
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
+        const values = [first, second]
 
-      const [first, second] = header
-      cursor.writeUint8((first * 40) + second)
+        while (subcursor.remaining)
+          values.push(VLQ.DER.tryRead(subcursor).throw().value)
 
-      for (const value of values)
-        value.write(cursor)
-    }
+        const value = values.join(".")
 
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.LengthDER.read(cursor)
-
-      const content = cursor.read(length.value)
-      const subcursor = new Cursor(content)
-
-      const header = subcursor.readUint8()
-      const first = Math.floor(header / 40)
-      const second = header % 40
-
-      const values = [first, second]
-
-      while (subcursor.remaining)
-        values.push(VLQ.DER.read(subcursor).value)
-
-      const value = values.join(".")
-
-      return new this.inner(type, value)
+        return new Ok(new ObjectIdentifier(type, value))
+      }, Error)
     }
   }
 

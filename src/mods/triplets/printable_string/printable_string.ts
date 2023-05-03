@@ -1,5 +1,6 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -25,8 +26,16 @@ export class PrintableString {
     return this.#class
   }
 
-  toDER() {
-    return new PrintableString.DER(this)
+  tryToDER(): Result<PrintableString.DER, Error> {
+    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
+      return Err.error(`Invalid value for PrintableString`)
+
+    const bytes = Bytes.fromUtf8(this.value)
+
+    const type = this.type.tryToDER().inner
+    const length = new Length(bytes.length).tryToDER().inner
+
+    return new Ok(new PrintableString.DER(type, length, bytes))
   }
 
   toString() {
@@ -40,54 +49,38 @@ export namespace PrintableString {
     static inner = PrintableString
 
     constructor(
-      readonly inner: PrintableString
+      readonly type: Type.DER,
+      readonly length: Length.DER,
+      readonly bytes: Bytes
     ) { }
 
-    #data?: {
-      length: Length.LengthDER,
-      bytes: Uint8Array
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.inner.value))
-        throw new Error(`Invalid value`)
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      const bytes = Bytes.fromUtf8(this.inner.value)
-      const length = new Length(bytes.length).toDER().prepare()
+        cursor.tryWrite(this.bytes).throw()
 
-      this.#data = { length, bytes }
-      return this
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<PrintableString, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        const value = cursor.tryReadString(length.value).throw()
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length, bytes } = this.#data
+        if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
+          return Err.error(`Invalid value for PrintableString`)
 
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
-
-      cursor.write(bytes)
-    }
-
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.LengthDER.read(cursor)
-
-      const value = cursor.readString(length.value)
-
-      if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
-        throw new Error(`Invalid value`)
-
-      return new this.inner(type, value)
+        return new Ok(new PrintableString(type, value))
+      }, Error)
     }
   }
 }

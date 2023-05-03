@@ -1,5 +1,7 @@
-import { Cursor, Readable } from "@hazae41/binary"
+import { Readable } from "@hazae41/binary"
 import { Bytes } from "@hazae41/bytes"
+import { Cursor } from "@hazae41/cursor"
+import { Ok, Result } from "@hazae41/result"
 import { Length } from "mods/length/length.js"
 import { Type } from "mods/type/type.js"
 
@@ -17,23 +19,24 @@ export class Opaque {
     /**
      * The whole triplet (type + length + value)
      */
-    readonly bytes: Uint8Array
+    readonly bytes: Bytes
   ) { }
 
   /**
    * Zero-copy transform into another type
    */
-  into<T>(readable: Readable<T>) {
-    return Readable.fromBytes(readable, this.bytes)
+  tryInto<T>(readable: Readable<T>): Result<T, Error> {
+    return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
-  toDER() {
-    return new Opaque.DER(this)
+  tryToDER(): Result<Opaque.DER, never> {
+    return new Ok(new Opaque.DER(this.bytes))
   }
 
   toString() {
     return `OPAQUE ${Bytes.toHex(this.bytes)}`
   }
+
 }
 
 export namespace Opaque {
@@ -42,34 +45,32 @@ export namespace Opaque {
     static inner = Opaque
 
     constructor(
-      readonly inner: Opaque
+      readonly bytes: Bytes
     ) { }
 
-    prepare() {
-      return this
+    trySize(): Result<number, never> {
+      return new Ok(this.bytes.length)
     }
 
-    size() {
-      return this.inner.bytes.length
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return cursor.tryWrite(this.bytes)
     }
 
-    write(cursor: Cursor) {
-      cursor.write(this.inner.bytes)
-    }
+    static tryRead(cursor: Cursor): Result<Opaque, Error> {
+      return Result.unthrowSync(() => {
+        const start = cursor.offset
 
-    static read(cursor: Cursor) {
-      const start = cursor.offset
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      const type = Type.DER.read(cursor)
-      const length = Length.LengthDER.read(cursor)
+        const end = cursor.offset
 
-      const end = cursor.offset
+        cursor.offset = start
 
-      cursor.offset = start
+        const bytes = cursor.tryRead(end - start + length.value).throw()
 
-      const bytes = cursor.read(end - start + length.value)
-
-      return new this.inner(type, bytes)
+        return new Ok(new Opaque(type, bytes))
+      }, Error)
     }
   }
 }
