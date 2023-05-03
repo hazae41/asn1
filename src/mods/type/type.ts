@@ -48,8 +48,8 @@ export class Type {
     return true
   }
 
-  toDER() {
-    return new Type.DER(this)
+  tryToDER(): Result<Type.DER, never> {
+    return new Ok(new Type.DER(this.clazz, this.wrap, this.tag))
   }
 
 }
@@ -57,15 +57,13 @@ export class Type {
 export namespace Type {
 
   export class DER {
-    static inner = Type
+    static readonly size = 1
 
     constructor(
-      readonly inner: Type
+      readonly clazz: number,
+      readonly wrap: number,
+      readonly tag: number
     ) { }
-
-    static size() {
-      return 1
-    }
 
     trySize(): Result<number, never> {
       return new Ok(1)
@@ -73,9 +71,9 @@ export namespace Type {
 
     tryWrite(cursor: Cursor): Result<void, Error> {
       let value = 0
-      value |= this.inner.clazz << 6
-      value |= this.inner.wrap << 5
-      value |= this.inner.tag
+      value |= this.clazz << 6
+      value |= this.wrap << 5
+      value |= this.tag
 
       return cursor.tryWriteUint8(value)
     }
@@ -92,7 +90,7 @@ export namespace Type {
         if (tag > 30) // TODO
           return Err.error(`Unimplemented tag`)
 
-        return new Ok(new this.inner(clazz, wrap, tag))
+        return new Ok(new Type(clazz, wrap, tag))
       }, Error)
     }
 

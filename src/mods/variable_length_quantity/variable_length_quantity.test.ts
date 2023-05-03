@@ -1,4 +1,4 @@
-import { Preparable } from "@hazae41/binary";
+import { Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
@@ -37,7 +37,7 @@ function checkReadWriteVLQ(hex: string) {
   const input = hexToCursor(hex)
   const vlq = VLQ.DER.tryRead(input).unwrap()
 
-  const output = Preparable.tryPrepareToBytes(vlq.toDER()).unwrap()
+  const output = vlq.tryToDER().andThenSync(Writable.tryWriteToBytes).unwrap()
   return input.buffer.equals(output)
 }
 

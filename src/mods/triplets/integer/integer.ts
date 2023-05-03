@@ -55,7 +55,7 @@ export namespace Integer {
     ) { }
 
     #data?: {
-      length: Length.DER
+      length: Length.LengthDER
       values: Array<number>
     }
 
@@ -112,7 +112,7 @@ export namespace Integer {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       let value = BigInt(0)
 

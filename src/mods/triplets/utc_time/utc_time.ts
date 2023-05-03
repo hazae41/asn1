@@ -48,7 +48,7 @@ export namespace UTCTime {
     ) { }
 
     #data?: {
-      length: Length.DER,
+      length: Length.LengthDER,
       bytes: Uint8Array
     }
 
@@ -93,7 +93,7 @@ export namespace UTCTime {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       const text = cursor.readString(length.value)
 

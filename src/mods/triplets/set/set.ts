@@ -49,7 +49,7 @@ export namespace Set {
     ) { }
 
     #data?: {
-      length: Length.DER,
+      length: Length.LengthDER,
       triplets: Writable[]
     }
 
@@ -83,7 +83,7 @@ export namespace Set {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       const content = cursor.read(length.value)
       const subcursor = new Cursor(content)

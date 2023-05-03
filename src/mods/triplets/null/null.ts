@@ -42,7 +42,7 @@ export namespace Null {
     ) { }
 
     #data?: {
-      length: Length.DER
+      length: Length.LengthDER
     }
 
     prepare() {
@@ -71,7 +71,7 @@ export namespace Null {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       if (length.value !== 0)
         throw new Error(`Invalid ${this.name} length`)

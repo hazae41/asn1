@@ -1,5 +1,6 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
+import { Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -26,8 +27,11 @@ export class BitString {
     return this.#class
   }
 
-  toDER() {
-    return new BitString.DER(this)
+  tryToDER(): Result<BitString.DER, never> {
+    const type = this.type.tryToDER().inner
+    const length = new Length(1 + this.bytes.length).tryToDER().inner
+
+    return new Ok(new BitString.DER(type, length, this.padding, this.bytes))
   }
 
   toString() {
@@ -42,54 +46,43 @@ export class BitString {
 export namespace BitString {
 
   export class DER {
-    static inner = BitString
 
     constructor(
-      readonly inner: BitString
+      readonly type: Type.DER,
+      readonly length: Length.DER,
+      readonly padding: number,
+      readonly bytes: Uint8Array,
     ) { }
 
-    #data?: {
-      length: Length.DER
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      const length = new Length(1 + this.inner.bytes.length).toDER().prepare()
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      this.#data = { length }
-      return this
+        cursor.tryWriteUint8(this.padding).throw()
+        cursor.tryWrite(this.bytes).throw()
+
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<BitString, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        const content = cursor.tryRead(length.value).throw()
+        const subcursor = new Cursor(content)
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+        const padding = subcursor.tryReadUint8().throw()
+        const bytes = subcursor.tryRead(subcursor.remaining).throw()
 
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
-
-      cursor.writeUint8(this.inner.padding)
-      cursor.write(this.inner.bytes)
-    }
-
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
-
-      const content = cursor.read(length.value)
-      const subcursor = new Cursor(content)
-
-      const padding = subcursor.readUint8()
-      const bytes = subcursor.read(subcursor.remaining)
-
-      return new this.inner(type, padding, bytes)
+        return new Ok(new BitString(type, padding, bytes))
+      }, Error)
     }
 
   }

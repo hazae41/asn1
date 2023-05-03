@@ -61,7 +61,7 @@ export namespace Opaque {
       const start = cursor.offset
 
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       const end = cursor.offset
 

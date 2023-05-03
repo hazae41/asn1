@@ -1,5 +1,5 @@
-import { Cursor } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
+import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { DER } from "mods/der.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
@@ -10,14 +10,12 @@ const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function hexToCursor(hex: string) {
-  const hex2 = hex.replaceAll(" ", "")
-  const buffer = Bytes.fromHex(hex2)
-  return new Cursor(buffer)
+  return new Cursor(Bytes.fromHex(hex.replaceAll(" ", "")))
 }
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = Boolean.DER.read(input)
+  const triplet = Boolean.DER.tryRead(input).unwrap()
 
   const output = DER.toBytes(triplet)
   return input.buffer.equals(output)

@@ -1,4 +1,4 @@
-import { Preparable } from "@hazae41/binary";
+import { Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
@@ -30,7 +30,7 @@ function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
   const length = Length.DER.tryRead(input).unwrap()
 
-  const output = Preparable.tryPrepareToBytes(length.toDER()).unwrap()
+  const output = length.tryToDER().andThenSync(Writable.tryWriteToBytes).unwrap()
   return input.buffer.equals(output)
 }
 

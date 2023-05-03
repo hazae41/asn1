@@ -44,7 +44,7 @@ export namespace UTF8String {
     ) { }
 
     #data?: {
-      length: Length.DER
+      length: Length.LengthDER
       bytes: Uint8Array
     }
 
@@ -77,7 +77,7 @@ export namespace UTF8String {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       const value = cursor.readString(length.value)
 

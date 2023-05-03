@@ -45,7 +45,7 @@ export namespace IA5String {
     ) { }
 
     #data?: {
-      length: Length.DER,
+      length: Length.LengthDER,
       bytes: Uint8Array
     }
 
@@ -78,7 +78,7 @@ export namespace IA5String {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       const bytes = cursor.read(length.value)
       const value = Bytes.toAscii(bytes)

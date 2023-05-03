@@ -44,7 +44,7 @@ export namespace OctetString {
     ) { }
 
     #data?: {
-      length: Length.DER
+      length: Length.LengthDER
     }
 
     prepare() {
@@ -75,7 +75,7 @@ export namespace OctetString {
 
     static read(cursor: Cursor) {
       const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
+      const length = Length.LengthDER.read(cursor)
 
       const buffer = cursor.read(length.value)
 

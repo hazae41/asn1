@@ -1,4 +1,5 @@
-import { Cursor } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
+import { Err, Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -24,8 +25,11 @@ export class Boolean {
     return this.#class
   }
 
-  toDER() {
-    return new Boolean.DER(this)
+  tryToDER(): Result<Boolean.DER, never> {
+    const type = this.type.tryToDER().inner
+    const length = new Length(1).tryToDER().inner
+
+    return new Ok(new Boolean.DER(type, length, this))
   }
 
   toString() {
@@ -37,53 +41,40 @@ export class Boolean {
 export namespace Boolean {
 
   export class DER {
-    static inner = Boolean
 
     constructor(
+      readonly type: Type.DER,
+      readonly length: Length.DER,
       readonly inner: Boolean
     ) { }
 
-    #data?: {
-      length: Length.DER
+    trySize(): Result<number, never> {
+      return Triplets.trySize(this.length)
     }
 
-    prepare() {
-      const length = new Length(1).toDER().prepare()
+    tryWrite(cursor: Cursor): Result<void, Error> {
+      return Result.unthrowSync(() => {
+        this.type.tryWrite(cursor).throw()
+        this.length.tryWrite(cursor).throw()
 
-      this.#data = { length }
-      return this
+        cursor.tryWriteUint8(this.inner.value).throw()
+
+        return Ok.void()
+      }, Error)
     }
 
-    size() {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
-      const { length } = this.#data
+    static tryRead(cursor: Cursor): Result<Boolean, Error> {
+      return Result.unthrowSync(() => {
+        const type = Type.DER.tryRead(cursor).throw()
+        const length = Length.DER.tryRead(cursor).throw()
 
-      return Triplets.trySize(length)
-    }
+        if (length.value !== 1)
+          return Err.error(`Invalid ${this.name} length`)
 
-    write(cursor: Cursor) {
-      if (!this.#data)
-        throw new Error(`Unprepared ${this.inner.class.name}`)
+        const value = cursor.tryReadUint8().throw()
 
-      const { length } = this.#data
-
-      this.inner.type.toDER().write(cursor)
-      length.write(cursor)
-
-      cursor.writeUint8(this.inner.value)
-    }
-
-    static read(cursor: Cursor) {
-      const type = Type.DER.read(cursor)
-      const length = Length.DER.read(cursor)
-
-      if (length.value !== 1)
-        throw new Error(`Invalid ${this.name} length`)
-
-      const value = cursor.readUint8()
-
-      return new this.inner(type, value)
+        return new Ok(new Boolean(type, value))
+      }, Error)
     }
   }
 }
