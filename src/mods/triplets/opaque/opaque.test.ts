@@ -1,7 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Integer } from "index.js";
-import { DER } from "mods/der.js";
+import { DER } from "mods/resolvers/der.js";
 import { relative, resolve } from "node:path";
 import { Opaque } from "./opaque.js";
 

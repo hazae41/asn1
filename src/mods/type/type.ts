@@ -1,7 +1,7 @@
-import { Writable } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
+import { Unimplemented } from "mods/errors/errors.js";
 
 export class Type {
 
@@ -52,6 +52,14 @@ export class Type {
     return new Ok(new Type.DER(this.clazz, this.wrap, this.tag))
   }
 
+  get byte(): number {
+    let value = 0
+    value |= this.clazz << 6
+    value |= this.wrap << 5
+    value |= this.tag
+    return value
+  }
+
 }
 
 export namespace Type {
@@ -88,14 +96,10 @@ export namespace Type {
         const tag = bitset.last(5).value
 
         if (tag > 30) // TODO
-          return Err.error(`Unimplemented tag`)
+          return new Err(new Unimplemented(`Type tag > 30`))
 
         return new Ok(new Type(clazz, wrap, tag))
       }, Error)
-    }
-
-    get byte(): Result<number, Error> {
-      return Writable.tryWriteToBytes(this).mapSync(x => x[0])
     }
 
   }

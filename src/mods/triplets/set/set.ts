@@ -2,7 +2,7 @@ import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
-import { Resolvable } from "mods/resolvable.js";
+import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";

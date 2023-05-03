@@ -1,8 +1,9 @@
 import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
+import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
-import { Resolvable } from "mods/resolvable.js";
+import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -76,12 +77,12 @@ export namespace Constructed {
       }, Error)
     }
 
-    static tryRead(cursor: Cursor): Result<Constructed<Opaque>, Error> {
+    static tryRead(cursor: Cursor): Result<Constructed<Opaque>, Error | InvalidTypeError> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
 
         if (type.wrap !== Type.wraps.CONSTRUCTED)
-          return Err.error(`Invalid type for Constructed`)
+          return new Err(new InvalidTypeError(`Constructed`, type))
 
         const length = Length.DER.tryRead(cursor).throw()
 

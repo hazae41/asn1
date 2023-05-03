@@ -6,7 +6,7 @@ export * from "./variable_length_quantity/variable_length_quantity.test.js";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { readFile } from "fs/promises";
-import { DER } from "mods/der.js";
+import { DER } from "mods/resolvers/der.js";
 import { relative, resolve } from "node:path";
 
 export namespace PEM {

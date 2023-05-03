@@ -1,6 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
+import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -26,9 +27,9 @@ export class PrintableString {
     return this.#class
   }
 
-  tryToDER(): Result<PrintableString.DER, Error> {
+  tryToDER(): Result<PrintableString.DER, Error | InvalidValueError> {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(this.value))
-      return Err.error(`Invalid value for PrintableString`)
+      return new Err(new InvalidValueError(`PrintableString`, this.value))
 
     const bytes = Bytes.fromUtf8(this.value)
 
@@ -68,7 +69,7 @@ export namespace PrintableString {
       }, Error)
     }
 
-    static tryRead(cursor: Cursor): Result<PrintableString, Error> {
+    static tryRead(cursor: Cursor): Result<PrintableString, Error | InvalidValueError> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
         const length = Length.DER.tryRead(cursor).throw()
@@ -76,7 +77,7 @@ export namespace PrintableString {
         const value = cursor.tryReadString(length.value).throw()
 
         if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
-          return Err.error(`Invalid value for PrintableString`)
+          new Err(new InvalidValueError(`PrintableString`, value))
 
         return new Ok(new PrintableString(type, value))
       }, Error)

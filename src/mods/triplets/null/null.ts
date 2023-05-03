@@ -1,5 +1,6 @@
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
+import { InvalidLengthError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -59,13 +60,13 @@ export namespace Null {
       }, Error)
     }
 
-    static tryRead(cursor: Cursor): Result<Null, Error> {
+    static tryRead(cursor: Cursor): Result<Null, Error | InvalidLengthError> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
         const length = Length.DER.tryRead(cursor).throw()
 
         if (length.value !== 0)
-          return Err.error(`Invalid length for Null`)
+          return new Err(new InvalidLengthError(`Null`, length.value))
 
         return new Ok(new Null(type))
       }, Error)

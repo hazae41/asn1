@@ -1,7 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
-import { DER } from "mods/der.js";
+import { DER } from "mods/resolvers/der.js";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { relative, resolve } from "node:path";
 
