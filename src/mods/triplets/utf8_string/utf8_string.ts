@@ -43,7 +43,6 @@ export class UTF8String {
 export namespace UTF8String {
 
   export class DER {
-    static inner = UTF8String
 
     constructor(
       readonly type: Type.DER,

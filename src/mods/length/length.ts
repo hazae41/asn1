@@ -84,7 +84,6 @@ export namespace Length {
   }
 
   export class LongDER {
-    static inner = Length
 
     constructor(
       readonly value: number,

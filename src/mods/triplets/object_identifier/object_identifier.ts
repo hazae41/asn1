@@ -59,7 +59,6 @@ export class ObjectIdentifier {
 export namespace ObjectIdentifier {
 
   export class DER {
-    static inner = ObjectIdentifier
 
     constructor(
       readonly type: Type.DER,

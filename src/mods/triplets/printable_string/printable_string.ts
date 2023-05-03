@@ -46,7 +46,6 @@ export class PrintableString {
 export namespace PrintableString {
 
   export class DER {
-    static inner = PrintableString
 
     constructor(
       readonly type: Type.DER,

@@ -42,7 +42,6 @@ export class Opaque {
 export namespace Opaque {
 
   export class DER {
-    static inner = Opaque
 
     constructor(
       readonly bytes: Bytes

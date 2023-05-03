@@ -70,7 +70,6 @@ export class Integer {
 export namespace Integer {
 
   export class DER {
-    static inner = Integer
 
     constructor(
       readonly type: Type.DER,

@@ -53,7 +53,6 @@ export class Constructed<T extends Triplet = Triplet> {
 export namespace Constructed {
 
   export class DER {
-    static inner = Constructed
 
     constructor(
       readonly type: Type.DER,

@@ -40,7 +40,6 @@ export class Null {
 export namespace Null {
 
   export class DER {
-    static inner = Null
 
     constructor(
       readonly type: Type.DER,

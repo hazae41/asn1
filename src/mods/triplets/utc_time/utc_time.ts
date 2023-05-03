@@ -60,7 +60,6 @@ export class UTCTime {
 export namespace UTCTime {
 
   export class DER {
-    static inner = UTCTime
 
     constructor(
       readonly type: Type.DER,

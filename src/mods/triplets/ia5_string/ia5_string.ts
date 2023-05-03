@@ -44,7 +44,6 @@ export class IA5String {
 export namespace IA5String {
 
   export class DER {
-    static inner = IA5String
 
     constructor(
       readonly type: Type.DER,
@@ -75,7 +74,7 @@ export namespace IA5String {
         const bytes = cursor.tryRead(length.value).throw()
         const value = Bytes.toAscii(bytes)
 
-        return new Ok(new this.inner(type, value))
+        return new Ok(new IA5String(type, value))
       }, Error)
     }
   }

@@ -61,7 +61,6 @@ export class Set<T extends Triplet = Triplet> {
 export namespace Set {
 
   export class DER {
-    static inner = Set
 
     constructor(
       readonly type: Type.DER,

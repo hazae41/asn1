@@ -62,7 +62,6 @@ export class Sequence<T extends Triplet = Triplet> {
 export namespace Sequence {
 
   export class DER {
-    static inner = Sequence
 
     constructor(
       readonly type: Type.DER,

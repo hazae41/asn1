@@ -34,7 +34,6 @@ export class VLQ {
 export namespace VLQ {
 
   export class DER {
-    static inner = VLQ
 
     constructor(
       readonly values: Array<number>

@@ -41,7 +41,6 @@ export class OctetString {
 export namespace OctetString {
 
   export class DER {
-    static inner = OctetString
 
     constructor(
       readonly type: Type.DER,
