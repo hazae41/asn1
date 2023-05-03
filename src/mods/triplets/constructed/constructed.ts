@@ -38,7 +38,7 @@ export class Constructed<T extends Triplet = Triplet> {
       const size = triplets.reduce((p, c) => p + c.trySize().throw(), 0)
 
       const type = this.type.tryToDER().inner
-      const length = new Length(size).tryToDER().throw()
+      const length = new Length(size).tryToDER().inner
 
       return new Ok(new Constructed.DER(type, length, triplets))
     }, Error)
