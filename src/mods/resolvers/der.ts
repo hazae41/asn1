@@ -47,9 +47,6 @@ export namespace DER {
     if (opaque.type.equals(UTCTime.type))
       return opaque.tryInto(UTCTime.DER)
 
-    if (opaque.type.clazz === Type.clazzes.UNIVERSAL)
-      throw new Error(`Unknown UNIVERSAL type`)
-
     if (opaque.type.wrap === Type.wraps.CONSTRUCTED)
       return opaque.tryInto(Constructed.DER).andThenSync(it => Constructed.tryResolve(it, DER))
 

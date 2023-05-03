@@ -57,6 +57,7 @@ export class Type {
     value |= this.clazz << 6
     value |= this.wrap << 5
     value |= this.tag
+
     return value
   }
 

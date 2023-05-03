@@ -1,6 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
+import { Err, Ok, Result } from "@hazae41/result";
+import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -82,7 +83,7 @@ export namespace UTCTime {
       }, Error)
     }
 
-    static tryRead(cursor: Cursor): Result<UTCTime, Error> {
+    static tryRead(cursor: Cursor): Result<UTCTime, Error | InvalidValueError> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
         const length = Length.DER.tryRead(cursor).throw()
@@ -90,9 +91,9 @@ export namespace UTCTime {
         const text = cursor.tryReadString(length.value).throw()
 
         if (text.length !== 13)
-          throw new Error(`Invalid format`)
+          return new Err(new InvalidValueError(`UTCTime`, text))
         if (!text.endsWith("Z"))
-          throw new Error(`Invalid format`)
+          return new Err(new InvalidValueError(`UTCTime`, text))
 
         const YY = Number(text.slice(0, 2))
         const MM = Number(text.slice(2, 4))
