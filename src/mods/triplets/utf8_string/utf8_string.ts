@@ -19,7 +19,7 @@ export class UTF8String {
   ) { }
 
   static new(value: string) {
-    return new this(this.type, value)
+    return new UTF8String(this.type, value)
   }
 
   get class() {

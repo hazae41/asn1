@@ -19,7 +19,7 @@ export class IA5String {
   ) { }
 
   static new(value: string) {
-    return new this(this.type, value)
+    return new IA5String(this.type, value)
   }
 
   get class() {

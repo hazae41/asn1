@@ -19,7 +19,7 @@ export class Boolean {
   ) { }
 
   static new(value: number) {
-    return new this(this.type, value)
+    return new Boolean(this.type, value)
   }
 
   get class() {

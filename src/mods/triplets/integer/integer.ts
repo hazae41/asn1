@@ -31,7 +31,7 @@ export class Integer {
   ) { }
 
   static new(value: bigint) {
-    return new this(this.type, value)
+    return new Integer(this.type, value)
   }
 
   get class() {

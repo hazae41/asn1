@@ -20,7 +20,7 @@ export class PrintableString {
   ) { }
 
   static new(value: string) {
-    return new this(this.type, value)
+    return new PrintableString(this.type, value)
   }
 
   get class() {

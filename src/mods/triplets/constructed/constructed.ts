@@ -13,15 +13,15 @@ const stringify = (parent: Constructed) => `[${parent.type.tag}] {
   ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
-export class Constructed<T extends Triplet = Triplet> {
+export class Constructed<T extends Triplet[] = Triplet[]> {
   readonly #class = Constructed
 
   constructor(
     readonly type: Type,
-    readonly triplets: T[]
+    readonly triplets: T
   ) { }
 
-  static tryResolve(sequence: Constructed<Opaque>, resolvable: Resolvable): Result<Constructed<Triplet>, Error> {
+  static tryResolve(sequence: Constructed<Opaque[]>, resolvable: Resolvable): Result<Constructed<Triplet[]>, Error> {
     return Result.unthrowSync(() => {
       const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw())
 
@@ -77,7 +77,7 @@ export namespace Constructed {
       }, Error)
     }
 
-    static tryRead(cursor: Cursor): Result<Constructed<Opaque>, Error | InvalidTypeError> {
+    static tryRead(cursor: Cursor): Result<Constructed<Opaque[]>, Error | InvalidTypeError> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
 
@@ -94,7 +94,7 @@ export namespace Constructed {
         while (subcursor.remaining)
           triplets.push(Opaque.DER.tryRead(subcursor).throw())
 
-        return new Ok(new Constructed<Opaque>(type, triplets))
+        return new Ok(new Constructed(type, triplets))
       }, Error)
     }
   }

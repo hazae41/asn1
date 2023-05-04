@@ -24,7 +24,7 @@ export class UTCTime {
   ) { }
 
   static new(value: Date) {
-    return new this(this.type, value)
+    return new UTCTime(this.type, value)
   }
 
   get class() {

@@ -19,7 +19,7 @@ export class OctetString {
   ) { }
 
   static new(bytes: Bytes) {
-    return new this(this.type, bytes)
+    return new OctetString(this.type, bytes)
   }
 
   get class() {

@@ -12,7 +12,7 @@ const stringify = (parent: Sequence) => `SEQUENCE {
   ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
-export class Sequence<T extends Triplet = Triplet> {
+export class Sequence<T extends Triplet[] = Triplet[]> {
   readonly #class = Sequence
 
   static type = new Type(
@@ -22,14 +22,14 @@ export class Sequence<T extends Triplet = Triplet> {
 
   constructor(
     readonly type: Type,
-    readonly triplets: T[]
+    readonly triplets: T
   ) { }
 
-  static new<T extends Triplet = Triplet>(triplets: T[]) {
-    return new this<T>(this.type, triplets)
+  static new<T extends Triplet[]>(triplets: T) {
+    return new Sequence(this.type, triplets)
   }
 
-  static tryResolve(sequence: Sequence<Opaque>, resolvable: Resolvable): Result<Sequence<Triplet>, Error> {
+  static tryResolve(sequence: Sequence<Opaque[]>, resolvable: Resolvable): Result<Sequence<Triplet[]>, Error> {
     return Result.unthrowSync(() => {
       const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw())
 
@@ -85,7 +85,7 @@ export namespace Sequence {
       }, Error)
     }
 
-    static tryRead(cursor: Cursor): Result<Sequence<Opaque>, Error> {
+    static tryRead(cursor: Cursor): Result<Sequence<Opaque[]>, Error> {
       return Result.unthrowSync(() => {
         const type = Type.DER.tryRead(cursor).throw()
         const length = Length.DER.tryRead(cursor).throw()
@@ -98,7 +98,7 @@ export namespace Sequence {
         while (subcursor.remaining)
           triplets.push(Opaque.DER.tryRead(subcursor).throw())
 
-        return new Ok(new Sequence<Opaque>(type, triplets))
+        return new Ok(new Sequence(type, triplets))
       }, Error)
     }
 

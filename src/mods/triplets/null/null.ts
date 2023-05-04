@@ -18,7 +18,7 @@ export class Null {
   ) { }
 
   static new() {
-    return new this(this.type)
+    return new Null(this.type)
   }
 
   get class() {

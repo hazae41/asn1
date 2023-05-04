@@ -20,7 +20,7 @@ export class BitString {
   ) { }
 
   static new(padding: number, bytes: Bytes) {
-    return new this(this.type, padding, bytes)
+    return new BitString(this.type, padding, bytes)
   }
 
   get class() {
