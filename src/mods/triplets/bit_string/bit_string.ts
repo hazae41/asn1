@@ -16,10 +16,10 @@ export class BitString {
   constructor(
     readonly type: Type,
     readonly padding: number,
-    readonly bytes: Uint8Array
+    readonly bytes: Bytes
   ) { }
 
-  static new(padding: number, bytes: Uint8Array) {
+  static new(padding: number, bytes: Bytes) {
     return new this(this.type, padding, bytes)
   }
 
@@ -51,7 +51,7 @@ export namespace BitString {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly padding: number,
-      readonly bytes: Uint8Array,
+      readonly bytes: Bytes,
     ) { }
 
     trySize(): Result<number, never> {
