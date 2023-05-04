@@ -5,7 +5,7 @@ import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 
-export class ObjectIdentifier {
+export class ObjectIdentifier<T extends string = string>  {
   readonly #class = ObjectIdentifier
 
   static type = new Type(
@@ -15,7 +15,7 @@ export class ObjectIdentifier {
 
   constructor(
     readonly type: Type,
-    readonly value: string
+    readonly value: T
   ) { }
 
   static new(value: string) {
