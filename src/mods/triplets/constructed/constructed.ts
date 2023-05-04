@@ -13,13 +13,17 @@ const stringify = (parent: Constructed) => `[${parent.type.tag}] {
   ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
-export class Constructed<T extends Triplet[] = Triplet[]> {
+export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
   readonly #class = Constructed
 
   constructor(
     readonly type: Type,
     readonly triplets: T
   ) { }
+
+  static new<T extends readonly Triplet[]>(type: Type, triplets: T) {
+    return new Constructed(type, triplets)
+  }
 
   static tryResolve(sequence: Constructed<Opaque[]>, resolvable: Resolvable): Result<Constructed<Triplet[]>, Error> {
     return Result.unthrowSync(() => {

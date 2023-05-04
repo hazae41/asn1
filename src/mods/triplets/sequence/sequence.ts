@@ -12,7 +12,7 @@ const stringify = (parent: Sequence) => `SEQUENCE {
   ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
-export class Sequence<T extends Triplet[] = Triplet[]> {
+export class Sequence<T extends readonly Triplet[] = readonly Triplet[]> {
   readonly #class = Sequence
 
   static type = new Type(
@@ -25,7 +25,7 @@ export class Sequence<T extends Triplet[] = Triplet[]> {
     readonly triplets: T
   ) { }
 
-  static new<T extends Triplet[]>(triplets: T) {
+  static new<T extends readonly Triplet[]>(triplets: T) {
     return new Sequence(this.type, triplets)
   }
 

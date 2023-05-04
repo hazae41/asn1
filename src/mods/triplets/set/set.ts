@@ -12,7 +12,7 @@ const stringify = (set: Set) => `SET {
   ${set.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
-export class Set<T extends Triplet[] = Triplet[]> {
+export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
   readonly #class = Set
 
   static type = new Type(
@@ -25,7 +25,7 @@ export class Set<T extends Triplet[] = Triplet[]> {
     readonly triplets: T
   ) { }
 
-  static new<T extends Triplet[]>(triplets: T): Set<T> {
+  static new<T extends readonly Triplet[]>(triplets: T): Set<T> {
     return new Set(this.type, triplets)
   }
 
