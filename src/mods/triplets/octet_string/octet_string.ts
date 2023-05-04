@@ -18,7 +18,7 @@ export class OctetString {
     readonly bytes: Bytes
   ) { }
 
-  static new(bytes: Bytes) {
+  static create(bytes: Bytes) {
     return new OctetString(this.type, bytes)
   }
 

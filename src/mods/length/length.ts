@@ -9,10 +9,6 @@ export class Length {
     readonly value: number
   ) { }
 
-  static new(value: number) {
-    return new Length(value)
-  }
-
   get class() {
     return this.#class
   }

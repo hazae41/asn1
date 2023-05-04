@@ -18,7 +18,7 @@ export class IA5String {
     readonly value: string
   ) { }
 
-  static new(value: string) {
+  static create(value: string) {
     return new IA5String(this.type, value)
   }
 

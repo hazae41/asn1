@@ -30,7 +30,7 @@ export class Integer {
     readonly value: bigint
   ) { }
 
-  static new(value: bigint) {
+  static create(value: bigint) {
     return new Integer(this.type, value)
   }
 

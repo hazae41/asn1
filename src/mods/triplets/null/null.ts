@@ -17,7 +17,7 @@ export class Null {
     readonly type: Type
   ) { }
 
-  static new() {
+  static create() {
     return new Null(this.type)
   }
 

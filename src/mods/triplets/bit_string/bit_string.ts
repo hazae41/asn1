@@ -19,7 +19,7 @@ export class BitString {
     readonly bytes: Bytes
   ) { }
 
-  static new(padding: number, bytes: Bytes) {
+  static create(padding: number, bytes: Bytes) {
     return new BitString(this.type, padding, bytes)
   }
 

@@ -18,7 +18,7 @@ export class Boolean {
     readonly value: number
   ) { }
 
-  static new(value: number) {
+  static create(value: number) {
     return new Boolean(this.type, value)
   }
 

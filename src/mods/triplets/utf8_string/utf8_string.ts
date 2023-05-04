@@ -18,7 +18,7 @@ export class UTF8String {
     readonly value: string
   ) { }
 
-  static new(value: string) {
+  static create(value: string) {
     return new UTF8String(this.type, value)
   }
 

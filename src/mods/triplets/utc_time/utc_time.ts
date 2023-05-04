@@ -23,7 +23,7 @@ export class UTCTime {
     readonly value: Date
   ) { }
 
-  static new(value: Date) {
+  static create(value: Date) {
     return new UTCTime(this.type, value)
   }
 

@@ -19,7 +19,7 @@ export class PrintableString {
     readonly value: string
   ) { }
 
-  static new(value: string) {
+  static create(value: string) {
     return new PrintableString(this.type, value)
   }
 
