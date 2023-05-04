@@ -30,7 +30,7 @@ export class Boolean {
     const type = this.type.tryToDER().inner
     const length = new Length(1).tryToDER().inner
 
-    return new Ok(new Boolean.DER(type, length, this))
+    return new Ok(new Boolean.DER(type, length, this.value))
   }
 
   toString() {
@@ -46,7 +46,7 @@ export namespace Boolean {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly inner: Boolean
+      readonly value: number
     ) { }
 
     trySize(): Result<number, never> {
@@ -58,7 +58,7 @@ export namespace Boolean {
         this.type.tryWrite(cursor).throw()
         this.length.tryWrite(cursor).throw()
 
-        cursor.tryWriteUint8(this.inner.value).throw()
+        cursor.tryWriteUint8(this.value).throw()
 
         return Ok.void()
       }, Error)
