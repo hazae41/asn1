@@ -25,7 +25,7 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
     readonly triplets: T
   ) { }
 
-  static new<T extends readonly Triplet[]>(triplets: T): Set<T> {
+  static create<T extends readonly Triplet[]>(triplets: T): Set<T> {
     return new Set(this.type, triplets)
   }
 

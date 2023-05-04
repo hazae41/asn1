@@ -25,7 +25,7 @@ export class Sequence<T extends readonly Triplet[] = readonly Triplet[]> {
     readonly triplets: T
   ) { }
 
-  static new<T extends readonly Triplet[]>(triplets: T) {
+  static create<T extends readonly Triplet[]>(triplets: T) {
     return new Sequence(this.type, triplets)
   }
 

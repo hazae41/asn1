@@ -21,7 +21,7 @@ export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
     readonly triplets: T
   ) { }
 
-  static new<T extends readonly Triplet[]>(type: Type, triplets: T) {
+  static create<T extends readonly Triplet[]>(type: Type, triplets: T) {
     return new Constructed(type, triplets)
   }
 
