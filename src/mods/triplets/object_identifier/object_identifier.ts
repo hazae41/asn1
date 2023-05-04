@@ -18,7 +18,7 @@ export class ObjectIdentifier<T extends string = string>  {
     readonly value: T
   ) { }
 
-  static new(value: string) {
+  static new<T extends string>(value: T) {
     return new ObjectIdentifier(this.type, value)
   }
 
