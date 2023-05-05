@@ -21,6 +21,10 @@ export class NotAnOID extends Error {
 
 export namespace OID {
 
+  export function as<T extends string>(inner: T) {
+    return inner as OID<T>
+  }
+
   export function is<T extends string>(inner: T): inner is OID<T> {
     return inner.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x)))
   }
