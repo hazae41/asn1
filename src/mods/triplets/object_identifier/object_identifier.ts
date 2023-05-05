@@ -6,27 +6,29 @@ import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 
+export type OID<T extends string> = T & { __isOID: true }
+
 export class NotAnOID extends Error {
   readonly #class = NotAnOID
 
   constructor(
     readonly text: string
   ) {
-    super(`Could not convert ${text} to OID`)
+    super(`${text} is not an OID`)
   }
 
 }
 
-export class OID<T extends string> {
+export namespace OID {
 
-  private constructor(
-    readonly inner: T
-  ) { }
+  export function is<T extends string>(inner: T): inner is OID<T> {
+    return inner.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x)))
+  }
 
-  static tryNew<T extends string>(inner: T): Result<OID<T>, NotAnOID> {
-    if (inner.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x))))
-      return new Ok(new OID(inner))
-    return new Err(new NotAnOID(inner))
+  export function tryCast<T extends string>(inner: T): Result<OID<T>, NotAnOID> {
+    if (!OID.is(inner))
+      return new Err(new NotAnOID(inner))
+    return new Ok(inner)
   }
 
 }
@@ -45,7 +47,7 @@ export class ObjectIdentifier<T extends string = string>  {
   ) { }
 
   static tryCreate<T extends string>(value: T): Result<ObjectIdentifier<T>, NotAnOID> {
-    return OID.tryNew(value).mapSync(oid => new ObjectIdentifier(this.type, oid))
+    return OID.tryCast(value).mapSync(oid => new ObjectIdentifier(this.type, oid))
   }
 
   get class() {
@@ -55,7 +57,7 @@ export class ObjectIdentifier<T extends string = string>  {
   tryToDER(): Result<ObjectIdentifier.DER, Error> {
     return Result.unthrowSync(() => {
       const values = new Array<VLQ.DER>()
-      const texts = this.value.inner.split(".")
+      const texts = this.value.split(".")
 
       const first = Number(texts[0])
       const second = Number(texts[1])
@@ -132,7 +134,7 @@ export namespace ObjectIdentifier {
 
         const value = values.join(".")
 
-        const oid = OID.tryNew(value).throw()
+        const oid = OID.tryCast(value).throw()
 
         return new Ok(new ObjectIdentifier(type, oid))
       }, Error)
