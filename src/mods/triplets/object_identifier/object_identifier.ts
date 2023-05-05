@@ -1,9 +1,35 @@
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
+import { Err, Ok, Result } from "@hazae41/result";
+import { Numbers } from "libs/numbers/numbers.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
+
+export class NotAnOID extends Error {
+  readonly #class = NotAnOID
+
+  constructor(
+    readonly text: string
+  ) {
+    super(`Could not convert ${text} to OID`)
+  }
+
+}
+
+export class OID<T extends string> {
+
+  private constructor(
+    readonly inner: T
+  ) { }
+
+  static tryNew<T extends string>(inner: T): Result<OID<T>, NotAnOID> {
+    if (inner.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x))))
+      return new Ok(new OID(inner))
+    return new Err(new NotAnOID(inner))
+  }
+
+}
 
 export class ObjectIdentifier<T extends string = string>  {
   readonly #class = ObjectIdentifier
@@ -15,11 +41,11 @@ export class ObjectIdentifier<T extends string = string>  {
 
   constructor(
     readonly type: Type,
-    readonly value: T
+    readonly value: OID<T>
   ) { }
 
-  static create<T extends string>(value: T) {
-    return new ObjectIdentifier(this.type, value)
+  static tryCreate<T extends string>(value: T): Result<ObjectIdentifier<T>, NotAnOID> {
+    return OID.tryNew(value).mapSync(oid => new ObjectIdentifier(this.type, oid))
   }
 
   get class() {
@@ -29,7 +55,7 @@ export class ObjectIdentifier<T extends string = string>  {
   tryToDER(): Result<ObjectIdentifier.DER, Error> {
     return Result.unthrowSync(() => {
       const values = new Array<VLQ.DER>()
-      const texts = this.value.split(".")
+      const texts = this.value.inner.split(".")
 
       const first = Number(texts[0])
       const second = Number(texts[1])
@@ -106,7 +132,9 @@ export namespace ObjectIdentifier {
 
         const value = values.join(".")
 
-        return new Ok(new ObjectIdentifier(type, value))
+        const oid = OID.tryNew(value).throw()
+
+        return new Ok(new ObjectIdentifier(type, oid))
       }, Error)
     }
   }
