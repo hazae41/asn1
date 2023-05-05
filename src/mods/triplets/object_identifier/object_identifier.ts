@@ -50,8 +50,12 @@ export class ObjectIdentifier<T extends string = string>  {
     readonly value: OID<T>
   ) { }
 
+  static create<T extends string>(value: OID<T>) {
+    return new ObjectIdentifier(this.type, value)
+  }
+
   static tryCreate<T extends string>(value: T): Result<ObjectIdentifier<T>, NotAnOID> {
-    return OID.tryCast(value).mapSync(oid => new ObjectIdentifier(this.type, oid))
+    return OID.tryCast(value).mapSync(value => this.create(value))
   }
 
   get class() {
