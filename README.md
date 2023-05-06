@@ -14,7 +14,7 @@ npm i @hazae41/asn1
 - 100% TypeScript and ESM
 - No external dependency
 - Rust-like patterns
-- Zero-copy DER reading and writing
+- Zero-copy DER <=> ASN1 reading and writing
 - Almost all universal triplets
 - Implicit and explicit tagged types
 
