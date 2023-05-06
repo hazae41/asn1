@@ -59,28 +59,28 @@ export namespace PrintableString {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
-        cursor.tryWrite(this.bytes).throw()
+        cursor.tryWrite(this.bytes).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<PrintableString, Error | InvalidValueError> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
-        const value = cursor.tryReadString(length.value).throw()
+        const value = cursor.tryReadString(length.value).throw(t)
 
         if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
           new Err(new InvalidValueError(`PrintableString`, value))
 
         return new Ok(new PrintableString(type, value))
-      }, Error)
+      })
     }
   }
 }

@@ -73,22 +73,22 @@ export namespace UTCTime {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
-        cursor.tryWrite(this.bytes).throw()
+        cursor.tryWrite(this.bytes).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<UTCTime, Error | InvalidValueError> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
-        const text = cursor.tryReadString(length.value).throw()
+        const text = cursor.tryReadString(length.value).throw(t)
 
         if (text.length !== 13)
           return new Err(new InvalidValueError(`UTCTime`, text))
@@ -112,7 +112,7 @@ export namespace UTCTime {
         value.setUTCMilliseconds(0)
 
         return new Ok(new UTCTime(type, value))
-      }, Error)
+      })
     }
 
   }

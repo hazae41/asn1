@@ -42,8 +42,8 @@ export namespace Length {
   export namespace DER {
 
     export function tryRead(cursor: Cursor): Result<Length, Error> {
-      return Result.unthrowSync(() => {
-        const first = cursor.tryReadUint8().throw()
+      return Result.unthrowSync(t => {
+        const first = cursor.tryReadUint8().throw(t)
 
         if (first < 128)
           return new Ok(new Length(first))
@@ -55,10 +55,10 @@ export namespace Length {
         let value = 0
 
         for (let i = 0; i < count; i++)
-          value = (value * 256) + cursor.tryReadUint8().throw()
+          value = (value * 256) + cursor.tryReadUint8().throw(t)
 
         return new Ok(new Length(value))
-      }, Error)
+      })
     }
 
   }
@@ -91,18 +91,18 @@ export namespace Length {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
+      return Result.unthrowSync(t => {
         const count = new Bitset(this.values.length, 8)
           .enableBE(0)
           .value
 
-        cursor.tryWriteUint8(count).throw()
+        cursor.tryWriteUint8(count).throw(t)
 
         for (const value of this.values)
-          cursor.tryWriteUint8(value).throw()
+          cursor.tryWriteUint8(value).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
   }

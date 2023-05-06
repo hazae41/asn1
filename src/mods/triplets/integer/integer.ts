@@ -83,41 +83,41 @@ export namespace Integer {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
         const negative = this.value < 0
 
         const first = sign(this.values[0], negative)
           .setBE(0, negative)
           .value
-        cursor.tryWriteUint8(first).throw()
+        cursor.tryWriteUint8(first).throw(t)
 
         for (let i = 1; i < this.values.length; i++)
-          cursor.tryWriteUint8(sign(this.values[i], negative).value).throw()
+          cursor.tryWriteUint8(sign(this.values[i], negative).value).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<Integer, Error> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
         let value = BigInt(0)
 
-        const negative = cursor.tryGetUint8().throw() > 127
+        const negative = cursor.tryGetUint8().throw(t) > 127
 
         for (let i = 0; i < length.value; i++)
-          value = (value * bn256) + BigInt(sign(cursor.tryReadUint8().throw(), negative).value)
+          value = (value * bn256) + BigInt(sign(cursor.tryReadUint8().throw(t), negative).value)
 
         if (negative)
           value = ~value
 
         return new Ok(new Integer(type, value))
-      }, Error)
+      })
     }
 
   }

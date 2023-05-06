@@ -30,11 +30,11 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
   }
 
   static tryResolve(sequence: Set<Opaque[]>, resolvable: Resolvable): Result<Set<Triplet[]>, Error> {
-    return Result.unthrowSync(() => {
-      const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw())
+    return Result.unthrowSync(t => {
+      const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw(t))
 
       return new Ok(new Set(sequence.type, resolveds))
-    }, Error)
+    })
   }
 
   get class() {
@@ -42,15 +42,15 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
   }
 
   tryToDER(): Result<Set.DER, Error> {
-    return Result.unthrowSync(() => {
-      const triplets = this.triplets.map(it => it.tryToDER().throw())
-      const size = triplets.reduce((p, c) => p + c.trySize().throw(), 0)
+    return Result.unthrowSync(t => {
+      const triplets = this.triplets.map(it => it.tryToDER().throw(t))
+      const size = triplets.reduce((p, c) => p + c.trySize().throw(t), 0)
 
       const type = this.type.tryToDER().inner
       const length = new Length(size).tryToDER().inner
 
       return new Ok(new Set.DER(type, length, triplets))
-    }, Error)
+    })
   }
 
   toString(): string {
@@ -73,32 +73,32 @@ export namespace Set {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
         for (const triplet of this.triplets)
-          triplet.tryWrite(cursor).throw()
+          triplet.tryWrite(cursor).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<Set<Opaque[]>, Error> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
-        const content = cursor.tryRead(length.value).throw()
+        const content = cursor.tryRead(length.value).throw(t)
         const subcursor = new Cursor(content)
 
         const triplets = new Array<Opaque>()
 
         while (subcursor.remaining)
-          triplets.push(Opaque.DER.tryRead(subcursor).throw())
+          triplets.push(Opaque.DER.tryRead(subcursor).throw(t))
 
         return new Ok(new Set(type, triplets))
-      }, Error)
+      })
     }
   }
 }

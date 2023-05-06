@@ -88,8 +88,8 @@ export namespace Type {
     }
 
     static tryRead(cursor: Cursor): Result<Type, Error> {
-      return Result.unthrowSync(() => {
-        const type = cursor.tryReadUint8().throw()
+      return Result.unthrowSync(t => {
+        const type = cursor.tryReadUint8().throw(t)
         const bitset = new Bitset(type, 8)
 
         const clazz = bitset.first(2).value
@@ -100,7 +100,7 @@ export namespace Type {
           return new Err(new Unimplemented(`Type tag > 30`))
 
         return new Ok(new Type(clazz, wrap, tag))
-      }, Error)
+      })
     }
 
   }

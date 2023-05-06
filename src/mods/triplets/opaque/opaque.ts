@@ -56,20 +56,20 @@ export namespace Opaque {
     }
 
     static tryRead(cursor: Cursor): Result<Opaque, Error> {
-      return Result.unthrowSync(() => {
+      return Result.unthrowSync(t => {
         const start = cursor.offset
 
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
         const end = cursor.offset
 
         cursor.offset = start
 
-        const bytes = cursor.tryRead(end - start + length.value).throw()
+        const bytes = cursor.tryRead(end - start + length.value).throw(t)
 
         return new Ok(new Opaque(type, bytes))
-      }, Error)
+      })
     }
   }
 }

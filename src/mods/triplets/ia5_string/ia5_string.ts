@@ -56,26 +56,26 @@ export namespace IA5String {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
-        cursor.tryWrite(this.bytes).throw()
+        cursor.tryWrite(this.bytes).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<IA5String, Error> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
-        const bytes = cursor.tryRead(length.value).throw()
+        const bytes = cursor.tryRead(length.value).throw(t)
         const value = Bytes.toAscii(bytes)
 
         return new Ok(new IA5String(type, value))
-      }, Error)
+      })
     }
   }
 }

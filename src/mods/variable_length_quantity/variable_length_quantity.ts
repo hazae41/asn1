@@ -44,24 +44,24 @@ export namespace VLQ {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
+      return Result.unthrowSync(t => {
         for (let i = 0; i < this.values.length - 1; i++) {
           const bitset = new Bitset(this.values[i], 8)
-          cursor.tryWriteUint8(bitset.enableBE(0).value).throw()
+          cursor.tryWriteUint8(bitset.enableBE(0).value).throw(t)
         }
 
-        cursor.tryWriteUint8(Arrays.last(this.values)).throw()
+        cursor.tryWriteUint8(Arrays.last(this.values)).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<VLQ, Error> {
-      return Result.unthrowSync(() => {
+      return Result.unthrowSync(t => {
         const values = new Array<number>()
 
         while (true) {
-          const current = cursor.tryReadUint8().throw()
+          const current = cursor.tryReadUint8().throw(t)
 
           if (current <= 127) {
             values.push(current)
@@ -78,7 +78,7 @@ export namespace VLQ {
           value = (value * 128) + values[i]
 
         return new Ok(new VLQ(value))
-      }, Error)
+      })
     }
 
   }

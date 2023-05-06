@@ -57,7 +57,7 @@ export class ObjectIdentifier<T extends string = string>  {
   }
 
   tryToDER(): Result<ObjectIdentifier.DER, Error> {
-    return Result.unthrowSync(() => {
+    return Result.unthrowSync(t => {
       const values = new Array<VLQ.DER>()
       const texts = this.value.inner.split(".")
 
@@ -68,8 +68,8 @@ export class ObjectIdentifier<T extends string = string>  {
       let size = 1
 
       for (let i = 2; i < texts.length; i++) {
-        const vlq = new VLQ(Number(texts[i])).tryToDER().throw()
-        size += vlq.trySize().throw()
+        const vlq = new VLQ(Number(texts[i])).tryToDER().throw(t)
+        size += vlq.trySize().throw(t)
         values.push(vlq)
       }
 
@@ -77,7 +77,7 @@ export class ObjectIdentifier<T extends string = string>  {
       const length = new Length(size).tryToDER().inner
 
       return new Ok(new ObjectIdentifier.DER(type, length, header, values))
-    }, Error)
+    })
   }
 
   toString() {
@@ -102,44 +102,44 @@ export namespace ObjectIdentifier {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
         const [first, second] = this.header
 
-        cursor.tryWriteUint8((first * 40) + second).throw()
+        cursor.tryWriteUint8((first * 40) + second).throw(t)
 
         for (const value of this.values)
-          value.tryWrite(cursor).throw()
+          value.tryWrite(cursor).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<ObjectIdentifier, Error> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
-        const content = cursor.tryRead(length.value).throw()
+        const content = cursor.tryRead(length.value).throw(t)
         const subcursor = new Cursor(content)
 
-        const header = subcursor.tryReadUint8().throw()
+        const header = subcursor.tryReadUint8().throw(t)
         const first = Math.floor(header / 40)
         const second = header % 40
 
         const values = [first, second]
 
         while (subcursor.remaining)
-          values.push(VLQ.DER.tryRead(subcursor).throw().value)
+          values.push(VLQ.DER.tryRead(subcursor).throw(t).value)
 
         const value = values.join(".")
 
-        const oid = OID.tryNew(value).throw()
+        const oid = OID.tryNew(value).throw(t)
 
         return new Ok(new ObjectIdentifier(type, oid))
-      }, Error)
+      })
     }
   }
 

@@ -53,25 +53,25 @@ export namespace OctetString {
     }
 
     tryWrite(cursor: Cursor): Result<void, Error> {
-      return Result.unthrowSync(() => {
-        this.type.tryWrite(cursor).throw()
-        this.length.tryWrite(cursor).throw()
+      return Result.unthrowSync(t => {
+        this.type.tryWrite(cursor).throw(t)
+        this.length.tryWrite(cursor).throw(t)
 
-        cursor.tryWrite(this.bytes).throw()
+        cursor.tryWrite(this.bytes).throw(t)
 
         return Ok.void()
-      }, Error)
+      })
     }
 
     static tryRead(cursor: Cursor): Result<OctetString, Error> {
-      return Result.unthrowSync(() => {
-        const type = Type.DER.tryRead(cursor).throw()
-        const length = Length.DER.tryRead(cursor).throw()
+      return Result.unthrowSync(t => {
+        const type = Type.DER.tryRead(cursor).throw(t)
+        const length = Length.DER.tryRead(cursor).throw(t)
 
-        const buffer = cursor.tryRead(length.value).throw()
+        const buffer = cursor.tryRead(length.value).throw(t)
 
         return new Ok(new OctetString(type, buffer))
-      }, Error)
+      })
     }
   }
 }
