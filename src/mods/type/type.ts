@@ -1,5 +1,5 @@
 import { Bitset } from "@hazae41/bitset";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { Unimplemented } from "mods/errors/errors.js";
 
@@ -48,8 +48,8 @@ export class Type {
     return true
   }
 
-  tryToDER(): Result<Type.DER, never> {
-    return new Ok(new Type.DER(this.clazz, this.wrap, this.tag))
+  toDER() {
+    return new Type.DER(this.clazz, this.wrap, this.tag)
   }
 
   get byte(): number {
@@ -78,7 +78,7 @@ export namespace Type {
       return new Ok(1)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       let value = 0
       value |= this.clazz << 6
       value |= this.wrap << 5
@@ -87,7 +87,7 @@ export namespace Type {
       return cursor.tryWriteUint8(value)
     }
 
-    static tryRead(cursor: Cursor): Result<Type, Error> {
+    static tryRead(cursor: Cursor): Result<Type, CursorReadUnknownError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = cursor.tryReadUint8().throw(t)
         const bitset = new Bitset(type, 8)

@@ -1,7 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteLengthOverflowError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
-import { InvalidValueError } from "mods/errors/errors.js";
+import { InvalidValueError, Unimplemented } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -31,7 +31,7 @@ export class UTCTime {
     return this.#class
   }
 
-  tryToDER(): Result<UTCTime.DER, never> {
+  toDER() {
     const year = this.value.getUTCFullYear()
 
     const YY = year > 2000
@@ -46,10 +46,10 @@ export class UTCTime {
 
     const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
 
-    const type = this.type.tryToDER().inner
-    const length = new Length(bytes.length).tryToDER().inner
+    const type = this.type.toDER()
+    const length = new Length(bytes.length).toDER()
 
-    return new Ok(new UTCTime.DER(type, length, bytes))
+    return new UTCTime.DER(type, length, bytes)
   }
 
   toString() {
@@ -72,7 +72,7 @@ export namespace UTCTime {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | CursorWriteLengthOverflowError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -83,7 +83,7 @@ export namespace UTCTime {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<UTCTime, Error | InvalidValueError> {
+    static tryRead(cursor: Cursor): Result<UTCTime, CursorReadUnknownError | Unimplemented | InvalidValueError> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

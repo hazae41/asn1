@@ -1,6 +1,6 @@
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
-import { InvalidLengthError } from "mods/errors/errors.js";
+import { InvalidLengthError, Unimplemented } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -25,11 +25,11 @@ export class Null {
     return this.#class
   }
 
-  tryToDER(): Result<Null.DER, never> {
-    const type = this.type.tryToDER().inner
-    const length = new Length(0).tryToDER().inner
+  toDER() {
+    const type = this.type.toDER()
+    const length = new Length(0).toDER()
 
-    return new Ok(new Null.DER(type, length))
+    return new Null.DER(type, length)
   }
 
   toString() {
@@ -51,7 +51,7 @@ export namespace Null {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -60,7 +60,7 @@ export namespace Null {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Null, Error | InvalidLengthError> {
+    static tryRead(cursor: Cursor): Result<Null, CursorReadUnknownError | Unimplemented | InvalidLengthError> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

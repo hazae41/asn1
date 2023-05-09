@@ -1,6 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteLengthOverflowError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
+import { Unimplemented } from "index.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -27,11 +28,11 @@ export class BitString {
     return this.#class
   }
 
-  tryToDER(): Result<BitString.DER, never> {
-    const type = this.type.tryToDER().inner
-    const length = new Length(1 + this.bytes.length).tryToDER().inner
+  toDER() {
+    const type = this.type.toDER()
+    const length = new Length(1 + this.bytes.length).toDER()
 
-    return new Ok(new BitString.DER(type, length, this.padding, this.bytes))
+    return new BitString.DER(type, length, this.padding, this.bytes)
   }
 
   toString() {
@@ -58,7 +59,7 @@ export namespace BitString {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | CursorWriteLengthOverflowError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -70,7 +71,7 @@ export namespace BitString {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<BitString, Error> {
+    static tryRead(cursor: Cursor): Result<BitString, CursorReadUnknownError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

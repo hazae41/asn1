@@ -1,6 +1,7 @@
 import { Writable } from "@hazae41/binary";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
+import { Unimplemented } from "index.js";
 import { Length } from "mods/length/length.js";
 import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
@@ -29,7 +30,7 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
     return new Set(this.type, triplets)
   }
 
-  static tryResolve(sequence: Set<Opaque[]>, resolvable: Resolvable): Result<Set<Triplet[]>, Error> {
+  static tryResolve<ResolveError>(sequence: Set<Opaque[]>, resolvable: Resolvable<ResolveError>): Result<Set<Triplet[]>, ResolveError> {
     return Result.unthrowSync(t => {
       const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw(t))
 
@@ -41,20 +42,26 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
     return this.#class
   }
 
-  tryToDER(): Result<Set.DER, Error> {
-    return Result.unthrowSync(t => {
-      const triplets = this.triplets.map(it => it.tryToDER().throw(t))
-      const size = triplets.reduce((p, c) => p + c.trySize().throw(t), 0)
+  toDER() {
+    const triplets = this.triplets.map(it => it.toDER())
+    const size = triplets.reduce((p, c) => p + c.trySize().inner, 0)
 
-      const type = this.type.tryToDER().inner
-      const length = new Length(size).tryToDER().inner
+    const type = this.type.toDER()
+    const length = new Length(size).toDER()
 
-      return new Ok(new Set.DER(type, length, triplets))
-    })
+    return new Set.DER(type, length, triplets)
   }
 
   toString(): string {
     return stringify(this)
+  }
+}
+
+export class SetWriteUnknownError extends Error {
+  readonly #class = SetWriteUnknownError
+
+  static new(cause: unknown) {
+    return new SetWriteUnknownError(undefined, { cause })
   }
 }
 
@@ -65,26 +72,26 @@ export namespace Set {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly triplets: Writable[]
+      readonly triplets: Writable<never, unknown>[]
     ) { }
 
     trySize(): Result<number, never> {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | SetWriteUnknownError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
 
         for (const triplet of this.triplets)
-          triplet.tryWrite(cursor).throw(t)
+          triplet.tryWrite(cursor).mapErrSync(SetWriteUnknownError.new).throw(t)
 
         return Ok.void()
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Set<Opaque[]>, Error> {
+    static tryRead(cursor: Cursor): Result<Set<Opaque[]>, CursorReadUnknownError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

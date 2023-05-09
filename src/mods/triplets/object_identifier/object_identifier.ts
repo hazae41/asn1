@@ -1,5 +1,6 @@
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
+import { Unimplemented } from "index.js";
 import { Numbers } from "libs/numbers/numbers.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
@@ -56,28 +57,26 @@ export class ObjectIdentifier<T extends string = string>  {
     return this.#class
   }
 
-  tryToDER(): Result<ObjectIdentifier.DER, Error> {
-    return Result.unthrowSync(t => {
-      const values = new Array<VLQ.DER>()
-      const texts = this.value.inner.split(".")
+  toDER() {
+    const values = new Array<VLQ.DER>()
+    const texts = this.value.inner.split(".")
 
-      const first = Number(texts[0])
-      const second = Number(texts[1])
-      const header = [first, second] as const
+    const first = Number(texts[0])
+    const second = Number(texts[1])
+    const header = [first, second] as const
 
-      let size = 1
+    let size = 1
 
-      for (let i = 2; i < texts.length; i++) {
-        const vlq = new VLQ(Number(texts[i])).tryToDER().throw(t)
-        size += vlq.trySize().throw(t)
-        values.push(vlq)
-      }
+    for (let i = 2; i < texts.length; i++) {
+      const vlq = new VLQ(Number(texts[i])).toDER()
+      size += vlq.trySize().inner
+      values.push(vlq)
+    }
 
-      const type = this.type.tryToDER().inner
-      const length = new Length(size).tryToDER().inner
+    const type = this.type.toDER()
+    const length = new Length(size).toDER()
 
-      return new Ok(new ObjectIdentifier.DER(type, length, header, values))
-    })
+    return new ObjectIdentifier.DER(type, length, header, values)
   }
 
   toString() {
@@ -101,7 +100,7 @@ export namespace ObjectIdentifier {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -117,7 +116,7 @@ export namespace ObjectIdentifier {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<ObjectIdentifier, Error> {
+    static tryRead(cursor: Cursor): Result<ObjectIdentifier, CursorReadUnknownError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

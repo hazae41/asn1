@@ -1,7 +1,8 @@
 import { Arrays } from "@hazae41/arrays";
 import { Bitset } from "@hazae41/bitset";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
+import { Unimplemented } from "index.js";
 import { Length } from "mods/length/length.js";
 import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
@@ -38,7 +39,7 @@ export class Integer {
     return this.#class
   }
 
-  tryToDER(): Result<Integer.DER, never> {
+  toDER() {
     let divided = this.value < 0
       ? ~this.value
       : this.value
@@ -55,10 +56,10 @@ export class Integer {
 
     values.reverse()
 
-    const type = this.type.tryToDER().inner
-    const length = new Length(values.length).tryToDER().inner
+    const type = this.type.toDER()
+    const length = new Length(values.length).toDER()
 
-    return new Ok(new Integer.DER(type, length, this.value, values))
+    return new Integer.DER(type, length, this.value, values)
   }
 
   toString() {
@@ -82,7 +83,7 @@ export namespace Integer {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -101,7 +102,7 @@ export namespace Integer {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Integer, Error> {
+    static tryRead(cursor: Cursor): Result<Integer, CursorReadUnknownError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

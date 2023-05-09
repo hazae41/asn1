@@ -1,7 +1,7 @@
 import { Writable } from "@hazae41/binary";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
-import { InvalidTypeError } from "mods/errors/errors.js";
+import { InvalidTypeError, Unimplemented } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
@@ -25,7 +25,7 @@ export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
     return new Constructed(type, triplets)
   }
 
-  static tryResolve(sequence: Constructed<Opaque[]>, resolvable: Resolvable): Result<Constructed<Triplet[]>, Error> {
+  static tryResolve<ResolveError>(sequence: Constructed<Opaque[]>, resolvable: Resolvable<ResolveError>): Result<Constructed<Triplet[]>, ResolveError> {
     return Result.unthrowSync(t => {
       const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw(t))
 
@@ -37,22 +37,28 @@ export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
     return this.#class
   }
 
-  tryToDER(): Result<Constructed.DER, Error> {
-    return Result.unthrowSync(t => {
-      const triplets = this.triplets.map(it => it.tryToDER().throw(t))
-      const size = triplets.reduce((p, c) => p + c.trySize().throw(t), 0)
+  toDER() {
+    const triplets = this.triplets.map(it => it.toDER())
+    const size = triplets.reduce((p, c) => p + c.trySize().inner, 0)
 
-      const type = this.type.tryToDER().inner
-      const length = new Length(size).tryToDER().inner
+    const type = this.type.toDER()
+    const length = new Length(size).toDER()
 
-      return new Ok(new Constructed.DER(type, length, triplets))
-    })
+    return new Constructed.DER(type, length, triplets)
   }
 
   toString(): string {
     return stringify(this)
   }
 
+}
+
+export class ConstructedWriteUnknownError extends Error {
+  readonly #class = ConstructedWriteUnknownError
+
+  static new(cause: unknown) {
+    return new ConstructedWriteUnknownError(undefined, { cause })
+  }
 }
 
 export namespace Constructed {
@@ -62,26 +68,26 @@ export namespace Constructed {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly triplets: Writable[]
+      readonly triplets: Writable<never, unknown>[]
     ) { }
 
     trySize(): Result<number, never> {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | ConstructedWriteUnknownError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
 
         for (const triplet of this.triplets)
-          triplet.tryWrite(cursor).throw(t)
+          triplet.tryWrite(cursor).mapErrSync(ConstructedWriteUnknownError.new).throw(t)
 
         return Ok.void()
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Constructed<Opaque[]>, Error | InvalidTypeError> {
+    static tryRead(cursor: Cursor): Result<Constructed<Opaque[]>, CursorReadUnknownError | Unimplemented | InvalidTypeError> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
 

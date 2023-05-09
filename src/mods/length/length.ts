@@ -1,5 +1,5 @@
 import { Bitset } from "@hazae41/bitset";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 
 export class Length {
@@ -13,9 +13,9 @@ export class Length {
     return this.#class
   }
 
-  tryToDER(): Result<Length.DER, never> {
+  toDER() {
     if (this.value < 128)
-      return new Ok(new Length.ShortDER(this.value))
+      return new Length.ShortDER(this.value)
 
     let floor = this.value
 
@@ -28,7 +28,7 @@ export class Length {
 
     values.reverse()
 
-    return new Ok(new Length.LongDER(this.value, values))
+    return new Length.LongDER(this.value, values)
   }
 
 }
@@ -41,7 +41,7 @@ export namespace Length {
 
   export namespace DER {
 
-    export function tryRead(cursor: Cursor): Result<Length, Error> {
+    export function tryRead(cursor: Cursor): Result<Length, CursorReadUnknownError> {
       return Result.unthrowSync(t => {
         const first = cursor.tryReadUint8().throw(t)
 
@@ -73,7 +73,7 @@ export namespace Length {
       return new Ok(1)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       return cursor.tryWriteUint8(this.value)
     }
 
@@ -90,7 +90,7 @@ export namespace Length {
       return new Ok(1 + this.values.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       return Result.unthrowSync(t => {
         const count = new Bitset(this.values.length, 8)
           .enableBE(0)

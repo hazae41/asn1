@@ -1,5 +1,4 @@
 import { Writable } from "@hazae41/binary"
-import { Result } from "@hazae41/result"
 import { Type } from "mods/type/type.js"
 
 export interface Typed {
@@ -12,6 +11,10 @@ export interface ToStringable {
 
 export interface Triplet {
   type: Type
-  tryToDER(): Result<Writable, Error>
+  toDER(): Writable<never, unknown>
   toString(): string
+}
+
+export interface ToDER<WriteError> {
+  toDER(): Writable<never, WriteError>
 }

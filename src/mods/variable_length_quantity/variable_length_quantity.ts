@@ -1,6 +1,6 @@
 import { Arrays } from "@hazae41/arrays";
 import { Bitset } from "@hazae41/bitset";
-import { Cursor } from "@hazae41/cursor";
+import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 
 export class VLQ {
@@ -14,7 +14,7 @@ export class VLQ {
     return this.#class
   }
 
-  tryToDER(): Result<VLQ.DER, never> {
+  toDER() {
     let value = this.value
 
     const values = new Array<number>()
@@ -26,7 +26,7 @@ export class VLQ {
 
     values.reverse()
 
-    return new Ok(new VLQ.DER(values))
+    return new VLQ.DER(values)
   }
 
 }
@@ -39,11 +39,11 @@ export namespace VLQ {
       readonly values: Array<number>
     ) { }
 
-    trySize(): Result<number, Error> {
+    trySize() {
       return new Ok(this.values.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, Error> {
+    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
       return Result.unthrowSync(t => {
         for (let i = 0; i < this.values.length - 1; i++) {
           const bitset = new Bitset(this.values[i], 8)
@@ -56,7 +56,7 @@ export namespace VLQ {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<VLQ, Error> {
+    static tryRead(cursor: Cursor): Result<VLQ, CursorReadUnknownError> {
       return Result.unthrowSync(t => {
         const values = new Array<number>()
 
