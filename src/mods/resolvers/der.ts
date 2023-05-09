@@ -15,7 +15,7 @@ import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
 import { Sequence } from "mods/triplets/sequence/sequence.js";
 import { Set } from "mods/triplets/set/set.js";
-import { ToDER, Triplet } from "mods/triplets/triplet.js";
+import { Triplet, TripletToDER } from "mods/triplets/triplet.js";
 import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { Type } from "mods/type/type.js";
@@ -66,7 +66,7 @@ export namespace DER {
     return Readable.tryReadFromBytes(DER, bytes)
   }
 
-  export function tryWriteToBytes<WriteError>(triplet: ToDER<WriteError>): Result<Bytes, WriteError | BinaryWriteUnderflowError> {
+  export function tryWriteToBytes<WriteError>(triplet: TripletToDER<WriteError>): Result<Bytes, WriteError | BinaryWriteUnderflowError> {
     return Writable.tryWriteToBytes(triplet.toDER())
   }
 
