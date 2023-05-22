@@ -1,4 +1,4 @@
-import { BinaryReadUnderflowError, Readable } from "@hazae41/binary"
+import { CursorReadLengthUnderflowError, Readable } from "@hazae41/binary"
 import { Bytes } from "@hazae41/bytes"
 import { Cursor, CursorReadUnknownError, CursorWriteLengthOverflowError } from "@hazae41/cursor"
 import { Ok, Result } from "@hazae41/result"
@@ -26,7 +26,7 @@ export class Opaque {
   /**
    * Zero-copy transform into another type
    */
-  tryInto<Output, ReadError>(readable: Readable<Output, ReadError>): Result<Output, ReadError | BinaryReadUnderflowError> {
+  tryInto<Output, ReadError>(readable: Readable<Output, ReadError>): Result<Output, ReadError | CursorReadLengthUnderflowError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 

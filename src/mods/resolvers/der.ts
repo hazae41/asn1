@@ -1,4 +1,4 @@
-import { BinaryReadUnderflowError, BinaryWriteUnderflowError, Readable, Writable } from "@hazae41/binary";
+import { CursorReadLengthUnderflowError, CursorWriteLenghtUnderflowError, Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor, CursorReadUnknownError } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
@@ -62,11 +62,11 @@ export namespace DER {
     return Readable.tryReadOrRollback(DER, cursor)
   }
 
-  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, CursorReadUnknownError | Unimplemented | InvalidLengthError | BinaryReadUnderflowError> {
+  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, CursorReadUnknownError | Unimplemented | InvalidLengthError | CursorReadLengthUnderflowError> {
     return Readable.tryReadFromBytes(DER, bytes)
   }
 
-  export function tryWriteToBytes<WriteError>(triplet: TripletToDER<WriteError>): Result<Bytes, WriteError | BinaryWriteUnderflowError> {
+  export function tryWriteToBytes<WriteError>(triplet: TripletToDER<WriteError>): Result<Bytes, WriteError | CursorWriteLenghtUnderflowError> {
     return Writable.tryWriteToBytes(triplet.toDER())
   }
 
