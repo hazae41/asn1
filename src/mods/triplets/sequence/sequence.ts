@@ -44,7 +44,7 @@ export class Sequence<T extends readonly Triplet[] = readonly Triplet[]> {
 
   toDER() {
     const triplets = this.triplets.map(it => it.toDER())
-    const size = triplets.reduce((p, c) => p + c.trySize().inner, 0)
+    const size = triplets.reduce((p, c) => p + c.trySize().get(), 0)
 
     const type = this.type.toDER()
     const length = new Length(size).toDER()

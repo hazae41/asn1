@@ -69,7 +69,7 @@ export class ObjectIdentifier<T extends string = string>  {
 
     for (let i = 2; i < texts.length; i++) {
       const vlq = new VLQ(Number(texts[i])).toDER()
-      size += vlq.trySize().inner
+      size += vlq.trySize().get()
       values.push(vlq)
     }
 

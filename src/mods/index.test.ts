@@ -5,6 +5,7 @@ export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
+import { Debug } from "@hazae41/result";
 import { readFile } from "fs/promises";
 import { DER } from "mods/resolvers/der.js";
 import { relative, resolve } from "node:path";
@@ -48,6 +49,8 @@ export namespace PKCS7 {
 const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
+
+Debug.debug = true
 
 function compare(a: Uint8Array, b: Uint8Array) {
   return Bytes.toHex(a) === Bytes.toHex(b)
