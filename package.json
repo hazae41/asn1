@@ -23,12 +23,12 @@
   },
   "dependencies": {
     "@hazae41/arrays": "^1.1.1",
-    "@hazae41/binary": "^1.2.29",
+    "@hazae41/binary": "^1.2.31",
     "@hazae41/bitset": "^1.0.1",
-    "@hazae41/bytes": "^1.1.10",
+    "@hazae41/bytes": "^1.1.12",
     "@hazae41/cursor": "^1.1.14",
     "@hazae41/option": "^1.0.9",
-    "@hazae41/result": "^1.0.26"
+    "@hazae41/result": "^1.0.33"
   },
   "devDependencies": {
     "@hazae41/phobos": "^1.0.10",

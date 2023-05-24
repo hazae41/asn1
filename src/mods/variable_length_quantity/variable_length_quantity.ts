@@ -1,6 +1,7 @@
 import { Arrays } from "@hazae41/arrays";
+import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 
 export class VLQ {
@@ -43,7 +44,7 @@ export namespace VLQ {
       return new Ok(this.values.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return Result.unthrowSync(t => {
         for (let i = 0; i < this.values.length - 1; i++) {
           const bitset = new Bitset(this.values[i], 8)
@@ -56,7 +57,7 @@ export namespace VLQ {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<VLQ, CursorReadUnknownError> {
+    static tryRead(cursor: Cursor): Result<VLQ, BinaryReadError> {
       return Result.unthrowSync(t => {
         const values = new Array<number>()
 

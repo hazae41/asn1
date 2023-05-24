@@ -1,4 +1,5 @@
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { InvalidLengthError, Unimplemented } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
@@ -53,7 +54,7 @@ export namespace Boolean {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -64,7 +65,7 @@ export namespace Boolean {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Boolean, CursorReadUnknownError | Unimplemented | InvalidLengthError> {
+    static tryRead(cursor: Cursor): Result<Boolean, BinaryReadError | Unimplemented | InvalidLengthError> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

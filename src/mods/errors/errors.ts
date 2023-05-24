@@ -1,6 +1,9 @@
 import { Type } from "index.js"
 
 export class Unimplemented extends Error {
+  readonly #class = Unimplemented
+  readonly name = this.#class.name
+
   constructor(
     readonly message: string
   ) {
@@ -10,33 +13,46 @@ export class Unimplemented extends Error {
 
 export class InvalidLengthError extends Error {
   readonly #class = InvalidLengthError
+  readonly name = this.#class.name
 
   constructor(
-    readonly name: string,
+    readonly triplet: string,
     readonly length: number
   ) {
-    super(`Invalid length ${length} for ${name}`)
+    super(`Invalid length ${length} for ${triplet}`)
   }
 }
 
 export class InvalidTypeError extends Error {
   readonly #class = InvalidTypeError
+  readonly name = this.#class.name
 
   constructor(
-    readonly name: string,
+    readonly triplet: string,
     readonly type: Type
   ) {
-    super(`Invalid type ${type.byte} for ${name}`)
+    super(`Invalid type ${type.byte} for ${triplet}`)
   }
 }
 
 export class InvalidValueError extends Error {
   readonly #class = InvalidValueError
+  readonly name = this.#class.name
 
   constructor(
-    readonly name: string,
+    readonly triplet: string,
     readonly value: string
   ) {
-    super(`Invalid value ${value} for ${name}`)
+    super(`Invalid value ${value} for ${triplet}`)
   }
+}
+
+export class UnknownWriteError extends Error {
+  readonly #class = UnknownWriteError
+  readonly name = this.#class.name
+
+  static from(cause: unknown) {
+    return new UnknownWriteError(undefined, { cause })
+  }
+
 }

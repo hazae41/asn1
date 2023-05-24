@@ -1,5 +1,6 @@
+import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
-import { Cursor, CursorReadUnknownError, CursorWriteLengthOverflowError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Unimplemented } from "index.js";
 import { Length } from "mods/length/length.js";
@@ -56,7 +57,7 @@ export namespace IA5String {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | CursorWriteLengthOverflowError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -67,7 +68,7 @@ export namespace IA5String {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<IA5String, CursorReadUnknownError | Unimplemented> {
+    static tryRead(cursor: Cursor): Result<IA5String, BinaryReadError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

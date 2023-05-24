@@ -1,5 +1,6 @@
+import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 
 export class Length {
@@ -41,7 +42,7 @@ export namespace Length {
 
   export namespace DER {
 
-    export function tryRead(cursor: Cursor): Result<Length, CursorReadUnknownError> {
+    export function tryRead(cursor: Cursor): Result<Length, BinaryReadError> {
       return Result.unthrowSync(t => {
         const first = cursor.tryReadUint8().throw(t)
 
@@ -73,7 +74,7 @@ export namespace Length {
       return new Ok(1)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return cursor.tryWriteUint8(this.value)
     }
 
@@ -90,7 +91,7 @@ export namespace Length {
       return new Ok(1 + this.values.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return Result.unthrowSync(t => {
         const count = new Bitset(this.values.length, 8)
           .enableBE(0)

@@ -1,5 +1,6 @@
+import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { Unimplemented } from "mods/errors/errors.js";
 
@@ -78,7 +79,7 @@ export namespace Type {
       return new Ok(1)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       let value = 0
       value |= this.clazz << 6
       value |= this.wrap << 5
@@ -87,7 +88,7 @@ export namespace Type {
       return cursor.tryWriteUint8(value)
     }
 
-    static tryRead(cursor: Cursor): Result<Type, CursorReadUnknownError | Unimplemented> {
+    static tryRead(cursor: Cursor): Result<Type, BinaryReadError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = cursor.tryReadUint8().throw(t)
         const bitset = new Bitset(type, 8)

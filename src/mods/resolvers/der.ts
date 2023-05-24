@@ -1,15 +1,15 @@
-import { CursorReadLengthUnderflowError, CursorWriteLenghtUnderflowError, Readable, Writable } from "@hazae41/binary";
+import { BinaryReadError, BinaryWriteError, Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
-import { Cursor, CursorReadUnknownError } from "@hazae41/cursor";
+import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
-import { InvalidLengthError, Unimplemented } from "mods/errors/errors.js";
+import { InvalidLengthError, InvalidTypeError, InvalidValueError, Unimplemented } from "mods/errors/errors.js";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";
 import { IA5String } from "mods/triplets/ia5_string/ia5_string.js";
 import { Integer } from "mods/triplets/integer/integer.js";
 import { Null } from "mods/triplets/null/null.js";
-import { ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
+import { NotAnOID, ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
 import { OctetString } from "mods/triplets/octet_string/octet_string.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
@@ -22,7 +22,7 @@ import { Type } from "mods/type/type.js";
 
 export namespace DER {
 
-  export function tryResolve(opaque: Opaque): Result<Triplet, CursorReadUnknownError | Unimplemented | InvalidLengthError> {
+  export function tryResolve(opaque: Opaque): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
     if (opaque.type.equals(Boolean.type))
       return opaque.tryInto(Boolean.DER)
     if (opaque.type.equals(Integer.type))
@@ -54,19 +54,19 @@ export namespace DER {
     return new Ok(opaque)
   }
 
-  export function tryRead(cursor: Cursor): Result<Triplet, CursorReadUnknownError | Unimplemented | InvalidLengthError> {
+  export function tryRead(cursor: Cursor): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
     return Opaque.DER.tryRead(cursor).andThenSync(tryResolve)
   }
 
-  export function tryReadOrRollback(cursor: Cursor): Result<Triplet, CursorReadUnknownError | Unimplemented | InvalidLengthError> {
+  export function tryReadOrRollback(cursor: Cursor): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
     return Readable.tryReadOrRollback(DER, cursor)
   }
 
-  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, CursorReadUnknownError | Unimplemented | InvalidLengthError | CursorReadLengthUnderflowError> {
+  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
     return Readable.tryReadFromBytes(DER, bytes)
   }
 
-  export function tryWriteToBytes<D extends DERWritable>(triplet: DERTriplet<D>): Result<Bytes, Writable.SizeError<D> | Writable.WriteError<D> | CursorWriteLenghtUnderflowError> {
+  export function tryWriteToBytes<D extends DERWritable & Writable.Infer<D>>(triplet: DERTriplet<D>): Result<Bytes, Writable.SizeError<D> | Writable.WriteError<D> | BinaryWriteError> {
     return Writable.tryWriteToBytes(triplet.toDER())
   }
 

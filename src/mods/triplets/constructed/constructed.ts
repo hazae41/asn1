@@ -1,7 +1,7 @@
-import { Writable } from "@hazae41/binary";
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { BinaryReadError, BinaryWriteError, Writable } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
-import { InvalidTypeError, Unimplemented } from "mods/errors/errors.js";
+import { InvalidTypeError, Unimplemented, UnknownWriteError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
@@ -53,14 +53,6 @@ export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
 
 }
 
-export class ConstructedWriteUnknownError extends Error {
-  readonly #class = ConstructedWriteUnknownError
-
-  static new(cause: unknown) {
-    return new ConstructedWriteUnknownError(undefined, { cause })
-  }
-}
-
 export namespace Constructed {
 
   export class DER {
@@ -75,19 +67,19 @@ export namespace Constructed {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | ConstructedWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError | UnknownWriteError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
 
         for (const triplet of this.triplets)
-          triplet.tryWrite(cursor).mapErrSync(ConstructedWriteUnknownError.new).throw(t)
+          triplet.tryWrite(cursor).mapErrSync(UnknownWriteError.from).throw(t)
 
         return Ok.void()
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Constructed<Opaque[]>, CursorReadUnknownError | Unimplemented | InvalidTypeError> {
+    static tryRead(cursor: Cursor): Result<Constructed<Opaque[]>, BinaryReadError | Unimplemented | InvalidTypeError> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
 

@@ -1,4 +1,5 @@
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { Unimplemented } from "index.js";
 import { Numbers } from "libs/numbers/numbers.js";
@@ -100,7 +101,7 @@ export namespace ObjectIdentifier {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
@@ -116,7 +117,7 @@ export namespace ObjectIdentifier {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<ObjectIdentifier, CursorReadUnknownError | Unimplemented> {
+    static tryRead(cursor: Cursor): Result<ObjectIdentifier, BinaryReadError | NotAnOID | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)

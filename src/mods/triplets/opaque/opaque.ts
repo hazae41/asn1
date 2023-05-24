@@ -1,6 +1,6 @@
-import { CursorReadLengthUnderflowError, Readable } from "@hazae41/binary"
+import { BinaryReadError, BinaryWriteError, Readable } from "@hazae41/binary"
 import { Bytes } from "@hazae41/bytes"
-import { Cursor, CursorReadUnknownError, CursorWriteLengthOverflowError } from "@hazae41/cursor"
+import { Cursor } from "@hazae41/cursor"
 import { Ok, Result } from "@hazae41/result"
 import { Unimplemented } from "index.js"
 import { Length } from "mods/length/length.js"
@@ -26,7 +26,7 @@ export class Opaque {
   /**
    * Zero-copy transform into another type
    */
-  tryInto<Output, ReadError>(readable: Readable<Output, ReadError>): Result<Output, ReadError | CursorReadLengthUnderflowError> {
+  tryInto<Output, ReadError>(readable: Readable<Output, ReadError>): Result<Output, ReadError | BinaryReadError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
@@ -52,11 +52,11 @@ export namespace Opaque {
       return new Ok(this.bytes.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteLengthOverflowError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
       return cursor.tryWrite(this.bytes)
     }
 
-    static tryRead(cursor: Cursor): Result<Opaque, CursorReadUnknownError | Unimplemented> {
+    static tryRead(cursor: Cursor): Result<Opaque, BinaryReadError | Unimplemented> {
       return Result.unthrowSync(t => {
         const start = cursor.offset
 
@@ -72,5 +72,6 @@ export namespace Opaque {
         return new Ok(new Opaque(type, bytes))
       })
     }
+
   }
 }

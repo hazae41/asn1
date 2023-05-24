@@ -1,7 +1,7 @@
-import { Writable } from "@hazae41/binary";
-import { Cursor, CursorReadUnknownError, CursorWriteUnknownError } from "@hazae41/cursor";
+import { BinaryReadError, BinaryWriteError, Writable } from "@hazae41/binary";
+import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
-import { Unimplemented } from "index.js";
+import { Unimplemented, UnknownWriteError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
@@ -79,19 +79,19 @@ export namespace Set {
       return Triplets.trySize(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, CursorWriteUnknownError | SetWriteUnknownError> {
+    tryWrite(cursor: Cursor): Result<void, BinaryWriteError | UnknownWriteError> {
       return Result.unthrowSync(t => {
         this.type.tryWrite(cursor).throw(t)
         this.length.tryWrite(cursor).throw(t)
 
         for (const triplet of this.triplets)
-          triplet.tryWrite(cursor).mapErrSync(SetWriteUnknownError.new).throw(t)
+          triplet.tryWrite(cursor).mapErrSync(UnknownWriteError.from).throw(t)
 
         return Ok.void()
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Set<Opaque[]>, CursorReadUnknownError | Unimplemented> {
+    static tryRead(cursor: Cursor): Result<Set<Opaque[]>, BinaryReadError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)
