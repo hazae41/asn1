@@ -6,7 +6,6 @@ import { Length } from "mods/length/length.js";
 import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { DERWritable, Triplet } from "mods/triplets/triplet.js";
-import { Triplets } from "mods/triplets/triplets.js";
 import { Type } from "mods/type/type.js";
 
 const stringify = (parent: Sequence) => `SEQUENCE {
@@ -69,7 +68,7 @@ export namespace Sequence {
     ) { }
 
     trySize(): Result<number, never> {
-      return Triplets.trySize(this.length)
+      return Triplet.trySize(this.length)
     }
 
     tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {

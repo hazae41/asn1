@@ -4,7 +4,7 @@ import { Err, Ok, Result } from "@hazae41/result";
 import { Unimplemented } from "index.js";
 import { Numbers } from "libs/numbers/numbers.js";
 import { Length } from "mods/length/length.js";
-import { Triplets } from "mods/triplets/triplets.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 
@@ -98,7 +98,7 @@ export namespace ObjectIdentifier {
     ) { }
 
     trySize(): Result<number, never> {
-      return Triplets.trySize(this.length)
+      return Triplet.trySize(this.length)
     }
 
     tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {

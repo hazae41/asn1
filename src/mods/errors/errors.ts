@@ -46,13 +46,3 @@ export class InvalidValueError extends Error {
     super(`Invalid value ${value} for ${triplet}`)
   }
 }
-
-export class UnknownWriteError extends Error {
-  readonly #class = UnknownWriteError
-  readonly name = this.#class.name
-
-  static from(cause: unknown) {
-    return new UnknownWriteError(undefined, { cause })
-  }
-
-}

@@ -11,7 +11,6 @@ export * from "./printable_string/printable_string.js";
 export * from "./sequence/sequence.js";
 export * from "./set/set.js";
 export * from "./triplet.js";
-export * from "./triplets.js";
 export * from "./utc_time/utc_time.js";
 export * from "./utf8_string/utf8_string.js";
 

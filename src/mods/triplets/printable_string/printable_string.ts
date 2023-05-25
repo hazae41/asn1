@@ -4,7 +4,7 @@ import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result } from "@hazae41/result";
 import { InvalidValueError, Unimplemented } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
-import { Triplets } from "mods/triplets/triplets.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class PrintableString {
@@ -68,7 +68,7 @@ export namespace PrintableString {
     ) { }
 
     trySize(): Result<number, never> {
-      return Triplets.trySize(this.length)
+      return Triplet.trySize(this.length)
     }
 
     tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {

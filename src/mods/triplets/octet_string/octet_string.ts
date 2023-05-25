@@ -4,7 +4,7 @@ import { Cursor } from "@hazae41/cursor";
 import { Ok, Result } from "@hazae41/result";
 import { Unimplemented } from "index.js";
 import { Length } from "mods/length/length.js";
-import { Triplets } from "mods/triplets/triplets.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class OctetString {
@@ -51,7 +51,7 @@ export namespace OctetString {
     ) { }
 
     trySize(): Result<number, never> {
-      return Triplets.trySize(this.length)
+      return Triplet.trySize(this.length)
     }
 
     tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
