@@ -20,9 +20,20 @@ import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
 import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
 import { Type } from "mods/type/type.js";
 
+export type DERReadError =
+  | BinaryReadError
+  | Unimplemented
+  | InvalidTypeError
+  | InvalidValueError
+  | InvalidLengthError
+  | NotAnOID
+
+export type DERWriteError =
+  | BinaryWriteError
+
 export namespace DER {
 
-  export function tryResolve(opaque: Opaque): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
+  export function tryResolve(opaque: Opaque): Result<Triplet, DERReadError> {
     if (opaque.type.equals(Boolean.type))
       return opaque.tryInto(Boolean.DER)
     if (opaque.type.equals(Integer.type))
@@ -54,19 +65,19 @@ export namespace DER {
     return new Ok(opaque)
   }
 
-  export function tryRead(cursor: Cursor): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
+  export function tryRead(cursor: Cursor): Result<Triplet, DERReadError> {
     return Opaque.DER.tryRead(cursor).andThenSync(tryResolve)
   }
 
-  export function tryReadOrRollback(cursor: Cursor): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
+  export function tryReadOrRollback(cursor: Cursor): Result<Triplet, DERReadError> {
     return Readable.tryReadOrRollback(DER, cursor)
   }
 
-  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, BinaryReadError | Unimplemented | InvalidTypeError | InvalidValueError | InvalidLengthError | NotAnOID> {
+  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, DERReadError> {
     return Readable.tryReadFromBytes(DER, bytes)
   }
 
-  export function tryWriteToBytes(triplet: Triplet): Result<Bytes, BinaryWriteError> {
+  export function tryWriteToBytes(triplet: Triplet): Result<Bytes, DERWriteError> {
     return Writable.tryWriteToBytes(triplet.toDER())
   }
 
