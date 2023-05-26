@@ -1,16 +1,5 @@
 import { Type } from "index.js"
 
-export class Unimplemented extends Error {
-  readonly #class = Unimplemented
-  readonly name = this.#class.name
-
-  constructor(
-    readonly message: string
-  ) {
-    super(`Unimplemented: ${message}`)
-  }
-}
-
 export class InvalidLengthError extends Error {
   readonly #class = InvalidLengthError
   readonly name = this.#class.name

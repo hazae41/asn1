@@ -1,8 +1,8 @@
 import { BinaryReadError, BinaryWriteError, Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
-import { InvalidLengthError, InvalidTypeError, InvalidValueError, Unimplemented } from "mods/errors/errors.js";
+import { Ok, Result, Unimplemented } from "@hazae41/result";
+import { InvalidLengthError, InvalidTypeError, InvalidValueError } from "mods/errors/errors.js";
 import { BitString } from "mods/triplets/bit_string/bit_string.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Constructed } from "mods/triplets/constructed/constructed.js";

@@ -1,8 +1,8 @@
 import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result } from "@hazae41/result";
-import { InvalidValueError, Unimplemented } from "mods/errors/errors.js";
+import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
+import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";

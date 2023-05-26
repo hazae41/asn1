@@ -1,7 +1,6 @@
 import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result } from "@hazae41/result";
-import { Unimplemented } from "index.js";
+import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
 import { Numbers } from "libs/numbers/numbers.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";

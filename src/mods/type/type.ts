@@ -1,8 +1,7 @@
 import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result } from "@hazae41/result";
-import { Unimplemented } from "mods/errors/errors.js";
+import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
 
 export class Type {
 
