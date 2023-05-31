@@ -55,14 +55,6 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
   }
 }
 
-export class SetWriteUnknownError extends Error {
-  readonly #class = SetWriteUnknownError
-
-  static new(cause: unknown) {
-    return new SetWriteUnknownError(undefined, { cause })
-  }
-}
-
 export namespace Set {
 
   export class DER {
