@@ -25,7 +25,7 @@ export class Opaque {
   /**
    * Zero-copy transform into another type
    */
-  tryInto<Output, ReadError>(readable: Readable<Output, ReadError>): Result<Output, ReadError | BinaryReadError> {
+  tryReadInto<ReadOutput, ReadError>(readable: Readable<ReadOutput, ReadError>): Result<ReadOutput, ReadError | BinaryReadError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
