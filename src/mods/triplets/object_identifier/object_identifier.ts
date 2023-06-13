@@ -9,6 +9,7 @@ import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 
 export class NotAnOID extends Error {
   readonly #class = NotAnOID
+  readonly name = this.#class.name
 
   constructor(
     readonly text: string

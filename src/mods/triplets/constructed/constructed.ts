@@ -83,7 +83,7 @@ export namespace Constructed {
         const type = Type.DER.tryRead(cursor).throw(t)
 
         if (type.wrap !== Type.wraps.CONSTRUCTED)
-          return new Err(new InvalidTypeError(`Constructed`, type))
+          return new Err(new InvalidTypeError(`Constructed`, type.byte))
 
         const length = Length.DER.tryRead(cursor).throw(t)
 

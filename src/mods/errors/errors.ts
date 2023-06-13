@@ -1,5 +1,3 @@
-import { Type } from "index.js"
-
 export class InvalidLengthError extends Error {
   readonly #class = InvalidLengthError
   readonly name = this.#class.name
@@ -10,6 +8,7 @@ export class InvalidLengthError extends Error {
   ) {
     super(`Invalid length ${length} for ${triplet}`)
   }
+
 }
 
 export class InvalidTypeError extends Error {
@@ -18,10 +17,11 @@ export class InvalidTypeError extends Error {
 
   constructor(
     readonly triplet: string,
-    readonly type: Type
+    readonly typeByte: number
   ) {
-    super(`Invalid type ${type.byte} for ${triplet}`)
+    super(`Invalid type ${typeByte} for ${triplet}`)
   }
+
 }
 
 export class InvalidValueError extends Error {
@@ -34,4 +34,5 @@ export class InvalidValueError extends Error {
   ) {
     super(`Invalid value ${value} for ${triplet}`)
   }
+
 }
