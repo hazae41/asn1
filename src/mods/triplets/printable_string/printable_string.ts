@@ -87,7 +87,7 @@ export namespace PrintableString {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)
 
-        const value = cursor.tryReadString(length.value).throw(t)
+        const value = cursor.tryReadUtf8(length.value).throw(t)
 
         return PrintableString.tryNew(type, value)
       })

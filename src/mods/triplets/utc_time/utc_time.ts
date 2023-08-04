@@ -89,7 +89,7 @@ export namespace UTCTime {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)
 
-        const text = cursor.tryReadString(length.value).throw(t)
+        const text = cursor.tryReadUtf8(length.value).throw(t)
 
         if (text.length !== 13)
           return new Err(new InvalidValueError(`UTCTime`, text))

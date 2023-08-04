@@ -71,7 +71,7 @@ export namespace UTF8String {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)
 
-        const value = cursor.tryReadString(length.value).throw(t)
+        const value = cursor.tryReadUtf8(length.value).throw(t)
 
         return new Ok(new UTF8String(type, value))
       })
