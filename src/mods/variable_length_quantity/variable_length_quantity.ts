@@ -51,7 +51,7 @@ export namespace VLQ {
           cursor.tryWriteUint8(bitset.enableBE(0).value).throw(t)
         }
 
-        cursor.tryWriteUint8(Arrays.last(this.values)).throw(t)
+        cursor.tryWriteUint8(Arrays.last(this.values)!).throw(t)
 
         return Ok.void()
       })

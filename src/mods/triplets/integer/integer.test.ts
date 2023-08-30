@@ -1,7 +1,7 @@
 import { Readable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Debug } from "@hazae41/result";
+import { Result } from "@hazae41/result";
 import { DER } from "mods/resolvers/der.js";
 import { Integer } from "mods/triplets/integer/integer.js";
 import { relative, resolve } from "node:path";
@@ -10,7 +10,7 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
-Debug.debug = true
+Result.debug = true
 
 function hexToBytes(hex: string) {
   return Bytes.fromHex(hex.replaceAll(" ", ""))

@@ -51,7 +51,7 @@ export class Integer {
       divided /= bn256
     } while (divided)
 
-    if (Arrays.last(values) > 127)
+    if (Arrays.last(values)! > 127)
       values.push(0)
 
     values.reverse()

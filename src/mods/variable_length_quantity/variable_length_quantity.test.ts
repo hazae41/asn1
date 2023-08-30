@@ -2,7 +2,7 @@ import { Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
-import { Debug } from "@hazae41/result";
+import { Result } from "@hazae41/result";
 import { VLQ } from "mods/variable_length_quantity/variable_length_quantity.js";
 import { relative, resolve } from "node:path";
 
@@ -10,7 +10,7 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
-Debug.debug = true
+Result.debug = true
 
 function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
