@@ -31,7 +31,6 @@
     "@hazae41/result": "^1.1.2"
   },
   "devDependencies": {
-    "@hazae41/alocer": "^1.0.0",
     "@hazae41/base64": "^1.0.1",
     "@hazae41/phobos": "^1.0.10",
     "@rollup/plugin-typescript": "^11.1.3",
