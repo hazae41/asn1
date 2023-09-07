@@ -3,7 +3,7 @@ export * from "./triplets/index.test.js";
 export * from "./type/type.test.js";
 export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
-import { Bytes } from "@hazae41/bytes";
+import { Base64 } from "@hazae41/base64";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
 import { readFile } from "fs/promises";
@@ -24,7 +24,7 @@ export namespace PEM {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Bytes.fromBase64(body)
+    return Base64.get().tryDecode(body).unwrap().copy()
   }
 }
 
@@ -42,7 +42,7 @@ export namespace PKCS7 {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Bytes.fromBase64(body)
+    return Base64.get().tryDecode(body).unwrap().copy()
   }
 }
 
@@ -53,7 +53,7 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 Result.debug = true
 
 function compare(a: Uint8Array, b: Uint8Array) {
-  return Bytes.toHex(a) === Bytes.toHex(b)
+  return Buffer.from(a).equals(Buffer.from(b))
 }
 
 test("Cert Ed25519", async () => {
@@ -93,7 +93,7 @@ test("Cert frank4dd-dsa", async () => {
 
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
-  const buffer = Bytes.fromBase64(text)
+  const buffer = Base64.get().tryDecode(text).unwrap().copy()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
   assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
@@ -101,7 +101,7 @@ test("Cert Tor", async () => {
 
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
-  const buffer = Bytes.fromBase64(text)
+  const buffer = Base64.get().tryDecode(text).unwrap().copy()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
   assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))

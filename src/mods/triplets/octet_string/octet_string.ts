@@ -1,3 +1,4 @@
+import { Base16 } from "@hazae41/base16";
 import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
@@ -35,7 +36,7 @@ export class OctetString {
   }
 
   toString() {
-    return `OCTET STRING ${Bytes.toHex(this.bytes)}`
+    return `OCTET STRING ${Base16.get().tryEncode(this.bytes).unwrap()}`
   }
 }
 
@@ -48,6 +49,8 @@ export namespace OctetString {
       readonly length: Length.DER,
       readonly bytes: Bytes
     ) { }
+
+    [Symbol.dispose]() { }
 
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)

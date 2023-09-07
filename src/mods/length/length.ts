@@ -70,6 +70,8 @@ export namespace Length {
       readonly value: number
     ) { }
 
+    [Symbol.dispose]() { }
+
     trySize(): Result<number, never> {
       return new Ok(1)
     }
@@ -86,6 +88,8 @@ export namespace Length {
       readonly value: number,
       readonly values: Array<number>
     ) { }
+
+    [Symbol.dispose]() { }
 
     trySize(): Result<number, never> {
       return new Ok(1 + this.values.length)

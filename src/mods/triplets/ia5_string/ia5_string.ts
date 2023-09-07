@@ -52,6 +52,8 @@ export namespace IA5String {
       readonly bytes: Bytes
     ) { }
 
+    [Symbol.dispose]() { }
+
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)
     }

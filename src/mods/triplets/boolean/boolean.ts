@@ -50,6 +50,8 @@ export namespace Boolean {
       readonly value: number
     ) { }
 
+    [Symbol.dispose]() { }
+
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)
     }

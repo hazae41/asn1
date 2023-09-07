@@ -40,6 +40,8 @@ export namespace VLQ {
       readonly values: Array<number>
     ) { }
 
+    [Symbol.dispose]() { }
+
     trySize() {
       return new Ok(this.values.length)
     }

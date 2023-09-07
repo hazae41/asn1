@@ -1,3 +1,4 @@
+import { Base16 } from "@hazae41/base16";
 import { BinaryReadError, BinaryWriteError, Readable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
@@ -34,7 +35,7 @@ export class Opaque {
   }
 
   toString() {
-    return `OPAQUE ${Bytes.toHex(this.bytes)}`
+    return `OPAQUE ${Base16.get().tryEncode(this.bytes).unwrap()}`
   }
 
 }
@@ -46,6 +47,8 @@ export namespace Opaque {
     constructor(
       readonly bytes: Bytes
     ) { }
+
+    [Symbol.dispose]() { }
 
     trySize(): Result<number, never> {
       return new Ok(this.bytes.length)

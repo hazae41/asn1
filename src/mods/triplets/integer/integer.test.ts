@@ -1,3 +1,4 @@
+import { Base16 } from "@hazae41/base16";
 import { Readable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
@@ -13,7 +14,8 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 Result.debug = true
 
 function hexToBytes(hex: string) {
-  return Bytes.fromHex(hex.replaceAll(" ", ""))
+  const hex2 = hex.replaceAll(" ", "")
+  return Base16.get().tryPadStartAndDecode(hex2).unwrap().copy()
 }
 
 function bytesToTriplet(bytes: Uint8Array) {

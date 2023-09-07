@@ -79,6 +79,8 @@ export namespace Integer {
       readonly values: Array<number>
     ) { }
 
+    [Symbol.dispose]() { }
+
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)
     }

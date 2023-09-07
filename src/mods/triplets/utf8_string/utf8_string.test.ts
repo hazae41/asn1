@@ -1,4 +1,4 @@
-import { Bytes } from "@hazae41/bytes";
+import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
@@ -14,7 +14,7 @@ Result.debug = true
 
 function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Bytes.fromHex(hex2)
+  const buffer = Base16.get().tryPadStartAndDecode(hex2).unwrap().copy()
   return new Cursor(buffer)
 }
 
