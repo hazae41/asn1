@@ -14,7 +14,7 @@ Result.debug = true
 
 function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Base16.get().tryPadStartAndDecode(hex2).unwrap().copy()
+  const buffer = Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose()
   return new Cursor(buffer)
 }
 
