@@ -55,7 +55,7 @@ export namespace BitString {
       readonly bytes: Uint8Array,
     ) { }
 
-    [Symbol.dispose]() { }
+    
 
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)

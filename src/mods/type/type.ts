@@ -74,7 +74,7 @@ export namespace Type {
       readonly tag: number
     ) { }
 
-    [Symbol.dispose]() { }
+    
 
     trySize(): Result<number, never> {
       return new Ok(1)

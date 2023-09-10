@@ -66,11 +66,6 @@ export namespace Sequence {
       readonly triplets: DERWritable[]
     ) { }
 
-    [Symbol.dispose]() {
-      for (const triplet of this.triplets)
-        triplet[Symbol.dispose]()
-    }
-
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)
     }

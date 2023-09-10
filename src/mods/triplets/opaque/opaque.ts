@@ -48,7 +48,7 @@ export namespace Opaque {
       readonly bytes: Bytes
     ) { }
 
-    [Symbol.dispose]() { }
+    
 
     trySize(): Result<number, never> {
       return new Ok(this.bytes.length)
