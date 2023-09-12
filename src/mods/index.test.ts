@@ -24,7 +24,7 @@ export namespace PEM {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Base64.get().tryDecode(body).unwrap().copyAndDispose()
+    return Base64.get().tryDecodePadded(body).unwrap().copyAndDispose()
   }
 }
 
@@ -36,13 +36,13 @@ export namespace PKCS7 {
     text = text.replaceAll(`\n`, ``)
 
     if (!text.startsWith(header))
-      throw new Error(`Missing PEM header`)
+      throw new Error(`Missing PKCS7 header`)
     if (!text.endsWith(footer))
-      throw new Error(`Missing PEM footer`)
+      throw new Error(`Missing PKCS7 footer`)
 
     const body = text.slice(header.length, -footer.length)
 
-    return Base64.get().tryDecode(body).unwrap().copyAndDispose()
+    return Base64.get().tryDecodePadded(body).unwrap().copyAndDispose()
   }
 }
 
@@ -93,7 +93,7 @@ test("Cert frank4dd-dsa", async () => {
 
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
-  const buffer = Base64.get().tryDecode(text).unwrap().copyAndDispose()
+  const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
   assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
@@ -101,7 +101,7 @@ test("Cert Tor", async () => {
 
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
-  const buffer = Base64.get().tryDecode(text).unwrap().copyAndDispose()
+  const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
   assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
