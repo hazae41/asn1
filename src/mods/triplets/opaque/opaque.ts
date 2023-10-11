@@ -1,5 +1,6 @@
 import { Base16 } from "@hazae41/base16";
 import { BinaryReadError, BinaryWriteError, Readable } from "@hazae41/binary";
+import { Box, Copied } from "@hazae41/box";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result, Unimplemented } from "@hazae41/result";
@@ -35,7 +36,7 @@ export class Opaque {
   }
 
   toString() {
-    return `OPAQUE ${Base16.get().tryEncode(this.bytes).unwrap()}`
+    return `OPAQUE ${Base16.get().tryEncode(new Box(new Copied(this.bytes))).unwrap()}`
   }
 
 }
@@ -48,7 +49,7 @@ export namespace Opaque {
       readonly bytes: Bytes
     ) { }
 
-    
+
 
     trySize(): Result<number, never> {
       return new Ok(this.bytes.length)

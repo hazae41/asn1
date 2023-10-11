@@ -74,7 +74,7 @@ export namespace Type {
       readonly tag: number
     ) { }
 
-    
+
 
     trySize(): Result<number, never> {
       return new Ok(1)
@@ -99,7 +99,7 @@ export namespace Type {
         const tag = bitset.last(5).value
 
         if (tag > 30) // TODO
-          return new Err(new Unimplemented(`Type tag > 30`))
+          return new Err(new Unimplemented({ cause: `Type tag > 30` }))
 
         return new Ok(new Type(clazz, wrap, tag))
       })
