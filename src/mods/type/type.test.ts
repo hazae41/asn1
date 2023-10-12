@@ -14,7 +14,7 @@ Result.debug = true
 
 function hexToType(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose().bytes
+  const buffer = Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose()
   return Type.DER.tryRead(new Cursor(buffer)).unwrap()
 }
 

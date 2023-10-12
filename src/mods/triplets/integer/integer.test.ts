@@ -15,7 +15,7 @@ Result.debug = true
 
 function hexToBytes(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  return Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose().bytes
+  return Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose()
 }
 
 function bytesToTriplet(bytes: Uint8Array) {

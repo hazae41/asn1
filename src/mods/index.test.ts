@@ -24,7 +24,7 @@ export namespace PEM {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Base64.get().tryDecodePadded(body).unwrap().copyAndDispose().bytes
+    return Base64.get().tryDecodePadded(body).unwrap().copyAndDispose()
   }
 }
 
@@ -42,7 +42,7 @@ export namespace PKCS7 {
 
     const body = text.slice(header.length, -footer.length)
 
-    return Base64.get().tryDecodePadded(body).unwrap().copyAndDispose().bytes
+    return Base64.get().tryDecodePadded(body).unwrap().copyAndDispose()
   }
 }
 
@@ -93,7 +93,7 @@ test("Cert frank4dd-dsa", async () => {
 
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
-  const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose().bytes
+  const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
   assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
@@ -101,7 +101,7 @@ test("Cert Tor", async () => {
 
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
-  const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose().bytes
+  const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
   assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))

@@ -1,6 +1,5 @@
 import { Base16 } from "@hazae41/base16";
 import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
-import { Box, Copied } from "@hazae41/box";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result, Unimplemented } from "@hazae41/result";
@@ -37,7 +36,7 @@ export class OctetString {
   }
 
   toString() {
-    return `OCTET STRING ${Base16.get().tryEncode(new Box(new Copied(this.bytes))).unwrap()}`
+    return `OCTET STRING ${Base16.get().tryEncode(this.bytes).unwrap()}`
   }
 }
 

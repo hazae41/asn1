@@ -1,6 +1,5 @@
 import { Base16 } from "@hazae41/base16";
 import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
-import { Box, Copied } from "@hazae41/box";
 import { Cursor } from "@hazae41/cursor";
 import { Ok, Result, Unimplemented } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
@@ -37,8 +36,7 @@ export class BitString {
   }
 
   toString() {
-    const bytesCopied = new Box(new Copied(this.bytes))
-    const bignum = BigInt("0x" + Base16.get().tryEncode(bytesCopied).unwrap())
+    const bignum = BigInt("0x" + Base16.get().tryEncode(this.bytes).unwrap())
     const cursor = bignum.toString(2).padStart(this.bytes.length * 8, "0")
 
     return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`
