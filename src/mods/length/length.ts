@@ -68,10 +68,6 @@ export namespace Length {
         super(value)
       }
 
-      toASN1() {
-        return new Length(this.value)
-      }
-
       sizeOrThrow() {
         return 1
       }
@@ -89,10 +85,6 @@ export namespace Length {
         readonly values: Array<number>
       ) {
         super(value)
-      }
-
-      toASN1() {
-        return new Length(this.value)
       }
 
       sizeOrThrow() {

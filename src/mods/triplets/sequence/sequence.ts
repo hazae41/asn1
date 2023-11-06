@@ -13,7 +13,7 @@ const stringify = (parent: Sequence) => `SEQUENCE {
 
 export class Sequence<T extends readonly Triplet[] = readonly Triplet[]> {
 
-  static type = new Type(
+  static readonly type = new Type(
     Type.clazzes.UNIVERSAL,
     Type.wraps.CONSTRUCTED,
     Type.tags.SEQUENCE)

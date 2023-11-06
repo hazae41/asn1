@@ -63,10 +63,6 @@ export namespace Opaque {
       readonly bytes: Bytes
     ) { }
 
-    toASN1() {
-      return new Opaque(this.type.toASN1(), this.bytes)
-    }
-
     resolveOrThrow() {
       if (this.type.equals(Boolean.type))
         return this.readIntoOrThrow(Boolean.DER)

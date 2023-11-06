@@ -70,10 +70,6 @@ export namespace Type {
       super(byte, clazz, wrap, tag)
     }
 
-    toASN1() {
-      return new Type(this.byte, this.clazz, this.wrap, this.tag)
-    }
-
     sizeOrThrow() {
       return 1
     }

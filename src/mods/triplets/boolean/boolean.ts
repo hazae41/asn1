@@ -6,18 +6,21 @@ import { Type } from "mods/type/type.js";
 
 export class Boolean {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.BOOLEAN)
 
+  static readonly length = new Length(1)
+
   constructor(
     readonly type: Type,
+    readonly length: Length,
     readonly value: number
   ) { }
 
   static create(value: number) {
-    return new Boolean(this.type, value)
+    return new Boolean(this.type, this.length, value)
   }
 
   toDER() {
@@ -42,11 +45,7 @@ export namespace Boolean {
       readonly length: Length.DER,
       readonly value: number
     ) {
-      super(type, value)
-    }
-
-    toASN1() {
-      return new Boolean(this.type.toASN1(), this.value)
+      super(type, length, value)
     }
 
     sizeOrThrow() {

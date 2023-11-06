@@ -8,7 +8,7 @@ import { Type } from "mods/type/type.js";
 
 export class PrintableString {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.PRINTABLE_STRING)
@@ -65,10 +65,6 @@ export namespace PrintableString {
       readonly bytes: Uint8Array
     ) {
       super(type.toDER(), value, bytes)
-    }
-
-    toASN1() {
-      return new PrintableString(this.type.toASN1(), this.value, this.bytes)
     }
 
     sizeOrThrow() {

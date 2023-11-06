@@ -13,7 +13,7 @@ function pad2(value: number) {
 
 export class UTCTime {
 
-  static type = new Type(
+  static readonly type = new Type(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.UTC_TIME)

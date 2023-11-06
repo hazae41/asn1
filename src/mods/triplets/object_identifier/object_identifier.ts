@@ -38,7 +38,7 @@ export class OID<T extends string> {
 
 export class ObjectIdentifier<T extends string = string>  {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.OBJECT_IDENTIFIER)

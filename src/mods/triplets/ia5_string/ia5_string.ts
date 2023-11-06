@@ -6,18 +6,23 @@ import { Type } from "mods/type/type.js";
 
 export class IA5String {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.IA5_STRING)
 
   constructor(
     readonly type: Type,
-    readonly value: string
+    readonly length: Length,
+    readonly value: string,
+    readonly bytes: Bytes
   ) { }
 
   static create(value: string) {
-    return new IA5String(this.type, value)
+    const bytes = Bytes.fromAscii(value)
+    const length = new Length(bytes.length).toDER()
+
+    return new IA5String(this.type, length, value, bytes)
   }
 
   toDER() {
@@ -45,11 +50,7 @@ export namespace IA5String {
       readonly value: string,
       readonly bytes: Bytes
     ) {
-      super(type, value)
-    }
-
-    toASN1() {
-      return new IA5String(this.type.toASN1(), this.value)
+      super(type, length, value, bytes)
     }
 
     sizeOrThrow() {

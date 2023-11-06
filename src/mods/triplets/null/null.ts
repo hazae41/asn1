@@ -7,7 +7,7 @@ import { Type } from "mods/type/type.js";
 
 export class Null {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.NULL)

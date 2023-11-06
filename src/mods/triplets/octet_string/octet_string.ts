@@ -7,7 +7,7 @@ import { Type } from "mods/type/type.js";
 
 export class OctetString {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.OCTET_STRING)
@@ -43,10 +43,6 @@ export namespace OctetString {
       readonly bytes: Bytes
     ) {
       super(type, bytes)
-    }
-
-    toASN1() {
-      return new OctetString(this.type.toASN1(), this.bytes)
     }
 
     sizeOrThrow() {

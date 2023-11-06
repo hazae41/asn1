@@ -35,10 +35,6 @@ export namespace VLQ {
       super(value)
     }
 
-    toASN1() {
-      return new VLQ(this.value)
-    }
-
     sizeOrThrow() {
       return this.values.length
     }

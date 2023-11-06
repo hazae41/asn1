@@ -8,7 +8,7 @@ const bn256 = BigInt(256)
 
 export class Integer {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.INTEGER)

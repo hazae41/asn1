@@ -6,26 +6,26 @@ import { Type } from "mods/type/type.js";
 
 export class BitString {
 
-  static type = Type.from(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.BIT_STRING)
 
   constructor(
     readonly type: Type,
+    readonly length: Length,
     readonly padding: number,
-    readonly bytes: Uint8Array
+    readonly bytes: Uint8Array,
   ) { }
 
   static create(padding: number, bytes: Uint8Array) {
-    return new BitString(this.type, padding, bytes)
+    const length = new Length(1 + bytes.length)
+
+    return new BitString(this.type, length, padding, bytes)
   }
 
   toDER() {
-    const type = this.type.toDER()
-    const length = new Length(1 + this.bytes.length).toDER()
-
-    return new BitString.DER(type, length, this.padding, this.bytes)
+    return new BitString.DER(this.type.toDER(), this.length.toDER(), this.padding, this.bytes)
   }
 
   toString() {
@@ -47,11 +47,7 @@ export namespace BitString {
       readonly padding: number,
       readonly bytes: Uint8Array,
     ) {
-      super(type, padding, bytes)
-    }
-
-    toASN1() {
-      return new BitString(this.type.toASN1(), this.padding, this.bytes)
+      super(type, length, padding, bytes)
     }
 
     sizeOrThrow() {
