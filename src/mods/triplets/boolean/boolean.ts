@@ -1,6 +1,4 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
 import { InvalidLengthError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
@@ -50,35 +48,33 @@ export namespace Boolean {
       readonly value: number
     ) { }
 
-    
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+    toASN1() {
+      return new Boolean(this.type.toASN1(), this.value)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
-
-        cursor.tryWriteUint8(this.value).throw(t)
-
-        return Ok.void()
-      })
+    sizeOrThrow() {
+      return Triplet.sizeOrThrow(this.length)
     }
 
-    static tryRead(cursor: Cursor): Result<Boolean, BinaryReadError | Unimplemented | InvalidLengthError> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
 
-        if (length.value !== 1)
-          return new Err(new InvalidLengthError(`Boolean`, length.value))
-
-        const value = cursor.tryReadUint8().throw(t)
-
-        return new Ok(new Boolean(type, value))
-      })
+      cursor.writeUint8OrThrow(this.value)
     }
+
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
+
+      if (length.value !== 1)
+        throw new InvalidLengthError(`Boolean`, length.value)
+
+      const value = cursor.readUint8OrThrow()
+
+      return new DER(type, length, value)
+    }
+
   }
+
 }

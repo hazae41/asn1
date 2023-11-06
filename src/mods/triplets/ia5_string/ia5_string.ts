@@ -1,7 +1,5 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result, Unimplemented } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -33,7 +31,7 @@ export class IA5String {
     const type = this.type.toDER()
     const length = new Length(bytes.length).toDER()
 
-    return new IA5String.DER(type, length, bytes)
+    return new IA5String.DER(type, length, this.value, bytes)
   }
 
   toString() {
@@ -49,36 +47,29 @@ export namespace IA5String {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
+      readonly value: string,
       readonly bytes: Bytes
     ) { }
 
-    
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+    sizeOrThrow() {
+      return Triplet.sizeOrThrow(this.length)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
 
-        cursor.tryWrite(this.bytes).throw(t)
-
-        return Ok.void()
-      })
+      cursor.writeOrThrow(this.bytes)
     }
 
-    static tryRead(cursor: Cursor): Result<IA5String, BinaryReadError | Unimplemented> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
 
-        const bytes = cursor.tryRead(length.value).throw(t)
-        const value = Bytes.toAscii(bytes)
+      const bytes = cursor.readOrThrow(length.value).slice()
+      const value = Bytes.toAscii(bytes)
 
-        return new Ok(new IA5String(type, value))
-      })
+      return new DER(type, length, value, bytes)
     }
   }
 }

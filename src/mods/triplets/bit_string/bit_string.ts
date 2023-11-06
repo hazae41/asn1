@@ -1,7 +1,5 @@
 import { Base16 } from "@hazae41/base16";
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result, Unimplemented } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -36,7 +34,7 @@ export class BitString {
   }
 
   toString() {
-    const bignum = BigInt("0x" + Base16.get().tryEncode(this.bytes).unwrap())
+    const bignum = BigInt("0x" + Base16.get().encodeOrThrow(this.bytes))
     const cursor = bignum.toString(2).padStart(this.bytes.length * 8, "0")
 
     return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`
@@ -55,37 +53,33 @@ export namespace BitString {
       readonly bytes: Uint8Array,
     ) { }
 
-
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+    toASN1() {
+      return new BitString(this.type.toASN1(), this.padding, this.bytes)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
-
-        cursor.tryWriteUint8(this.padding).throw(t)
-        cursor.tryWrite(this.bytes).throw(t)
-
-        return Ok.void()
-      })
+    sizeOrThrow() {
+      return Triplet.sizeOrThrow(this.length)
     }
 
-    static tryRead(cursor: Cursor): Result<BitString, BinaryReadError | Unimplemented> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
 
-        const content = cursor.tryRead(length.value).throw(t)
-        const subcursor = new Cursor(content)
+      cursor.writeUint8OrThrow(this.padding)
+      cursor.writeOrThrow(this.bytes)
+    }
 
-        const padding = subcursor.tryReadUint8().throw(t)
-        const bytes = subcursor.tryRead(subcursor.remaining).throw(t)
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
 
-        return new Ok(new BitString(type, padding, bytes))
-      })
+      const content = cursor.readOrThrow(length.value)
+      const subcursor = new Cursor(content)
+
+      const padding = subcursor.readUint8OrThrow()
+      const bytes = subcursor.readOrThrow(subcursor.remaining)
+
+      return new DER(type, length, padding, bytes)
     }
 
   }
