@@ -13,25 +13,16 @@ export class IA5String {
 
   constructor(
     readonly type: Type,
-    readonly length: Length,
     readonly value: string,
     readonly bytes: Bytes
   ) { }
 
   static create(value: string) {
-    const bytes = Bytes.fromAscii(value)
-    const length = new Length(bytes.length).toDER()
-
-    return new IA5String(this.type, length, value, bytes)
+    return new IA5String(this.type, value, Bytes.fromAscii(value))
   }
 
   toDER() {
-    const bytes = Bytes.fromAscii(this.value)
-
-    const type = this.type.toDER()
-    const length = new Length(bytes.length).toDER()
-
-    return new IA5String.DER(type, length, this.value, bytes)
+    return IA5String.DER.from(this)
   }
 
   toString() {
@@ -50,7 +41,12 @@ export namespace IA5String {
       readonly value: string,
       readonly bytes: Bytes
     ) {
-      super(type, length, value, bytes)
+      super(type, value, bytes)
+    }
+
+    static from(asn1: IA5String) {
+      const length = new Length(asn1.bytes.length).toDER()
+      return new DER(asn1.type.toDER(), length, asn1.value, asn1.bytes)
     }
 
     sizeOrThrow() {

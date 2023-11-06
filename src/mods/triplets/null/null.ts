@@ -21,10 +21,7 @@ export class Null {
   }
 
   toDER() {
-    const type = this.type.toDER()
-    const length = new Length(0).toDER()
-
-    return new Null.DER(type, length)
+    return Null.DER.from(this)
   }
 
   toString() {
@@ -37,11 +34,20 @@ export namespace Null {
 
   export class DER extends Null {
 
+    static readonly length = new Length(0).toDER()
+
     constructor(
-      readonly type: Type.DER,
-      readonly length: Length.DER
+      readonly type: Type.DER
     ) {
       super(type)
+    }
+
+    get length() {
+      return DER.length
+    }
+
+    static from(asn1: Null) {
+      return new DER(asn1.type.toDER())
     }
 
     sizeOrThrow() {

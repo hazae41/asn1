@@ -11,23 +11,17 @@ export class Boolean {
     Type.wraps.PRIMITIVE,
     Type.tags.BOOLEAN)
 
-  static readonly length = new Length(1)
-
   constructor(
     readonly type: Type,
-    readonly length: Length,
     readonly value: number
   ) { }
 
   static create(value: number) {
-    return new Boolean(this.type, this.length, value)
+    return new Boolean(this.type, value)
   }
 
   toDER() {
-    const type = this.type.toDER()
-    const length = new Length(1).toDER()
-
-    return new Boolean.DER(type, length, this.value)
+    return Boolean.DER.from(this)
   }
 
   toString() {
@@ -40,12 +34,21 @@ export namespace Boolean {
 
   export class DER extends Boolean {
 
+    static readonly length = new Length(1).toDER()
+
     constructor(
       readonly type: Type.DER,
-      readonly length: Length.DER,
       readonly value: number
     ) {
-      super(type, length, value)
+      super(type, value)
+    }
+
+    get length() {
+      return DER.length
+    }
+
+    static from(asn1: Boolean) {
+      return new DER(asn1.type.toDER(), asn1.value)
     }
 
     sizeOrThrow() {
@@ -63,12 +66,12 @@ export namespace Boolean {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      if (length.value !== 1)
+      if (length.value !== this.length.value)
         throw new InvalidLengthError(`Boolean`, length.value)
 
       const value = cursor.readUint8OrThrow()
 
-      return new DER(type, length, value)
+      return new DER(type, value)
     }
 
   }

@@ -42,10 +42,7 @@ export class PrintableString {
   }
 
   toDER() {
-    const type = this.type.toDER()
-    const length = new Length(this.bytes.length).toDER()
-
-    return new PrintableString.DER(type, length, this.value, this.bytes)
+    return PrintableString.DER.from(this)
   }
 
   toString() {
@@ -65,6 +62,11 @@ export namespace PrintableString {
       readonly bytes: Uint8Array
     ) {
       super(type.toDER(), value, bytes)
+    }
+
+    static from(asn1: PrintableString) {
+      const length = new Length(asn1.bytes.length).toDER()
+      return new DER(asn1.type.toDER(), length, asn1.value, asn1.bytes)
     }
 
     sizeOrThrow() {

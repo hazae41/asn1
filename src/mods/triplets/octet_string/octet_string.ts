@@ -22,15 +22,13 @@ export class OctetString {
   }
 
   toDER() {
-    const type = this.type.toDER()
-    const length = new Length(this.bytes.length).toDER()
-
-    return new OctetString.DER(type, length, this.bytes)
+    return OctetString.DER.from(this)
   }
 
   toString() {
     return `OCTET STRING ${Base16.get().tryEncode(this.bytes).unwrap()}`
   }
+
 }
 
 export namespace OctetString {
@@ -43,6 +41,11 @@ export namespace OctetString {
       readonly bytes: Bytes
     ) {
       super(type, bytes)
+    }
+
+    static from(asn1: OctetString) {
+      const length = new Length(asn1.bytes.length).toDER()
+      return new DER(asn1.type.toDER(), length, asn1.bytes)
     }
 
     sizeOrThrow() {

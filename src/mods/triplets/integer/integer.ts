@@ -23,26 +23,7 @@ export class Integer {
   }
 
   toDER() {
-    let divided = this.value < 0
-      ? ~this.value
-      : this.value
-
-    const values = new Array<number>()
-
-    do {
-      values.push(Number(divided % bn256))
-      divided /= bn256
-    } while (divided)
-
-    if (Arrays.last(values)! > 127)
-      values.push(0)
-
-    values.reverse()
-
-    const type = this.type.toDER()
-    const length = new Length(values.length).toDER()
-
-    return new Integer.DER(type, length, this.value, values)
+    return Integer.DER.from(this)
   }
 
   toString() {
@@ -62,6 +43,28 @@ export namespace Integer {
       readonly values: Array<number>
     ) {
       super(type, value)
+    }
+
+    static from(asn1: Integer) {
+      let divided = asn1.value < 0
+        ? ~asn1.value
+        : asn1.value
+
+      const values = new Array<number>()
+
+      do {
+        values.push(Number(divided % bn256))
+        divided /= bn256
+      } while (divided)
+
+      if (Arrays.last(values)! > 127)
+        values.push(0)
+
+      values.reverse()
+
+      const length = new Length(values.length).toDER()
+
+      return new DER(asn1.type.toDER(), length, asn1.value, values)
     }
 
     sizeOrThrow(): number {

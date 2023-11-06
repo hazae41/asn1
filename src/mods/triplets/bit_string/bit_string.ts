@@ -13,19 +13,16 @@ export class BitString {
 
   constructor(
     readonly type: Type,
-    readonly length: Length,
     readonly padding: number,
     readonly bytes: Uint8Array,
   ) { }
 
   static create(padding: number, bytes: Uint8Array) {
-    const length = new Length(1 + bytes.length)
-
-    return new BitString(this.type, length, padding, bytes)
+    return new BitString(this.type, padding, bytes)
   }
 
   toDER() {
-    return new BitString.DER(this.type.toDER(), this.length.toDER(), this.padding, this.bytes)
+    return BitString.DER.from(this)
   }
 
   toString() {
@@ -47,7 +44,12 @@ export namespace BitString {
       readonly padding: number,
       readonly bytes: Uint8Array,
     ) {
-      super(type, length, padding, bytes)
+      super(type, padding, bytes)
+    }
+
+    static from(asn1: BitString) {
+      const length = new Length(asn1.bytes.length + 1).toDER()
+      return new DER(asn1.type.toDER(), length, asn1.padding, asn1.bytes)
     }
 
     sizeOrThrow() {

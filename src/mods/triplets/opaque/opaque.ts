@@ -27,27 +27,17 @@ export class Opaque {
   ) { }
 
   toDER() {
-    return new Opaque.DER(this.type.toDER(), this.bytes)
+    return Opaque.DER.from(this)
   }
 
   toString() {
     return `OPAQUE ${Base16.get().tryEncode(this.bytes).unwrap()}`
   }
 
-  /**
-   * Transform this opaque into a binary data type
-   * @param readable 
-   * @returns 
-   */
   readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
     return Readable.readFromBytesOrThrow(readable, this.bytes)
   }
 
-  /**
-   * Transform this opaque into a binary data type
-   * @param readable 
-   * @returns 
-   */
   tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.Output<T>, ReadError> {
     return Readable.tryReadFromBytes(readable, this.bytes)
   }
@@ -56,12 +46,18 @@ export class Opaque {
 
 export namespace Opaque {
 
-  export class DER {
+  export class DER extends Opaque {
 
     constructor(
       readonly type: Type.DER,
       readonly bytes: Bytes
-    ) { }
+    ) {
+      super(type, bytes)
+    }
+
+    static from(asn1: Opaque) {
+      return new DER(asn1.type.toDER(), asn1.bytes)
+    }
 
     resolveOrThrow() {
       if (this.type.equals(Boolean.type))
@@ -71,24 +67,6 @@ export namespace Opaque {
       if (this.type.equals(BitString.type))
         return this.readIntoOrThrow(BitString.DER)
       return this
-    }
-
-    /**
-     * Transform this opaque into a binary data type
-     * @param readable 
-     * @returns 
-     */
-    readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
-      return Readable.readFromBytesOrThrow(readable, this.bytes)
-    }
-
-    /**
-     * Transform this opaque into a binary data type
-     * @param readable 
-     * @returns 
-     */
-    tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.Output<T>, ReadError> {
-      return Readable.tryReadFromBytes(readable, this.bytes)
     }
 
     sizeOrThrow() {
