@@ -1,9 +1,8 @@
 import { Base16 } from "@hazae41/base16";
-import { Readable } from "@hazae41/binary";
+import { Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
-import { DER } from "mods/resolvers/der.js";
 import { Integer } from "mods/triplets/integer/integer.js";
 import { relative, resolve } from "node:path";
 
@@ -40,7 +39,7 @@ test("Read", async () => {
 function checkReadWrite(hex: string) {
   const input = hexToBytes(hex)
   const triplet = bytesToTriplet(input)
-  const output = DER.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.tryWriteToBytes(triplet).unwrap()
   return Bytes.equals(input, output)
 }
 

@@ -1,15 +1,13 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
+import { Err } from "@hazae41/result";
 import { InvalidLengthError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class Null {
-  readonly #class = Null
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.NULL)
@@ -20,10 +18,6 @@ export class Null {
 
   static create() {
     return new Null(this.type)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -41,38 +35,32 @@ export class Null {
 
 export namespace Null {
 
-  export class DER {
+  export class DER extends Null {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER
-    ) { }
-
-    
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+    ) {
+      super(type)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
-
-        return Ok.void()
-      })
+    sizeOrThrow() {
+      return Triplet.sizeOrThrow(this.length)
     }
 
-    static tryRead(cursor: Cursor): Result<Null, BinaryReadError | Unimplemented | InvalidLengthError> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
+    }
 
-        if (length.value !== 0)
-          return new Err(new InvalidLengthError(`Null`, length.value))
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
 
-        return new Ok(new Null(type))
-      })
+      if (length.value !== 0)
+        return new Err(new InvalidLengthError(`Null`, length.value))
+
+      return new Null(type)
     }
 
   }

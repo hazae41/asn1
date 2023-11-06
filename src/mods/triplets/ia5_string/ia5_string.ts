@@ -5,9 +5,8 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class IA5String {
-  readonly #class = IA5String
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.IA5_STRING)
@@ -19,10 +18,6 @@ export class IA5String {
 
   static create(value: string) {
     return new IA5String(this.type, value)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -42,14 +37,20 @@ export class IA5String {
 
 export namespace IA5String {
 
-  export class DER {
+  export class DER extends IA5String {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: string,
       readonly bytes: Bytes
-    ) { }
+    ) {
+      super(type, value)
+    }
+
+    toASN1() {
+      return new IA5String(this.type.toASN1(), this.value)
+    }
 
     sizeOrThrow() {
       return Triplet.sizeOrThrow(this.length)
@@ -71,5 +72,7 @@ export namespace IA5String {
 
       return new DER(type, length, value, bytes)
     }
+
   }
+
 }

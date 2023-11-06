@@ -1,84 +1,42 @@
-import { BinaryReadError, BinaryWriteError, Readable, Writable } from "@hazae41/binary";
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result, Unimplemented } from "@hazae41/result";
-import { InvalidLengthError, InvalidTypeError, InvalidValueError } from "mods/errors/errors.js";
-import { BitString } from "mods/triplets/bit_string/bit_string.js";
-import { Boolean } from "mods/triplets/boolean/boolean.js";
-import { Constructed } from "mods/triplets/constructed/constructed.js";
-import { IA5String } from "mods/triplets/ia5_string/ia5_string.js";
-import { Integer } from "mods/triplets/integer/integer.js";
-import { Null } from "mods/triplets/null/null.js";
-import { NotAnOID, ObjectIdentifier } from "mods/triplets/object_identifier/object_identifier.js";
-import { OctetString } from "mods/triplets/octet_string/octet_string.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
-import { PrintableString } from "mods/triplets/printable_string/printable_string.js";
-import { Sequence } from "mods/triplets/sequence/sequence.js";
-import { Set } from "mods/triplets/set/set.js";
-import { Triplet } from "mods/triplets/triplet.js";
-import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
-import { UTF8String } from "mods/triplets/utf8_string/utf8_string.js";
-import { Type } from "mods/type/type.js";
-
-export type DERReadError =
-  | BinaryReadError
-  | Unimplemented
-  | InvalidTypeError
-  | InvalidValueError
-  | InvalidLengthError
-  | NotAnOID
-
-export type DERWriteError =
-  | BinaryWriteError
 
 export namespace DER {
 
-  export function tryResolve(opaque: Opaque): Result<Triplet, DERReadError> {
-    if (opaque.type.equals(Boolean.type))
-      return opaque.tryReadInto(Boolean.DER)
-    if (opaque.type.equals(Integer.type))
-      return opaque.tryReadInto(Integer.DER)
-    if (opaque.type.equals(BitString.type))
-      return opaque.tryReadInto(BitString.DER)
-    if (opaque.type.equals(OctetString.type))
-      return opaque.tryReadInto(OctetString.DER)
-    if (opaque.type.equals(Null.type))
-      return opaque.tryReadInto(Null.DER)
-    if (opaque.type.equals(ObjectIdentifier.type))
-      return opaque.tryReadInto(ObjectIdentifier.DER)
-    if (opaque.type.equals(UTF8String.type))
-      return opaque.tryReadInto(UTF8String.DER)
-    if (opaque.type.equals(PrintableString.type))
-      return opaque.tryReadInto(PrintableString.DER)
-    if (opaque.type.equals(Sequence.type))
-      return opaque.tryReadInto(Sequence.DER).andThenSync(it => Sequence.tryResolve(it, DER))
-    if (opaque.type.equals(Set.type))
-      return opaque.tryReadInto(Set.DER).andThenSync(it => Set.tryResolve(it, DER))
-    if (opaque.type.equals(IA5String.type))
-      return opaque.tryReadInto(IA5String.DER)
-    if (opaque.type.equals(UTCTime.type))
-      return opaque.tryReadInto(UTCTime.DER)
-
-    if (opaque.type.wrap === Type.wraps.CONSTRUCTED)
-      return opaque.tryReadInto(Constructed.DER).andThenSync(it => Constructed.tryResolve(it, DER))
-
-    return new Ok(opaque)
+  export function readOrThrow(cursor: Cursor) {
+    Opaque.DER.readOrThrow(cursor).resolveOrThrow()
   }
 
-  export function tryRead(cursor: Cursor): Result<Triplet, DERReadError> {
-    return Opaque.DER.tryRead(cursor).andThenSync(tryResolve)
-  }
+  // export function tryResolve(opaque: Opaque): Result<Triplet, DERReadError> {
+  //   if (opaque.type.equals(Boolean.type))
+  //     return opaque.tryReadInto(Boolean.DER)
+  //   if (opaque.type.equals(Integer.type))
+  //     return opaque.tryReadInto(Integer.DER)
+  //   if (opaque.type.equals(BitString.type))
+  //     return opaque.tryReadInto(BitString.DER)
+  //   if (opaque.type.equals(OctetString.type))
+  //     return opaque.tryReadInto(OctetString.DER)
+  //   if (opaque.type.equals(Null.type))
+  //     return opaque.tryReadInto(Null.DER)
+  //   if (opaque.type.equals(ObjectIdentifier.type))
+  //     return opaque.tryReadInto(ObjectIdentifier.DER)
+  //   if (opaque.type.equals(UTF8String.type))
+  //     return opaque.tryReadInto(UTF8String.DER)
+  //   if (opaque.type.equals(PrintableString.type))
+  //     return opaque.tryReadInto(PrintableString.DER)
+  //   if (opaque.type.equals(Sequence.type))
+  //     return opaque.tryReadInto(Sequence.DER).andThenSync(it => Sequence.tryResolve(it, DER))
+  //   if (opaque.type.equals(Set.type))
+  //     return opaque.tryReadInto(Set.DER).andThenSync(it => Set.tryResolve(it, DER))
+  //   if (opaque.type.equals(IA5String.type))
+  //     return opaque.tryReadInto(IA5String.DER)
+  //   if (opaque.type.equals(UTCTime.type))
+  //     return opaque.tryReadInto(UTCTime.DER)
 
-  export function tryReadOrRollback(cursor: Cursor): Result<Triplet, DERReadError> {
-    return Readable.tryReadOrRollback(DER, cursor)
-  }
+  //   if (opaque.type.wrap === Type.wraps.CONSTRUCTED)
+  //     return opaque.tryReadInto(Constructed.DER).andThenSync(it => Constructed.tryResolve(it, DER))
 
-  export function tryReadFromBytes(bytes: Bytes): Result<Triplet, DERReadError> {
-    return Readable.tryReadFromBytes(DER, bytes)
-  }
-
-  export function tryWriteToBytes(triplet: Triplet): Result<Bytes, DERWriteError> {
-    return Writable.tryWriteToBytes(triplet.toDER())
-  }
+  //   return new Ok(opaque)
+  // }
 
 }

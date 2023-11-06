@@ -1,4 +1,3 @@
-import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
 
 export class Length {
@@ -12,7 +11,7 @@ export class Length {
     return this.#class
   }
 
-  toDER() {
+  toDER(): Length.DER {
     if (this.value < 128)
       return new Length.DER.Short(this.value)
 
@@ -46,7 +45,12 @@ export namespace Length {
       if (first < 128)
         return new Short(first)
 
-      const count = new Bitset(first, 8).disableBE(0).value
+      let count = first
+
+      /**
+       * Disable the first BE bit
+       */
+      count &= ~(1 << (8 - 0 - 1))
 
       let value = 0
 
@@ -61,11 +65,13 @@ export namespace Length {
       return new Long(value, values)
     }
 
-    export class Short {
+    export class Short extends Length {
 
       constructor(
         readonly value: number
-      ) { }
+      ) {
+        super(value)
+      }
 
       toASN1() {
         return new Length(this.value)
@@ -81,12 +87,14 @@ export namespace Length {
 
     }
 
-    export class Long {
+    export class Long extends Length {
 
       constructor(
         readonly value: number,
         readonly values: Array<number>
-      ) { }
+      ) {
+        super(value)
+      }
 
       toASN1() {
         return new Length(this.value)
@@ -97,7 +105,12 @@ export namespace Length {
       }
 
       writeOrThrow(cursor: Cursor) {
-        const count = new Bitset(this.values.length, 8).enableBE(0).value
+        let count = this.values.length
+
+        /**
+         * Enable the first BE bit
+         */
+        count |= 1 << (8 - 0 - 1)
 
         cursor.writeUint8OrThrow(count)
 

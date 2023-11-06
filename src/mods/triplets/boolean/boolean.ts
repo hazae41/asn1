@@ -7,7 +7,7 @@ import { Type } from "mods/type/type.js";
 export class Boolean {
   readonly #class = Boolean
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.BOOLEAN)
@@ -40,13 +40,15 @@ export class Boolean {
 
 export namespace Boolean {
 
-  export class DER {
+  export class DER extends Boolean {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: number
-    ) { }
+    ) {
+      super(type, value)
+    }
 
     toASN1() {
       return new Boolean(this.type.toASN1(), this.value)

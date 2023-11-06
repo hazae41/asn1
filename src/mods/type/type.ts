@@ -1,12 +1,5 @@
-import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
 import { Unimplemented } from "@hazae41/result";
-
-export interface TypeLike {
-  readonly clazz: number
-  readonly wrap: number
-  readonly tag: number
-}
 
 export class Type {
 
@@ -38,65 +31,47 @@ export class Type {
   } as const
 
   constructor(
+    readonly byte: number,
     readonly clazz: number,
     readonly wrap: number,
     readonly tag: number
   ) { }
 
-  get byte() {
-    return Type.byte(this)
+  static from(clazz: number, wrap: number, tag: number) {
+    let byte = 0
+    byte |= clazz << 6
+    byte |= wrap << 5
+    byte |= tag
+
+    return new Type(byte, clazz, wrap, tag)
   }
 
-  equals(other: TypeLike) {
-    return Type.equals(this, other)
+  equals(other: Type) {
+    return this.byte === other.byte
   }
 
   toDER() {
-    return new Type.DER(this.clazz, this.wrap, this.tag)
+    return new Type.DER(this.byte, this.clazz, this.wrap, this.tag)
   }
 
 }
 
 export namespace Type {
 
-  export function equals(a: TypeLike, b: TypeLike) {
-    if (a.clazz !== b.clazz)
-      return false
-    if (a.wrap !== b.wrap)
-      return false
-    if (a.tag !== b.tag)
-      return false
-    return true
-  }
-
-  export function byte(type: TypeLike) {
-    let value = 0
-    value |= type.clazz << 6
-    value |= type.wrap << 5
-    value |= type.tag
-
-    return value
-  }
-
-  export class DER {
+  export class DER extends Type {
     static readonly size = 1
 
     constructor(
+      readonly byte: number,
       readonly clazz: number,
       readonly wrap: number,
       readonly tag: number
-    ) { }
-
-    get byte() {
-      return Type.byte(this)
-    }
-
-    equals(other: TypeLike) {
-      return Type.equals(this, other)
+    ) {
+      super(byte, clazz, wrap, tag)
     }
 
     toASN1() {
-      return new Type(this.clazz, this.wrap, this.tag)
+      return new Type(this.byte, this.clazz, this.wrap, this.tag)
     }
 
     sizeOrThrow() {
@@ -108,17 +83,16 @@ export namespace Type {
     }
 
     static readOrThrow(cursor: Cursor) {
-      const type = cursor.readUint8OrThrow()
-      const bitset = new Bitset(type, 8)
+      const byte = cursor.readUint8OrThrow()
 
-      const clazz = bitset.first(2).value
-      const wrap = Number(bitset.getLE(5))
-      const tag = bitset.last(5).value
+      const clazz = byte >> 6
+      const wrap = (byte >> 5) & 1
+      const tag = byte & 0b11111
 
       if (tag > 30) // TODO
         throw new Unimplemented({ cause: `Type tag > 30` })
 
-      return new DER(clazz, wrap, tag)
+      return new DER(byte, clazz, wrap, tag)
     }
 
   }

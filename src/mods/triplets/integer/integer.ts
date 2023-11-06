@@ -1,27 +1,14 @@
 import { Arrays } from "@hazae41/arrays";
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
-import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result, Unimplemented } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 const bn256 = BigInt(256)
 
-function sign(value: number, negative: boolean) {
-  const bitset = new Bitset(value, 8)
-
-  if (negative)
-    return bitset.not()
-  else
-    return bitset
-}
-
 export class Integer {
-  readonly #class = Integer
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.INTEGER)
@@ -33,10 +20,6 @@ export class Integer {
 
   static create(value: bigint) {
     return new Integer(this.type, value)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -70,57 +53,85 @@ export class Integer {
 
 export namespace Integer {
 
-  export class DER {
+  export class DER extends Integer {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: bigint,
       readonly values: Array<number>
-    ) { }
-
-    
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+    ) {
+      super(type, value)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
-
-        const negative = this.value < 0
-
-        const first = sign(this.values[0], negative)
-          .setBE(0, negative)
-          .value
-        cursor.tryWriteUint8(first).throw(t)
-
-        for (let i = 1; i < this.values.length; i++)
-          cursor.tryWriteUint8(sign(this.values[i], negative).value).throw(t)
-
-        return Ok.void()
-      })
+    sizeOrThrow(): number {
+      return Triplet.sizeOrThrow(this.length)
     }
 
-    static tryRead(cursor: Cursor): Result<Integer, BinaryReadError | Unimplemented> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
 
-        let value = BigInt(0)
+      const negative = this.value < 0
 
-        const negative = cursor.tryGetUint8().throw(t) > 127
+      let first = this.values[0]
 
-        for (let i = 0; i < length.value; i++)
-          value = (value * bn256) + BigInt(sign(cursor.tryReadUint8().throw(t), negative).value)
+      if (negative) {
+        /**
+         * Bitwise NOT
+         */
+        first = (1 << 8) - first - 1
+
+        /**
+         * Enable the first BE bit
+         */
+        first |= 1 << (8 - 0 - 1)
+      }
+
+      cursor.writeUint8OrThrow(first)
+
+      for (let i = 1; i < this.values.length; i++) {
+        let byte = this.values[i]
 
         if (negative)
-          value = ~value
+          /**
+           * Bitwise NOT
+           */
+          byte = (1 << 8) - byte - 1
 
-        return new Ok(new Integer(type, value))
-      })
+        cursor.writeUint8OrThrow(byte)
+      }
+
+      return
+    }
+
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
+
+      let value = BigInt(0)
+
+      const values = new Array<number>()
+
+      const negative = cursor.getUint8OrThrow() & (1 << (8 - 0 - 1))
+
+      for (let i = 0; i < length.value; i++) {
+        let byte = cursor.readUint8OrThrow()
+
+        if (negative)
+          /**
+           * Bitwise NOT
+           */
+          byte = (1 << 8) - byte - 1
+
+        value = (value * bn256) + BigInt(byte)
+        values.push(byte)
+      }
+
+      if (negative)
+        value = ~value
+
+      return new DER(type, length, value, values)
     }
 
   }

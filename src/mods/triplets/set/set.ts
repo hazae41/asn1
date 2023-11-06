@@ -28,7 +28,7 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
     return new Set(this.type, triplets)
   }
 
-  static tryResolve<ResolveError>(sequence: Set<Opaque[]>, resolvable: Resolvable<ResolveError>): Result<Set<Triplet[]>, ResolveError> {
+  static tryResolve<ResolveError>(sequence: Set<Unknown[]>, resolvable: Resolvable<ResolveError>): Result<Set<Triplet[]>, ResolveError> {
     return Result.unthrowSync(t => {
       const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw(t))
 
@@ -81,7 +81,7 @@ export namespace Set {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Set<Opaque[]>, BinaryReadError | Unimplemented> {
+    static tryRead(cursor: Cursor): Result<Set<Unknown[]>, BinaryReadError | Unimplemented> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
         const length = Length.DER.tryRead(cursor).throw(t)
@@ -89,7 +89,7 @@ export namespace Set {
         const content = cursor.tryRead(length.value).throw(t)
         const subcursor = new Cursor(content)
 
-        const triplets = new Array<Opaque>()
+        const triplets = new Array<Unknown>()
 
         while (subcursor.remaining)
           triplets.push(Opaque.DER.tryRead(subcursor).throw(t))

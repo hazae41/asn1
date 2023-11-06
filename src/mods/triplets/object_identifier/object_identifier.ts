@@ -1,4 +1,3 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
 import { Numbers } from "libs/numbers/numbers.js";
@@ -40,7 +39,7 @@ export class OID<T extends string> {
 export class ObjectIdentifier<T extends string = string>  {
   readonly #class = ObjectIdentifier
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.OBJECT_IDENTIFIER)
@@ -97,7 +96,7 @@ export namespace ObjectIdentifier {
       readonly values: VLQ.DER[]
     ) { }
 
-    
+
 
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)

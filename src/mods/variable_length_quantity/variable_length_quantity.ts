@@ -1,17 +1,11 @@
 import { Arrays } from "@hazae41/arrays";
-import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
 
 export class VLQ {
-  readonly #class = VLQ
 
   constructor(
     readonly value: number
   ) { }
-
-  get class() {
-    return this.#class
-  }
 
   toDER() {
     let value = this.value
@@ -32,12 +26,14 @@ export class VLQ {
 
 export namespace VLQ {
 
-  export class DER {
+  export class DER extends VLQ {
 
     constructor(
       readonly value: number,
       readonly values: Array<number>
-    ) { }
+    ) {
+      super(value)
+    }
 
     toASN1() {
       return new VLQ(this.value)
@@ -49,8 +45,14 @@ export namespace VLQ {
 
     writeOrThrow(cursor: Cursor) {
       for (let i = 0; i < this.values.length - 1; i++) {
-        const bitset = new Bitset(this.values[i], 8)
-        cursor.writeUint8OrThrow(bitset.enableBE(0).value)
+        let byte = this.values[i]
+
+        /**
+         * Enable the first BE bit
+         */
+        byte |= (1 << (8 - 0 - 1))
+
+        cursor.writeUint8OrThrow(byte)
       }
 
       cursor.writeUint8OrThrow(Arrays.last(this.values)!)
@@ -62,18 +64,23 @@ export namespace VLQ {
       const values = new Array<number>()
 
       while (true) {
-        const current = cursor.readUint8OrThrow()
+        const byte = cursor.readUint8OrThrow()
 
-        if (current <= 127) {
-          value = (value * 128) + current
-          values.push(current)
+        if (byte <= 127) {
+          value = (value * 128) + byte
+          values.push(byte)
           break
         }
 
-        const bitset = new Bitset(current, 8)
-        const byte = bitset.disableBE(0).value
-        value = (value * 128) + byte
-        values.push(byte)
+        let integer = byte
+
+        /**
+         * Disable the first BE bit
+         */
+        integer &= ~(1 << (8 - 0 - 1))
+
+        value = (value * 128) + integer
+        values.push(integer)
       }
 
       return new DER(value, values)

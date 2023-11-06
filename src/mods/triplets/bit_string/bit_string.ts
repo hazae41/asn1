@@ -5,9 +5,8 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class BitString {
-  readonly #class = BitString
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.BIT_STRING)
@@ -20,10 +19,6 @@ export class BitString {
 
   static create(padding: number, bytes: Uint8Array) {
     return new BitString(this.type, padding, bytes)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -44,14 +39,16 @@ export class BitString {
 
 export namespace BitString {
 
-  export class DER {
+  export class DER extends BitString {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly padding: number,
       readonly bytes: Uint8Array,
-    ) { }
+    ) {
+      super(type, padding, bytes)
+    }
 
     toASN1() {
       return new BitString(this.type.toASN1(), this.padding, this.bytes)

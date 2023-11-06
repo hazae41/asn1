@@ -1,11 +1,10 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
 import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Resolvable } from "mods/resolvers/resolvable.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
-import { DERWritable, Triplet } from "mods/triplets/triplet.js";
+import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 const stringify = (parent: Constructed) => `[${parent.type.tag}] {
@@ -24,7 +23,7 @@ export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
     return new Constructed(type, triplets)
   }
 
-  static tryResolve<ResolveError>(sequence: Constructed<Opaque[]>, resolvable: Resolvable<ResolveError>): Result<Constructed<Triplet[]>, ResolveError> {
+  static tryResolve<ResolveError>(sequence: Constructed<Unknown[]>, resolvable: Resolvable<ResolveError>): Result<Constructed<Triplet[]>, ResolveError> {
     return Result.unthrowSync(t => {
       const resolveds = sequence.triplets.map(it => resolvable.tryResolve(it).throw(t))
 
@@ -78,7 +77,7 @@ export namespace Constructed {
       })
     }
 
-    static tryRead(cursor: Cursor): Result<Constructed<Opaque[]>, BinaryReadError | Unimplemented | InvalidTypeError> {
+    static tryRead(cursor: Cursor): Result<Constructed<Unknown[]>, BinaryReadError | Unimplemented | InvalidTypeError> {
       return Result.unthrowSync(t => {
         const type = Type.DER.tryRead(cursor).throw(t)
 
@@ -90,7 +89,7 @@ export namespace Constructed {
         const content = cursor.tryRead(length.value).throw(t)
         const subcursor = new Cursor(content)
 
-        const triplets = new Array<Opaque>()
+        const triplets = new Array<Unknown>()
 
         while (subcursor.remaining)
           triplets.push(Opaque.DER.tryRead(subcursor).throw(t))
