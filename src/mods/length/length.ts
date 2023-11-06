@@ -1,7 +1,5 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result } from "@hazae41/result";
 
 export class Length {
   readonly #class = Length
@@ -16,7 +14,7 @@ export class Length {
 
   toDER() {
     if (this.value < 128)
-      return new Length.ShortDER(this.value)
+      return new Length.DER.Short(this.value)
 
     let floor = this.value
 
@@ -29,7 +27,7 @@ export class Length {
 
     values.reverse()
 
-    return new Length.LongDER(this.value, values)
+    return new Length.DER.Long(this.value, values)
   }
 
 }
@@ -37,77 +35,78 @@ export class Length {
 export namespace Length {
 
   export type DER =
-    | ShortDER
-    | LongDER
+    | DER.Short
+    | DER.Long
 
   export namespace DER {
 
-    export function tryRead(cursor: Cursor): Result<Length, BinaryReadError> {
-      return Result.unthrowSync(t => {
-        const first = cursor.tryReadUint8().throw(t)
+    export function readOrThrow(cursor: Cursor) {
+      const first = cursor.readUint8OrThrow()
 
-        if (first < 128)
-          return new Ok(new Length(first))
+      if (first < 128)
+        return new Short(first)
 
-        const count = new Bitset(first, 8)
-          .disableBE(0)
-          .value
+      const count = new Bitset(first, 8).disableBE(0).value
 
-        let value = 0
+      let value = 0
 
-        for (let i = 0; i < count; i++)
-          value = (value * 256) + cursor.tryReadUint8().throw(t)
+      const values = new Array<number>()
 
-        return new Ok(new Length(value))
-      })
+      for (let i = 0; i < count; i++) {
+        const byte = cursor.readUint8OrThrow()
+        value = (value * 256) + byte
+        values.push(byte)
+      }
+
+      return new Long(value, values)
     }
 
-  }
+    export class Short {
 
-  export class ShortDER {
+      constructor(
+        readonly value: number
+      ) { }
 
-    constructor(
-      readonly value: number
-    ) { }
+      toASN1() {
+        return new Length(this.value)
+      }
 
-    
+      sizeOrThrow() {
+        return 1
+      }
 
-    trySize(): Result<number, never> {
-      return new Ok(1)
+      writeOrThrow(cursor: Cursor) {
+        cursor.writeUint8OrThrow(this.value)
+      }
+
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return cursor.tryWriteUint8(this.value)
-    }
+    export class Long {
 
-  }
+      constructor(
+        readonly value: number,
+        readonly values: Array<number>
+      ) { }
 
-  export class LongDER {
+      toASN1() {
+        return new Length(this.value)
+      }
 
-    constructor(
-      readonly value: number,
-      readonly values: Array<number>
-    ) { }
+      sizeOrThrow() {
+        return 1 + this.values.length
+      }
 
-    
+      writeOrThrow(cursor: Cursor) {
+        const count = new Bitset(this.values.length, 8).enableBE(0).value
 
-    trySize(): Result<number, never> {
-      return new Ok(1 + this.values.length)
-    }
+        cursor.writeUint8OrThrow(count)
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        const count = new Bitset(this.values.length, 8)
-          .enableBE(0)
-          .value
+        for (const byte of this.values)
+          cursor.writeUint8OrThrow(byte)
 
-        cursor.tryWriteUint8(count).throw(t)
+        return
+      }
 
-        for (const value of this.values)
-          cursor.tryWriteUint8(value).throw(t)
-
-        return Ok.void()
-      })
     }
 
   }

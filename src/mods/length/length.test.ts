@@ -20,7 +20,7 @@ function hexToCursor(hex: string) {
 
 function hexToLength(hex: string) {
   const cursor = hexToCursor(hex)
-  const length = Length.DER.tryRead(cursor).unwrap()
+  const length = Length.DER.readOrThrow(cursor)
   return length.value
 }
 
@@ -31,9 +31,9 @@ test("Read", async () => {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const length = Length.DER.tryRead(input).unwrap()
+  const length = Length.DER.readOrThrow(input)
 
-  const output = Writable.tryWriteToBytes(length.toDER()).unwrap()
+  const output = Writable.tryWriteToBytes(length).unwrap()
   return input.buffer.equals(output)
 }
 

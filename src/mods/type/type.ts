@@ -1,7 +1,12 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bitset } from "@hazae41/bitset";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
+import { Unimplemented } from "@hazae41/result";
+
+export interface TypeLike {
+  readonly clazz: number
+  readonly wrap: number
+  readonly tag: number
+}
 
 export class Type {
 
@@ -38,32 +43,40 @@ export class Type {
     readonly tag: number
   ) { }
 
-  equals(other: Type) {
-    if (this.clazz !== other.clazz)
-      return false
-    if (this.wrap !== other.wrap)
-      return false
-    if (this.tag !== other.tag)
-      return false
-    return true
+  get byte() {
+    return Type.byte(this)
+  }
+
+  equals(other: TypeLike) {
+    return Type.equals(this, other)
   }
 
   toDER() {
     return new Type.DER(this.clazz, this.wrap, this.tag)
   }
 
-  get byte(): number {
-    let value = 0
-    value |= this.clazz << 6
-    value |= this.wrap << 5
-    value |= this.tag
-
-    return value
-  }
-
 }
 
 export namespace Type {
+
+  export function equals(a: TypeLike, b: TypeLike) {
+    if (a.clazz !== b.clazz)
+      return false
+    if (a.wrap !== b.wrap)
+      return false
+    if (a.tag !== b.tag)
+      return false
+    return true
+  }
+
+  export function byte(type: TypeLike) {
+    let value = 0
+    value |= type.clazz << 6
+    value |= type.wrap << 5
+    value |= type.tag
+
+    return value
+  }
 
   export class DER {
     static readonly size = 1
@@ -74,35 +87,38 @@ export namespace Type {
       readonly tag: number
     ) { }
 
-
-
-    trySize(): Result<number, never> {
-      return new Ok(1)
+    get byte() {
+      return Type.byte(this)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      let value = 0
-      value |= this.clazz << 6
-      value |= this.wrap << 5
-      value |= this.tag
-
-      return cursor.tryWriteUint8(value)
+    equals(other: TypeLike) {
+      return Type.equals(this, other)
     }
 
-    static tryRead(cursor: Cursor): Result<Type, BinaryReadError | Unimplemented> {
-      return Result.unthrowSync(t => {
-        const type = cursor.tryReadUint8().throw(t)
-        const bitset = new Bitset(type, 8)
+    toASN1() {
+      return new Type(this.clazz, this.wrap, this.tag)
+    }
 
-        const clazz = bitset.first(2).value
-        const wrap = Number(bitset.getLE(5))
-        const tag = bitset.last(5).value
+    sizeOrThrow() {
+      return 1
+    }
 
-        if (tag > 30) // TODO
-          return new Err(new Unimplemented({ cause: `Type tag > 30` }))
+    writeOrThrow(cursor: Cursor) {
+      cursor.writeUint8OrThrow(this.byte)
+    }
 
-        return new Ok(new Type(clazz, wrap, tag))
-      })
+    static readOrThrow(cursor: Cursor) {
+      const type = cursor.readUint8OrThrow()
+      const bitset = new Bitset(type, 8)
+
+      const clazz = bitset.first(2).value
+      const wrap = Number(bitset.getLE(5))
+      const tag = bitset.last(5).value
+
+      if (tag > 30) // TODO
+        throw new Unimplemented({ cause: `Type tag > 30` })
+
+      return new DER(clazz, wrap, tag)
     }
 
   }
