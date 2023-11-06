@@ -1,16 +1,13 @@
 import { Base16 } from "@hazae41/base16";
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Ok, Result, Unimplemented } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class OctetString {
-  readonly #class = OctetString
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.OCTET_STRING)
@@ -22,10 +19,6 @@ export class OctetString {
 
   static create(bytes: Bytes) {
     return new OctetString(this.type, bytes)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -42,40 +35,41 @@ export class OctetString {
 
 export namespace OctetString {
 
-  export class DER {
+  export class DER extends OctetString {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly bytes: Bytes
-    ) { }
-
-
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+    ) {
+      super(type, bytes)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
-
-        cursor.tryWrite(this.bytes).throw(t)
-
-        return Ok.void()
-      })
+    toASN1() {
+      return new OctetString(this.type.toASN1(), this.bytes)
     }
 
-    static tryRead(cursor: Cursor): Result<OctetString, BinaryReadError | Unimplemented> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
-
-        const buffer = cursor.tryRead(length.value).throw(t)
-
-        return new Ok(new OctetString(type, buffer))
-      })
+    sizeOrThrow() {
+      return Triplet.sizeOrThrow(this.length)
     }
+
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
+
+      cursor.writeOrThrow(this.bytes)
+    }
+
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
+
+      const content = cursor.readOrThrow(length.value)
+      const bytes = new Uint8Array(content)
+
+      return new DER(type, length, bytes)
+    }
+
   }
+
 }

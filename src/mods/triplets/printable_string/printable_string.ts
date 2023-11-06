@@ -1,98 +1,99 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
+import { Err, Ok, Result } from "@hazae41/result";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class PrintableString {
-  readonly #class = PrintableString
 
-  static type = new Type(
+  static type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.PRINTABLE_STRING)
 
   constructor(
     readonly type: Type,
-    readonly value: string
+    readonly value: string,
+    readonly bytes: Uint8Array
   ) { }
 
-  static new(type: Type, value: string) {
-    return new PrintableString(type, value)
+  static newOrThrow(type: Type, value: string) {
+    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
+      throw new InvalidValueError(`PrintableString`, value)
+
+    return new Ok(new PrintableString(type, value, Bytes.fromUtf8(value)))
   }
 
   static tryNew(type: Type, value: string): Result<PrintableString, InvalidValueError> {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       return new Err(new InvalidValueError(`PrintableString`, value))
 
-    return new Ok(new PrintableString(type, value))
+    return new Ok(new PrintableString(type, value, Bytes.fromUtf8(value)))
   }
 
-  static create(value: string) {
-    return new PrintableString(this.type, value)
+  static createOrThrow(value: string) {
+    return this.newOrThrow(this.type, value)
   }
 
   static tryCreate(value: string): Result<PrintableString, InvalidValueError> {
     return this.tryNew(this.type, value)
   }
 
-  get class() {
-    return this.#class
-  }
-
   toDER() {
-    const bytes = Bytes.fromUtf8(this.value)
-
     const type = this.type.toDER()
-    const length = new Length(bytes.length).toDER()
+    const length = new Length(this.bytes.length).toDER()
 
-    return new PrintableString.DER(type, length, bytes)
+    return new PrintableString.DER(type, length, this.value, this.bytes)
   }
 
   toString() {
     return `PrintableString ${this.value}`
   }
+
 }
 
 export namespace PrintableString {
 
-  export class DER {
+  export class DER extends PrintableString {
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly bytes: Bytes
-    ) { }
-
-    
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+      readonly value: string,
+      readonly bytes: Uint8Array
+    ) {
+      super(type.toDER(), value, bytes)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
-
-        cursor.tryWrite(this.bytes).throw(t)
-
-        return Ok.void()
-      })
+    toASN1() {
+      return new PrintableString(this.type.toASN1(), this.value, this.bytes)
     }
 
-    static tryRead(cursor: Cursor): Result<PrintableString, BinaryReadError | Unimplemented | InvalidValueError> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    sizeOrThrow() {
+      return Triplet.sizeOrThrow(this.length)
+    }
 
-        const value = cursor.tryReadUtf8(length.value).throw(t)
+    writeOrThrow(cursor: Cursor) {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
 
-        return PrintableString.tryNew(type, value)
-      })
+      cursor.writeOrThrow(this.bytes)
+    }
+
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
+
+      const content = cursor.readOrThrow(length.value)
+      const bytes = new Uint8Array(content)
+      const value = Bytes.toUtf8(bytes)
+
+      if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
+        throw new InvalidValueError(`PrintableString`, value)
+
+      return new DER(type, length, value, bytes)
     }
   }
 }

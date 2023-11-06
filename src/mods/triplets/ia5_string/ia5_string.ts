@@ -67,7 +67,9 @@ export namespace IA5String {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = cursor.readOrThrow(length.value).slice()
+      const content = cursor.readOrThrow(length.value)
+
+      const bytes = new Uint8Array(content)
       const value = Bytes.toAscii(bytes)
 
       return new DER(type, length, value, bytes)

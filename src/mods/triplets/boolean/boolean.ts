@@ -5,7 +5,6 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class Boolean {
-  readonly #class = Boolean
 
   static type = Type.from(
     Type.clazzes.UNIVERSAL,
@@ -19,10 +18,6 @@ export class Boolean {
 
   static create(value: number) {
     return new Boolean(this.type, value)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {

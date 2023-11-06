@@ -12,7 +12,6 @@ function pad2(value: number) {
 }
 
 export class UTCTime {
-  readonly #class = UTCTime
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -26,10 +25,6 @@ export class UTCTime {
 
   static create(value: Date) {
     return new UTCTime(this.type, value)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -69,7 +64,7 @@ export namespace UTCTime {
       readonly bytes: Bytes
     ) { }
 
-    
+
 
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)

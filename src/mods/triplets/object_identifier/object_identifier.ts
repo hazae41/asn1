@@ -37,7 +37,6 @@ export class OID<T extends string> {
 }
 
 export class ObjectIdentifier<T extends string = string>  {
-  readonly #class = ObjectIdentifier
 
   static type = Type.from(
     Type.clazzes.UNIVERSAL,
@@ -51,10 +50,6 @@ export class ObjectIdentifier<T extends string = string>  {
 
   static create<T extends string>(value: OID<T>) {
     return new ObjectIdentifier(this.type, value)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {

@@ -4,7 +4,7 @@ import { Opaque } from "mods/triplets/opaque/opaque.js";
 export namespace DER {
 
   export function readOrThrow(cursor: Cursor) {
-    Opaque.DER.readOrThrow(cursor).resolveOrThrow()
+    return Opaque.DER.readOrThrow(cursor).resolveOrThrow()
   }
 
   // export function tryResolve(opaque: Opaque): Result<Triplet, DERReadError> {

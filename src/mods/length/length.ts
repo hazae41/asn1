@@ -1,15 +1,10 @@
 import { Cursor } from "@hazae41/cursor";
 
 export class Length {
-  readonly #class = Length
 
   constructor(
     readonly value: number
   ) { }
-
-  get class() {
-    return this.#class
-  }
 
   toDER(): Length.DER {
     if (this.value < 128)

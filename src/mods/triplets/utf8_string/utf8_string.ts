@@ -7,7 +7,6 @@ import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class UTF8String {
-  readonly #class = UTF8String
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -21,10 +20,6 @@ export class UTF8String {
 
   static create(value: string) {
     return new UTF8String(this.type, value)
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {
@@ -51,7 +46,7 @@ export namespace UTF8String {
       readonly bytes: Bytes
     ) { }
 
-    
+
 
     trySize(): Result<number, never> {
       return Triplet.trySize(this.length)

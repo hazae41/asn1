@@ -12,7 +12,6 @@ const stringify = (parent: Constructed) => `[${parent.type.tag}] {
 }`
 
 export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
-  readonly #class = Constructed
 
   constructor(
     readonly type: Type,
@@ -29,10 +28,6 @@ export class Constructed<T extends readonly Triplet[] = readonly Triplet[]> {
 
       return new Ok(new Constructed(sequence.type, resolveds))
     })
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {

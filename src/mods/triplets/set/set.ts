@@ -12,7 +12,6 @@ const stringify = (set: Set) => `SET {
 }`
 
 export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
-  readonly #class = Set
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -34,10 +33,6 @@ export class Set<T extends readonly Triplet[] = readonly Triplet[]> {
 
       return new Ok(new Set(sequence.type, resolveds))
     })
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {

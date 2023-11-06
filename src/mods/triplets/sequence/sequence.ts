@@ -12,7 +12,6 @@ const stringify = (parent: Sequence) => `SEQUENCE {
 }`
 
 export class Sequence<T extends readonly Triplet[] = readonly Triplet[]> {
-  readonly #class = Sequence
 
   static type = new Type(
     Type.clazzes.UNIVERSAL,
@@ -34,10 +33,6 @@ export class Sequence<T extends readonly Triplet[] = readonly Triplet[]> {
 
       return new Ok(new Sequence(sequence.type, resolveds))
     })
-  }
-
-  get class() {
-    return this.#class
   }
 
   toDER() {

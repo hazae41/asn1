@@ -1,4 +1,5 @@
 import { Base16 } from "@hazae41/base16";
+import { Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
@@ -19,7 +20,7 @@ function hexToBytes(hex: string) {
 }
 
 function bytesToTriplet(bytes: Uint8Array) {
-  const opaque = DER.tryReadFromBytes(bytes).unwrap()
+  const opaque = Readable.readFromBytesOrThrow(DER, bytes)
 
   if (!(opaque instanceof Opaque))
     throw new Error(`Not an opaque`)
@@ -46,7 +47,7 @@ test("Read", async () => {
 function checkReadWrite(hex: string) {
   const input = hexToBytes(hex)
   const triplet = bytesToTriplet(input)
-  const output = DER.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.writeToBytesOrThrow(triplet)
   return Bytes.equals(input, output)
 }
 

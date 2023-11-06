@@ -74,7 +74,8 @@ export namespace BitString {
       const subcursor = new Cursor(content)
 
       const padding = subcursor.readUint8OrThrow()
-      const bytes = subcursor.readOrThrow(subcursor.remaining)
+      const string = subcursor.readOrThrow(subcursor.remaining)
+      const bytes = new Uint8Array(string)
 
       return new DER(type, length, padding, bytes)
     }
