@@ -55,6 +55,8 @@ export namespace PrintableString {
 
   export class DER extends PrintableString {
 
+    static readonly type = PrintableString.type.toDER()
+
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,

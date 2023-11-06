@@ -1,8 +1,8 @@
 import { Base16 } from "@hazae41/base16";
+import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
-import { DER } from "mods/resolvers/der.js";
 import { OctetString } from "mods/triplets/octet_string/octet_string.js";
 import { relative, resolve } from "node:path";
 
@@ -20,9 +20,9 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = OctetString.DER.tryRead(input).unwrap()
+  const triplet = OctetString.DER.readOrThrow(input)
 
-  const output = DER.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.writeToBytesOrThrow(triplet)
   return input.buffer.equals(output)
 }
 

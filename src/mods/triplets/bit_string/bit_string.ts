@@ -38,6 +38,8 @@ export namespace BitString {
 
   export class DER extends BitString {
 
+    static readonly type = BitString.type.toDER()
+
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,

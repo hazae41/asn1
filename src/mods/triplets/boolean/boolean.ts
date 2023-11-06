@@ -34,6 +34,7 @@ export namespace Boolean {
 
   export class DER extends Boolean {
 
+    static readonly type = Boolean.type.toDER()
     static readonly length = new Length(1).toDER()
 
     constructor(

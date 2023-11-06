@@ -36,6 +36,8 @@ export namespace Integer {
 
   export class DER extends Integer {
 
+    static readonly type = Integer.type.toDER()
+
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,

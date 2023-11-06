@@ -35,6 +35,8 @@ export namespace IA5String {
 
   export class DER extends IA5String {
 
+    static readonly type = IA5String.type.toDER()
+
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,

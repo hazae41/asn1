@@ -34,6 +34,7 @@ export namespace Null {
 
   export class DER extends Null {
 
+    static readonly type = Null.type.toDER()
     static readonly length = new Length(0).toDER()
 
     constructor(

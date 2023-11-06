@@ -35,6 +35,8 @@ export namespace OctetString {
 
   export class DER extends OctetString {
 
+    static readonly type = OctetString.type.toDER()
+
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
