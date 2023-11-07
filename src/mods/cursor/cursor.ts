@@ -21,17 +21,17 @@ export class DERCursor<T extends DERHolder> {
     return new DERCursor(inner)
   }
 
-  static castAndFromOrThrow<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): DERCursor<T> {
+  static fromAsOrThrow<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): DERCursor<T> {
     if (holder instanceof clazz)
-      if (type === undefined || holder.type.equals(type))
+      if (type == null || holder.type.equals(type))
         return new DERCursor(holder)
 
     throw new ASN1CastError(holder, [clazz])
   }
 
-  static tryCastAndFrom<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): Result<DERCursor<T>, ASN1CastError> {
+  static tryFromAs<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): Result<DERCursor<T>, ASN1CastError> {
     if (holder instanceof clazz)
-      if (type === undefined || holder.type.equals(type))
+      if (type == null || holder.type.equals(type))
         return new Ok(new DERCursor(holder))
 
     return new Err(new ASN1CastError(holder, [clazz]))
@@ -73,7 +73,7 @@ export class DERCursor<T extends DERHolder> {
     return this.tryGet().inspectSync(() => this.offset++)
   }
 
-  readAndCastOrThrow<T>(...clazzes: Class<T>[]): T {
+  readAsOrThrow<T>(...clazzes: Class<T>[]): T {
     const triplet = this.readOrThrow()
 
     for (const clazz of clazzes)
@@ -83,7 +83,7 @@ export class DERCursor<T extends DERHolder> {
     throw new ASN1CastError(triplet, clazzes)
   }
 
-  tryReadAndCast<T>(...clazzes: Class<T>[]): Result<T, ASN1OverflowError | ASN1CastError> {
+  tryReadAs<T>(...clazzes: Class<T>[]): Result<T, ASN1OverflowError | ASN1CastError> {
     return Result.unthrowSync(t => {
       const triplet = this.tryRead().throw(t)
 
