@@ -16,21 +16,20 @@ export class PrintableString {
   constructor(
     readonly type: Type,
     readonly value: string,
-    readonly bytes: Uint8Array
   ) { }
 
   static newOrThrow(type: Type, value: string) {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       throw new InvalidValueError(`PrintableString`, value)
 
-    return new Ok(new PrintableString(type, value, Bytes.fromUtf8(value)))
+    return new Ok(new PrintableString(type, value))
   }
 
   static tryNew(type: Type, value: string): Result<PrintableString, InvalidValueError> {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       return new Err(new InvalidValueError(`PrintableString`, value))
 
-    return new Ok(new PrintableString(type, value, Bytes.fromUtf8(value)))
+    return new Ok(new PrintableString(type, value))
   }
 
   static createOrThrow(value: string) {
@@ -63,12 +62,14 @@ export namespace PrintableString {
       readonly value: string,
       readonly bytes: Uint8Array
     ) {
-      super(type.toDER(), value, bytes)
+      super(type.toDER(), value)
     }
 
     static from(asn1: PrintableString) {
-      const length = new Length(asn1.bytes.length).toDER()
-      return new DER(asn1.type.toDER(), length, asn1.value, asn1.bytes)
+      const bytes = Bytes.fromUtf8(asn1.value)
+      const length = new Length(bytes.length).toDER()
+
+      return new DER(asn1.type.toDER(), length, asn1.value, bytes)
     }
 
     sizeOrThrow() {

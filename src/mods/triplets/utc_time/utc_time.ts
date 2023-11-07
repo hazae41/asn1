@@ -1,7 +1,6 @@
-import { BinaryReadError, BinaryWriteError } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result, Unimplemented } from "@hazae41/result";
+import { Err } from "@hazae41/result";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
@@ -13,14 +12,14 @@ function pad2(value: number) {
 
 export class UTCTime {
 
-  static readonly type = new Type(
+  static readonly type = Type.from(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.UTC_TIME)
 
   constructor(
     readonly type: Type,
-    readonly value: Date
+    readonly value: Date,
   ) { }
 
   static create(value: Date) {
@@ -28,24 +27,7 @@ export class UTCTime {
   }
 
   toDER() {
-    const year = this.value.getUTCFullYear()
-
-    const YY = year > 2000
-      ? pad2(year - 2000)
-      : pad2(year - 1900)
-
-    const MM = pad2(this.value.getUTCMonth() + 1)
-    const DD = pad2(this.value.getUTCDate())
-    const hh = pad2(this.value.getUTCHours())
-    const mm = pad2(this.value.getUTCMinutes())
-    const ss = pad2(this.value.getUTCSeconds())
-
-    const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
-
-    const type = this.type.toDER()
-    const length = new Length(bytes.length).toDER()
-
-    return new UTCTime.DER(type, length, bytes)
+    return UTCTime.DER.from(this)
   }
 
   toString() {
@@ -56,61 +38,78 @@ export class UTCTime {
 
 export namespace UTCTime {
 
-  export class DER {
+  export class DER extends UTCTime {
+
+    static readonly type = UTCTime.type.toDER()
 
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly bytes: Bytes
-    ) { }
-
-
-
-    trySize(): Result<number, never> {
-      return Triplet.trySize(this.length)
+      readonly value: Date,
+      readonly bytes: Uint8Array
+    ) {
+      super(type, value)
     }
 
-    tryWrite(cursor: Cursor): Result<void, BinaryWriteError> {
-      return Result.unthrowSync(t => {
-        this.type.tryWrite(cursor).throw(t)
-        this.length.tryWrite(cursor).throw(t)
+    static from(asn1: UTCTime) {
+      const year = asn1.value.getUTCFullYear()
 
-        cursor.tryWrite(this.bytes).throw(t)
+      const YY = year > 2000
+        ? pad2(year - 2000)
+        : pad2(year - 1900)
 
-        return Ok.void()
-      })
+      const MM = pad2(asn1.value.getUTCMonth() + 1)
+      const DD = pad2(asn1.value.getUTCDate())
+      const hh = pad2(asn1.value.getUTCHours())
+      const mm = pad2(asn1.value.getUTCMinutes())
+      const ss = pad2(asn1.value.getUTCSeconds())
+
+      const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
+      const length = new Length(bytes.length).toDER()
+
+      return new DER(asn1.type.toDER(), length, asn1.value, bytes)
     }
 
-    static tryRead(cursor: Cursor): Result<UTCTime, BinaryReadError | Unimplemented | InvalidValueError> {
-      return Result.unthrowSync(t => {
-        const type = Type.DER.tryRead(cursor).throw(t)
-        const length = Length.DER.tryRead(cursor).throw(t)
+    sizeOrThrow(): number {
+      return Triplet.sizeOrThrow(this.length)
+    }
 
-        const text = cursor.tryReadUtf8(length.value).throw(t)
+    writeOrThrow(cursor: Cursor): void {
+      this.type.writeOrThrow(cursor)
+      this.length.writeOrThrow(cursor)
 
-        if (text.length !== 13)
-          return new Err(new InvalidValueError(`UTCTime`, text))
-        if (!text.endsWith("Z"))
-          return new Err(new InvalidValueError(`UTCTime`, text))
+      cursor.writeOrThrow(this.bytes)
+    }
 
-        const YY = Number(text.slice(0, 2))
-        const MM = Number(text.slice(2, 4))
-        const DD = Number(text.slice(4, 6))
-        const hh = Number(text.slice(6, 8))
-        const mm = Number(text.slice(8, 10))
-        const ss = Number(text.slice(10, 12))
+    static readOrThrow(cursor: Cursor) {
+      const type = Type.DER.readOrThrow(cursor)
+      const length = Length.DER.readOrThrow(cursor)
 
-        const year = YY > 50
-          ? 1900 + YY
-          : 2000 + YY
+      const bytes = cursor.readOrThrow(length.value)
+      const text = Bytes.toUtf8(bytes)
 
-        const value = new Date()
-        value.setUTCFullYear(year, MM - 1, DD)
-        value.setUTCHours(hh, mm, ss)
-        value.setUTCMilliseconds(0)
+      if (text.length !== 13)
+        return new Err(new InvalidValueError(`UTCTime`, text))
+      if (!text.endsWith("Z"))
+        return new Err(new InvalidValueError(`UTCTime`, text))
 
-        return new Ok(new UTCTime(type, value))
-      })
+      const YY = Number(text.slice(0, 2))
+      const MM = Number(text.slice(2, 4))
+      const DD = Number(text.slice(4, 6))
+      const hh = Number(text.slice(6, 8))
+      const mm = Number(text.slice(8, 10))
+      const ss = Number(text.slice(10, 12))
+
+      const year = YY > 50
+        ? 1900 + YY
+        : 2000 + YY
+
+      const value = new Date()
+      value.setUTCFullYear(year, MM - 1, DD)
+      value.setUTCHours(hh, mm, ss)
+      value.setUTCMilliseconds(0)
+
+      return new DER(type, length, value, bytes)
     }
 
   }

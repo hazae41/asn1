@@ -1,5 +1,4 @@
 import { Base16 } from "@hazae41/base16";
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
@@ -14,10 +13,10 @@ export class OctetString {
 
   constructor(
     readonly type: Type,
-    readonly bytes: Bytes
+    readonly bytes: Uint8Array
   ) { }
 
-  static create(bytes: Bytes) {
+  static create(bytes: Uint8Array) {
     return new OctetString(this.type, bytes)
   }
 
@@ -40,7 +39,7 @@ export namespace OctetString {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly bytes: Bytes
+      readonly bytes: Uint8Array
     ) {
       super(type, bytes)
     }

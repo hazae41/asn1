@@ -1,6 +1,5 @@
 import { Base16 } from "@hazae41/base16";
 import { ReadError, Readable } from "@hazae41/binary";
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
@@ -23,7 +22,7 @@ export class Opaque {
     /**
      * The whole triplet (type + length + value)
      */
-    readonly bytes: Bytes
+    readonly bytes: Uint8Array
   ) { }
 
   toDER() {
@@ -50,7 +49,7 @@ export namespace Opaque {
 
     constructor(
       readonly type: Type.DER,
-      readonly bytes: Bytes
+      readonly bytes: Uint8Array
     ) {
       super(type, bytes)
     }
