@@ -7,28 +7,24 @@ export interface DERHolder extends DERTriplet {
   readonly triplets: DERTriplet[]
 }
 
-export class DERCursor<T extends DERHolder = DERHolder> {
+export class DERCursor {
 
   offset = 0
 
   constructor(
-    readonly inner: T
+    readonly triplets: DERTriplet[]
   ) { }
 
-  static new<T extends DERHolder>(inner: T) {
-    return new DERCursor(inner)
-  }
-
   get before() {
-    return this.inner.triplets.slice(0, this.offset)
+    return this.triplets.slice(0, this.offset)
   }
 
   get after() {
-    return this.inner.triplets.slice(this.offset)
+    return this.triplets.slice(this.offset)
   }
 
   get() {
-    return this.inner.triplets.at(this.offset)
+    return this.triplets.at(this.offset)
   }
 
   getOrThrow() {
@@ -107,12 +103,12 @@ export class DERCursor<T extends DERHolder = DERHolder> {
     throw new CastError()
   }
 
-  subAsOrThrow<T extends DERHolder>(clazz: Class<T>): DERCursor<T> {
-    return new DERCursor(this.readAsOrThrow(clazz))
+  subAsOrThrow<T extends DERHolder>(clazz: Class<T>): DERCursor {
+    return new DERCursor(this.readAsOrThrow(clazz).triplets)
   }
 
-  subAsTypeOrThrow<T extends DERHolder>(type: Type.DER, clazz: Class<T>): DERCursor<T> {
-    return new DERCursor(this.readAsTypeOrThrow(type, clazz))
+  subAsTypeOrThrow<T extends DERHolder>(type: Type.DER, clazz: Class<T>): DERCursor {
+    return new DERCursor(this.readAsTypeOrThrow(type, clazz).triplets)
   }
 
 }
