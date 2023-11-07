@@ -3,7 +3,7 @@ import { DERTriplet } from "mods/resolvers/der/triplet.js"
 import { Type } from "mods/type/type.js"
 import { CastError, ReadError } from "./errors.js"
 
-export interface DERHolder {
+export interface DERHolder extends DERTriplet {
   readonly triplets: DERTriplet[]
 }
 
@@ -40,7 +40,7 @@ export class DERCursor<T extends DERHolder = DERHolder> {
     return triplet
   }
 
-  getAs<T>(...clazzes: Class<T>[]): T | undefined {
+  getAs<T extends DERTriplet>(...clazzes: Class<T>[]): T | undefined {
     const triplet = this.get()
 
     if (triplet == null)
@@ -71,7 +71,7 @@ export class DERCursor<T extends DERHolder = DERHolder> {
     return triplet
   }
 
-  readAs<T>(...clazzes: Class<T>[]): T | undefined {
+  readAs<T extends DERTriplet>(...clazzes: Class<T>[]): T | undefined {
     const triplet = this.read()
 
     if (triplet == null)
@@ -84,7 +84,7 @@ export class DERCursor<T extends DERHolder = DERHolder> {
     return undefined
   }
 
-  readAsOrThrow<T>(...clazzes: Class<T>[]): T {
+  readAsOrThrow<T extends DERTriplet>(...clazzes: Class<T>[]): T {
     const triplet = this.readOrThrow()
 
     for (const clazz of clazzes)
@@ -94,7 +94,7 @@ export class DERCursor<T extends DERHolder = DERHolder> {
     throw new CastError()
   }
 
-  readAsTypeOrThrow<T>(type: Type.DER, ...clazzes: Class<T>[]): T {
+  readAsTypeOrThrow<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T {
     const triplet = this.readOrThrow()
 
     if (!triplet.type.equals(type))
