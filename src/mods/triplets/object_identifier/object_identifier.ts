@@ -86,7 +86,7 @@ export namespace ObjectIdentifier {
       super(type, value)
     }
 
-    static from(asn1: ObjectIdentifier) {
+    static from<T extends string = string>(asn1: ObjectIdentifier<T>) {
       const texts = asn1.value.inner.split(".")
 
       const first = Number(texts[0])
