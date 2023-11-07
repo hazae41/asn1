@@ -1,7 +1,7 @@
 import { Arrays } from "@hazae41/arrays";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
 
 const bn256 = BigInt(256)
@@ -70,7 +70,7 @@ export namespace Integer {
     }
 
     sizeOrThrow(): number {
-      return Triplet.sizeOrThrow(this.length)
+      return DERTriplet.sizeOrThrow(this.length)
     }
 
     writeOrThrow(cursor: Cursor) {

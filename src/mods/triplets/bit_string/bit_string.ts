@@ -1,7 +1,7 @@
 import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class BitString {
@@ -56,7 +56,7 @@ export namespace BitString {
     }
 
     sizeOrThrow() {
-      return Triplet.sizeOrThrow(this.length)
+      return DERTriplet.sizeOrThrow(this.length)
     }
 
     writeOrThrow(cursor: Cursor) {

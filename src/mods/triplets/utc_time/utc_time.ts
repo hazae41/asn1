@@ -2,7 +2,7 @@ import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
 
 function pad2(value: number) {
@@ -70,7 +70,7 @@ export namespace UTCTime {
     }
 
     sizeOrThrow(): number {
-      return Triplet.sizeOrThrow(this.length)
+      return DERTriplet.sizeOrThrow(this.length)
     }
 
     writeOrThrow(cursor: Cursor): void {

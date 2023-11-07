@@ -1,6 +1,6 @@
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
-import { DERTriplet } from "mods/resolvers/der.js";
+import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -72,7 +72,7 @@ export namespace Sequence {
     }
 
     sizeOrThrow(): number {
-      return Triplet.sizeOrThrow(this.length)
+      return DERTriplet.sizeOrThrow(this.length)
     }
 
     writeOrThrow(cursor: Cursor): void {

@@ -1,2 +1,2 @@
-export * from "./der.js";
+export * from "./der/der.js";
 

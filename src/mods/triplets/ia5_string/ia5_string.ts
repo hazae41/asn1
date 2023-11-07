@@ -1,7 +1,7 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
-import { Triplet } from "mods/triplets/triplet.js";
+import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
 
 export class IA5String {
@@ -53,7 +53,7 @@ export namespace IA5String {
     }
 
     sizeOrThrow() {
-      return Triplet.sizeOrThrow(this.length)
+      return DERTriplet.sizeOrThrow(this.length)
     }
 
     writeOrThrow(cursor: Cursor) {

@@ -1,7 +1,7 @@
 import { Cursor } from "@hazae41/cursor";
-import { DERTriplet } from "index.js";
 import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
+import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -66,7 +66,7 @@ export namespace Constructed {
     }
 
     sizeOrThrow(): number {
-      return Triplet.sizeOrThrow(this.length)
+      return DERTriplet.sizeOrThrow(this.length)
     }
 
     writeOrThrow(cursor: Cursor) {
