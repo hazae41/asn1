@@ -59,11 +59,11 @@ export namespace Opaque {
     }
 
     resolveOrThrow() {
-      if (this.type.equals(Boolean.type))
+      if (this.type.equals(Boolean.DER.type))
         return this.readIntoOrThrow(Boolean.DER)
-      if (this.type.equals(Integer.type))
+      if (this.type.equals(Integer.DER.type))
         return this.readIntoOrThrow(Integer.DER)
-      if (this.type.equals(BitString.type))
+      if (this.type.equals(BitString.DER.type))
         return this.readIntoOrThrow(BitString.DER)
       return this
     }

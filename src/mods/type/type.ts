@@ -70,6 +70,10 @@ export namespace Type {
       return new DER(byte, type.clazz, type.wrap, type.tag)
     }
 
+    equals(other: DER) {
+      return this.byte === other.byte
+    }
+
     sizeOrThrow() {
       return 1
     }

@@ -61,7 +61,7 @@ export class ObjectIdentifier<T extends string = string>  {
   }
 
   toDER() {
-
+    return ObjectIdentifier.DER.from(this)
   }
 
   toString() {

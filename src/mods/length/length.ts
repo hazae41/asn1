@@ -6,7 +6,7 @@ export class Length {
     readonly value: number
   ) { }
 
-  toDER(): Length.DER {
+  toDER() {
     return Length.DER.from(this)
   }
 
@@ -20,7 +20,7 @@ export namespace Length {
 
   export namespace DER {
 
-    export function from(length: Length) {
+    export function from(length: Length): DER {
       if (length.value < 128)
         return new Short(length.value)
 

@@ -21,7 +21,7 @@ export class UTF8String {
   }
 
   toDER() {
-
+    return UTF8String.DER.from(this)
   }
 
   toString() {
