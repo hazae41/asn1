@@ -1,6 +1,6 @@
-import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
+import { DERTriplet } from "mods/resolvers/der.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Triplet } from "mods/triplets/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -42,7 +42,7 @@ export class Set<T extends readonly Set.Inner[] = readonly Set.Inner[]> {
 export namespace Set {
 
   export namespace DER {
-    export type Inner = Triplet & Writable
+    export type Inner = DERTriplet
   }
 
   export class DER<T extends readonly DER.Inner[] = readonly DER.Inner[]> extends Set<T> {

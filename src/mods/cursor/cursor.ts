@@ -1,15 +1,15 @@
 import { Err, Ok, Result } from "@hazae41/result"
+import { DERTriplet } from "index.js"
 import { Class } from "libs/reflection/reflection.js"
 import { Triplet } from "mods/triplets/triplet.js"
 import { Type } from "mods/type/type.js"
 import { ASN1CastError, ASN1OverflowError } from "./errors.js"
-import { ASN1Resolvable } from "./resolvable.js"
 
-export interface ANS1Holder {
-  readonly triplets: Triplet[]
+export interface DERHolder {
+  readonly triplets: DERTriplet[]
 }
 
-export class ASN1Cursor<T extends ANS1Holder> {
+export class DERCursor<T extends DERHolder> {
 
   offset = 0
 
@@ -17,11 +17,11 @@ export class ASN1Cursor<T extends ANS1Holder> {
     readonly inner: T
   ) { }
 
-  static new<T extends ANS1Holder>(inner: T) {
+  static new<T extends DERHolder>(inner: T) {
     return new this(inner)
   }
 
-  static tryCastAndFrom<T extends ANS1Holder>(holder: Triplet, clazz: Class<T>, type?: Type): Result<ASN1Cursor<T>, ASN1CastError> {
+  static tryCastAndFrom<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): Result<DERCursor<T>, ASN1CastError> {
     if (holder instanceof clazz)
       if (type === undefined || holder.type.equals(type))
         return new Ok(new this(holder))
@@ -37,6 +37,15 @@ export class ASN1Cursor<T extends ANS1Holder> {
     return this.inner.triplets.slice(this.offset)
   }
 
+  getOrThrow() {
+    const triplet = this.inner.triplets.at(this.offset)
+
+    if (triplet === undefined)
+      throw new ASN1OverflowError()
+
+    return triplet
+  }
+
   tryGet(): Result<Triplet, ASN1OverflowError> {
     const triplet = this.inner.triplets.at(this.offset)
 
@@ -46,25 +55,36 @@ export class ASN1Cursor<T extends ANS1Holder> {
     return new Ok(triplet)
   }
 
+  readOrThrow() {
+    const triplet = this.getOrThrow()
+    this.offset++
+    return triplet
+  }
+
   tryRead(): Result<Triplet, ASN1OverflowError> {
     return this.tryGet().inspectSync(() => this.offset++)
   }
 
-  tryReadAndResolve<T extends ASN1Resolvable.Infer<T>>(readable: T): Result<ASN1Resolvable.ResolveOutput<T>, ASN1Resolvable.ResolveError<T> | ASN1OverflowError> {
-    return this.tryRead().andThenSync(triplet => readable.tryResolve(triplet))
+  readAndCastOrThrow<T>(...clazzes: Class<T>[]): T {
+    const triplet = this.readOrThrow()
+
+    for (const clazz of clazzes)
+      if (triplet instanceof clazz)
+        return triplet as T
+
+    throw new ASN1CastError(triplet, clazzes)
   }
 
   tryReadAndCast<T>(...clazzes: Class<T>[]): Result<T, ASN1OverflowError | ASN1CastError> {
-    const triplet = this.tryRead()
+    return Result.unthrowSync(t => {
+      const triplet = this.tryRead().throw(t)
 
-    if (triplet.isErr())
-      return triplet
+      for (const clazz of clazzes)
+        if (triplet instanceof clazz)
+          return new Ok(triplet)
 
-    for (const clazz of clazzes)
-      if (triplet.inner instanceof clazz)
-        return triplet as Ok<T>
-
-    return new Err(new ASN1CastError(triplet.get(), clazzes))
+      return new Err(new ASN1CastError(triplet, clazzes))
+    })
   }
 
 }

@@ -4,11 +4,12 @@ export * from "./type/type.test.js";
 export * from "./variable_length_quantity/variable_length_quantity.test.js";
 
 import { Base64 } from "@hazae41/base64";
+import { Readable, Writable } from "@hazae41/binary";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
 import { readFile } from "fs/promises";
-import { DER } from "mods/resolvers/der.js";
 import { relative, resolve } from "node:path";
+import { DER } from "./resolvers/der.js";
 
 export namespace PEM {
   export const header = `-----BEGIN CERTIFICATE-----`
@@ -58,35 +59,35 @@ function compare(a: Uint8Array, b: Uint8Array) {
 
 test("Cert Ed25519", async () => {
   const text = await readFile("./certs/ed25519.pem", "utf8")
-  const triplet = DER.tryReadFromBytes(PEM.parse(text)).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, PEM.parse(text))
 
   assert(compare(PEM.parse(text), Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert Let's Encrypt", async () => {
   const text = await readFile("./certs/letsencrypt.pem", "utf8")
-  const triplet = DER.tryReadFromBytes(PEM.parse(text)).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, PEM.parse(text))
 
   assert(compare(PEM.parse(text), Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert PKCS7", async () => {
   const text = await readFile("./certs/pkcs7.pem", "utf8")
-  const triplet = DER.tryReadFromBytes(PKCS7.parse(text)).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, PKCS7.parse(text))
 
   assert(compare(PKCS7.parse(text), Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert frank4dd-rsa", async () => {
   const buffer = await readFile("./certs/frank4dd-rsa.der")
-  const triplet = DER.tryReadFromBytes(buffer).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
   assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert frank4dd-dsa", async () => {
   const buffer = await readFile("./certs/frank4dd-dsa.der")
-  const triplet = DER.tryReadFromBytes(buffer).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
   assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
@@ -94,7 +95,7 @@ test("Cert frank4dd-dsa", async () => {
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
   const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
-  const triplet = DER.tryReadFromBytes(buffer).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
   assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
@@ -102,7 +103,7 @@ test("Cert Tor", async () => {
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
   const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
-  const triplet = DER.tryReadFromBytes(buffer).unwrap()
+  const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
   assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })

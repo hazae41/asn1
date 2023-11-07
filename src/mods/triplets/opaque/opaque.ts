@@ -1,7 +1,8 @@
 import { Base16 } from "@hazae41/base16";
-import { ReadError, Readable, Writable } from "@hazae41/binary";
+import { ReadError, Readable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Result } from "@hazae41/result";
+import { DERTriplet } from "index.js";
 import { Length } from "mods/length/length.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Integer } from "mods/triplets/integer/integer.js";
@@ -15,7 +16,6 @@ import { ObjectIdentifier } from "../object_identifier/object_identifier.js";
 import { OctetString } from "../octet_string/octet_string.js";
 import { PrintableString } from "../printable_string/printable_string.js";
 import { Sequence } from "../sequence/sequence.js";
-import { Triplet } from "../triplet.js";
 import { UTCTime } from "../utc_time/utc_time.js";
 import { UTF8String } from "../utf8_string/utf8_string.js";
 
@@ -69,7 +69,7 @@ export namespace Opaque {
       return new DER(asn1.type.toDER(), asn1.bytes)
     }
 
-    resolveOrThrow(): Triplet & Writable {
+    resolveOrThrow(): DERTriplet {
       if (this.type.equals(Boolean.DER.type))
         return this.readIntoOrThrow(Boolean.DER)
       if (this.type.equals(Integer.DER.type))

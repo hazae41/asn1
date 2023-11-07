@@ -1,4 +1,5 @@
 import { Base16 } from "@hazae41/base16";
+import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
@@ -19,7 +20,7 @@ function hexToCursor(hex: string) {
 
 function checkReadWriteOID(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = ObjectIdentifier.DER.tryRead(input).unwrap()
+  const triplet = ObjectIdentifier.DER.readOrThrow(input)
 
   const output = Writable.writeToBytesOrThrow(triplet)
   return input.buffer.equals(output)

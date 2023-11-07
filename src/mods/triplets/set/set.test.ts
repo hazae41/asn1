@@ -1,4 +1,5 @@
 import { Base16 } from "@hazae41/base16";
+import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
@@ -20,7 +21,7 @@ function hexToCursor(hex: string) {
 
 function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
-  const triplet = DER.tryRead(input).unwrap()
+  const triplet = DER.readOrThrow(input)
 
   assert(triplet instanceof Set)
 

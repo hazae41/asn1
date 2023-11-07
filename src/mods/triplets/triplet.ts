@@ -1,10 +1,10 @@
-import { Writable } from "@hazae41/binary"
+import { DERTriplet } from "index.js"
 import { Length } from "mods/length/length.js"
 import { Type } from "mods/type/type.js"
 
 export interface Triplet {
-  type: Type
-  toDER(): Triplet & Writable
+  readonly type: Type
+  toDER(): DERTriplet
   toString(): string
 }
 

@@ -1,5 +1,5 @@
-import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
+import { DERTriplet } from "index.js";
 import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
@@ -38,7 +38,7 @@ export class Constructed<T extends readonly Constructed.Inner[] = readonly Const
 export namespace Constructed {
 
   export namespace DER {
-    export type Inner = Triplet & Writable
+    export type Inner = DERTriplet
   }
 
   export class DER<T extends readonly DER.Inner[] = readonly DER.Inner[]> extends Constructed<T> {
