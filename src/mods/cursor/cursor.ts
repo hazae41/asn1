@@ -7,7 +7,7 @@ export interface DERHolder {
   readonly triplets: DERTriplet[]
 }
 
-export class DERCursor<T extends DERHolder> {
+export class DERCursor<T extends DERHolder = DERHolder> {
 
   offset = 0
 
