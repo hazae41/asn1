@@ -1,3 +1,4 @@
+export * from "../resolvers/triplet.js";
 export * from "./bit_string/bit_string.js";
 export * from "./boolean/boolean.js";
 export * from "./constructed/constructed.js";
@@ -10,7 +11,6 @@ export * from "./opaque/opaque.js";
 export * from "./printable_string/printable_string.js";
 export * from "./sequence/sequence.js";
 export * from "./set/set.js";
-export * from "./triplet.js";
 export * from "./utc_time/utc_time.js";
 export * from "./utf8_string/utf8_string.js";
 

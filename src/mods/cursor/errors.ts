@@ -1,5 +1,5 @@
 import { Class } from "libs/reflection/reflection.js"
-import { Triplet } from "mods/triplets/triplet.js"
+import { Triplet } from "mods/resolvers/triplet.js"
 
 export type ASN1Error =
   | ASN1CastError

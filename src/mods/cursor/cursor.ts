@@ -1,7 +1,7 @@
 import { Err, Ok, Result } from "@hazae41/result"
 import { Class } from "libs/reflection/reflection.js"
 import { DERTriplet } from "mods/resolvers/der/triplet.js"
-import { Triplet } from "mods/triplets/triplet.js"
+import { Triplet } from "mods/resolvers/triplet.js"
 import { Type } from "mods/type/type.js"
 import { ASN1CastError, ASN1OverflowError } from "./errors.js"
 
