@@ -27,19 +27,61 @@ export class DERCursor<T extends DERHolder = DERHolder> {
     return this.inner.triplets.slice(this.offset)
   }
 
-  getOrThrow() {
-    const triplet = this.inner.triplets.at(this.offset)
+  get() {
+    return this.inner.triplets.at(this.offset)
+  }
 
-    if (triplet === undefined)
+  getOrThrow() {
+    const triplet = this.get()
+
+    if (triplet == null)
       throw new ReadError()
 
     return triplet
   }
 
-  readOrThrow() {
-    const triplet = this.getOrThrow()
-    this.offset++
+  getAs<T>(...clazzes: Class<T>[]): T | undefined {
+    const triplet = this.get()
+
+    if (triplet == null)
+      return undefined
+
+    for (const clazz of clazzes)
+      if (triplet instanceof clazz)
+        return triplet as T
+
+    return undefined
+  }
+
+  read() {
+    const triplet = this.get()
+
+    if (triplet != null)
+      this.offset++
+
     return triplet
+  }
+
+  readOrThrow() {
+    const triplet = this.read()
+
+    if (triplet == null)
+      throw new ReadError()
+
+    return triplet
+  }
+
+  readAs<T>(...clazzes: Class<T>[]): T | undefined {
+    const triplet = this.read()
+
+    if (triplet == null)
+      return undefined
+
+    for (const clazz of clazzes)
+      if (triplet instanceof clazz)
+        return triplet as T
+
+    return undefined
   }
 
   readAsOrThrow<T>(...clazzes: Class<T>[]): T {
