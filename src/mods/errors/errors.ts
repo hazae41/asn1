@@ -17,9 +17,9 @@ export class InvalidTypeError extends Error {
 
   constructor(
     readonly triplet: string,
-    readonly typeByte: number
+    readonly byte: number
   ) {
-    super(`Invalid type ${typeByte} for ${triplet}`)
+    super(`Invalid type ${byte} for ${triplet}`)
   }
 
 }
