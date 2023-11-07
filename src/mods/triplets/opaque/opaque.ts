@@ -1,12 +1,23 @@
 import { Base16 } from "@hazae41/base16";
-import { ReadError, Readable } from "@hazae41/binary";
+import { ReadError, Readable, Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
 import { Integer } from "mods/triplets/integer/integer.js";
+import { Set } from "mods/triplets/set/set.js";
 import { Type } from "mods/type/type.js";
 import { BitString } from "../bit_string/bit_string.js";
+import { Constructed } from "../constructed/constructed.js";
+import { IA5String } from "../ia5_string/ia5_string.js";
+import { Null } from "../null/null.js";
+import { ObjectIdentifier } from "../object_identifier/object_identifier.js";
+import { OctetString } from "../octet_string/octet_string.js";
+import { PrintableString } from "../printable_string/printable_string.js";
+import { Sequence } from "../sequence/sequence.js";
+import { Triplet } from "../triplet.js";
+import { UTCTime } from "../utc_time/utc_time.js";
+import { UTF8String } from "../utf8_string/utf8_string.js";
 
 export class Opaque {
 
@@ -58,13 +69,35 @@ export namespace Opaque {
       return new DER(asn1.type.toDER(), asn1.bytes)
     }
 
-    resolveOrThrow() {
+    resolveOrThrow(): Triplet & Writable {
       if (this.type.equals(Boolean.DER.type))
         return this.readIntoOrThrow(Boolean.DER)
       if (this.type.equals(Integer.DER.type))
         return this.readIntoOrThrow(Integer.DER)
       if (this.type.equals(BitString.DER.type))
         return this.readIntoOrThrow(BitString.DER)
+      if (this.type.equals(OctetString.DER.type))
+        return this.readIntoOrThrow(OctetString.DER)
+      if (this.type.equals(Null.DER.type))
+        return this.readIntoOrThrow(Null.DER)
+      if (this.type.equals(ObjectIdentifier.DER.type))
+        return this.readIntoOrThrow(ObjectIdentifier.DER)
+      if (this.type.equals(UTF8String.DER.type))
+        return this.readIntoOrThrow(UTF8String.DER.DER)
+      if (this.type.equals(PrintableString.DER.type))
+        return this.readIntoOrThrow(PrintableString.DER)
+      if (this.type.equals(Sequence.DER.type))
+        return this.readIntoOrThrow(Sequence.DER).resolveOrThrow()
+      if (this.type.equals(Set.DER.type))
+        return this.readIntoOrThrow(Set.DER).resolveOrThrow()
+      if (this.type.equals(IA5String.DER.type))
+        return this.readIntoOrThrow(IA5String.DER)
+      if (this.type.equals(UTCTime.DER.type))
+        return this.readIntoOrThrow(UTCTime.DER)
+
+      if (this.type.wrap === Type.wraps.CONSTRUCTED)
+        return this.readIntoOrThrow(Constructed.DER).resolveOrThrow()
+
       return this
     }
 

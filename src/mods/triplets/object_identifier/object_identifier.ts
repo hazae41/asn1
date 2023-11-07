@@ -80,31 +80,32 @@ export namespace ObjectIdentifier {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: OID<T>,
-      readonly header: readonly [number, number],
-      readonly values: readonly VLQ.DER[]
+      readonly head: readonly number[],
+      readonly body: readonly VLQ.DER[]
     ) {
       super(type, value)
     }
 
     static from(asn1: ObjectIdentifier) {
-      const values = new Array<VLQ.DER>()
       const texts = asn1.value.inner.split(".")
 
       const first = Number(texts[0])
       const second = Number(texts[1])
-      const header = [first, second] as const
+      const head = [first, second]
 
       let size = 1
+
+      const body = new Array<VLQ.DER>()
 
       for (let i = 2; i < texts.length; i++) {
         const vlq = new VLQ(Number(texts[i])).toDER()
         size += vlq.sizeOrThrow()
-        values.push(vlq)
+        body.push(vlq)
       }
 
       const length = new Length(size).toDER()
 
-      return new DER(asn1.type.toDER(), length, asn1.value, header, values)
+      return new DER(asn1.type.toDER(), length, asn1.value, head, body)
     }
 
     sizeOrThrow() {
@@ -115,12 +116,11 @@ export namespace ObjectIdentifier {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
-      const [first, second] = this.header
-
+      const [first, second] = this.head
       cursor.writeUint8OrThrow((first * 40) + second)
 
-      for (const value of this.values)
-        value.writeOrThrow(cursor)
+      for (const vlq of this.body)
+        vlq.writeOrThrow(cursor)
 
       return
     }
@@ -132,19 +132,25 @@ export namespace ObjectIdentifier {
       const content = cursor.readOrThrow(length.value)
       const subcursor = new Cursor(content)
 
-      const header = subcursor.readUint8OrThrow()
-      const first = Math.floor(header / 40)
-      const second = header % 40
+      const byte = subcursor.readUint8OrThrow()
+      const first = Math.floor(byte / 40)
+      const second = byte % 40
 
-      const values = [first, second]
+      const head = [first, second]
+      const body = new Array<VLQ.DER>()
 
-      while (subcursor.remaining)
-        values.push(VLQ.DER.readOrThrow(subcursor).value)
+      const all = [first, second]
 
-      const value = values.join(".")
+      while (subcursor.remaining) {
+        const vlq = VLQ.DER.readOrThrow(subcursor)
+        body.push(vlq)
+        all.push(vlq.value)
+      }
+
+      const value = all.join(".")
       const oid = OID.newOrThrow(value)
 
-      return new ObjectIdentifier(type, oid)
+      return new DER(type, length, oid, head, body)
     }
   }
 

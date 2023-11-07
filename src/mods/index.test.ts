@@ -60,35 +60,35 @@ test("Cert Ed25519", async () => {
   const text = await readFile("./certs/ed25519.pem", "utf8")
   const triplet = DER.tryReadFromBytes(PEM.parse(text)).unwrap()
 
-  assert(compare(PEM.parse(text), DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(PEM.parse(text), Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert Let's Encrypt", async () => {
   const text = await readFile("./certs/letsencrypt.pem", "utf8")
   const triplet = DER.tryReadFromBytes(PEM.parse(text)).unwrap()
 
-  assert(compare(PEM.parse(text), DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(PEM.parse(text), Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert PKCS7", async () => {
   const text = await readFile("./certs/pkcs7.pem", "utf8")
   const triplet = DER.tryReadFromBytes(PKCS7.parse(text)).unwrap()
 
-  assert(compare(PKCS7.parse(text), DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(PKCS7.parse(text), Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert frank4dd-rsa", async () => {
   const buffer = await readFile("./certs/frank4dd-rsa.der")
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert frank4dd-dsa", async () => {
   const buffer = await readFile("./certs/frank4dd-dsa.der")
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert Tor", async () => {
@@ -96,7 +96,7 @@ test("Cert Tor", async () => {
   const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert Tor 2", async () => {
@@ -104,5 +104,5 @@ test("Cert Tor 2", async () => {
   const buffer = Base64.get().tryDecodePadded(text).unwrap().copyAndDispose()
   const triplet = DER.tryReadFromBytes(buffer).unwrap()
 
-  assert(compare(buffer, DER.tryWriteToBytes(triplet).unwrap()))
+  assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })

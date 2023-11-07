@@ -1,6 +1,5 @@
 import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Err } from "@hazae41/result";
 import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
@@ -60,6 +59,12 @@ export namespace Constructed {
       return new Constructed.DER(asn1.type.toDER(), length, triplets)
     }
 
+    resolveOrThrow(this: DER<Opaque.DER[]>) {
+      const resolved = this.triplets.map(it => it.resolveOrThrow())
+
+      return new DER(this.type, this.length, resolved)
+    }
+
     sizeOrThrow(): number {
       return Triplet.sizeOrThrow(this.length)
     }
@@ -78,7 +83,7 @@ export namespace Constructed {
       const type = Type.DER.readOrThrow(cursor)
 
       if (type.wrap !== Type.wraps.CONSTRUCTED)
-        return new Err(new InvalidTypeError(`Constructed`, type.byte))
+        throw new InvalidTypeError(`Constructed`, type.byte)
 
       const length = Length.DER.readOrThrow(cursor)
 

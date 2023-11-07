@@ -1,6 +1,5 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Err } from "@hazae41/result";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
@@ -89,9 +88,9 @@ export namespace UTCTime {
       const text = Bytes.toUtf8(bytes)
 
       if (text.length !== 13)
-        return new Err(new InvalidValueError(`UTCTime`, text))
+        throw new InvalidValueError(`UTCTime`, text)
       if (!text.endsWith("Z"))
-        return new Err(new InvalidValueError(`UTCTime`, text))
+        throw new InvalidValueError(`UTCTime`, text)
 
       const YY = Number(text.slice(0, 2))
       const MM = Number(text.slice(2, 4))

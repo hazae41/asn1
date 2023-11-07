@@ -24,7 +24,7 @@ function checkReadWrite(hex: string) {
 
   assert(triplet instanceof Constructed)
 
-  const output = DER.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.writeToBytesOrThrow(triplet)
   return input.buffer.equals(output)
 }
 

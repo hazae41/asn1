@@ -2,7 +2,6 @@ import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
-import { DER } from "mods/resolvers/der.js";
 import { UTCTime } from "mods/triplets/utc_time/utc_time.js";
 import { relative, resolve } from "node:path";
 
@@ -37,7 +36,7 @@ function checkReadWrite(hex: string) {
   const input = hexToCursor(hex)
   const triplet = UTCTime.DER.tryRead(input).unwrap()
 
-  const output = DER.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.writeToBytesOrThrow(triplet)
   return input.buffer.equals(output)
 }
 

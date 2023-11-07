@@ -2,7 +2,6 @@ import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
-import { DER } from "mods/resolvers/der.js";
 import { Null } from "mods/triplets/null/null.js";
 import { relative, resolve } from "node:path";
 
@@ -22,7 +21,7 @@ function checkReadWrite(hex: string) {
   const input = hexToCursor("05 00")
   const triplet = Null.DER.tryRead(input).unwrap()
 
-  const output = DER.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.writeToBytesOrThrow(triplet)
   return input.buffer.equals(output)
 }
 

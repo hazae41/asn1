@@ -1,5 +1,4 @@
 import { Cursor } from "@hazae41/cursor";
-import { Err } from "@hazae41/result";
 import { InvalidLengthError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { Triplet } from "mods/triplets/triplet.js";
@@ -65,9 +64,9 @@ export namespace Null {
       const length = Length.DER.readOrThrow(cursor)
 
       if (length.value !== 0)
-        return new Err(new InvalidLengthError(`Null`, length.value))
+        throw new InvalidLengthError(`Null`, length.value)
 
-      return new Null(type)
+      return new DER(type)
     }
 
   }
