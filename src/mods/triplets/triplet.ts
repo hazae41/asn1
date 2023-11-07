@@ -4,7 +4,7 @@ import { Type } from "mods/type/type.js"
 
 export interface Triplet {
   type: Type
-  toDER(): Writable
+  toDER(): Triplet & Writable
   toString(): string
 }
 
