@@ -1,4 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
+import { DERable } from "index.js";
 import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -51,8 +52,8 @@ export namespace Constructed {
       super(type, triplets)
     }
 
-    static from(asn1: Constructed) {
-      const triplets = asn1.triplets.map(it => it.toDER())
+    static from<T extends readonly Constructed.Inner[] = readonly Constructed.Inner[]>(asn1: Constructed<T>) {
+      const triplets = asn1.triplets.map(it => it.toDER()) as DERable.AllFrom<T>
       const size = triplets.reduce((p, c) => p + c.sizeOrThrow(), 0)
       const length = new Length(size).toDER()
 

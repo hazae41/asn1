@@ -1,4 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
+import { DERable } from "index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Triplet } from "mods/resolvers/triplet.js";
@@ -57,8 +58,8 @@ export namespace Sequence {
       super(type, triplets)
     }
 
-    static from(asn1: Sequence) {
-      const triplets = asn1.triplets.map(it => it.toDER())
+    static from<T extends readonly Sequence.Inner[] = readonly Sequence.Inner[]>(asn1: Sequence<T>) {
+      const triplets = asn1.triplets.map(it => it.toDER()) as DERable.AllFrom<T>
       const size = triplets.reduce((p, c) => p + c.sizeOrThrow(), 0)
       const length = new Length(size).toDER()
 
