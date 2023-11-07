@@ -21,6 +21,14 @@ export class DERCursor<T extends DERHolder> {
     return new DERCursor(inner)
   }
 
+  static castAndFromOrThrow<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): DERCursor<T> {
+    if (holder instanceof clazz)
+      if (type === undefined || holder.type.equals(type))
+        return new DERCursor(holder)
+
+    throw new ASN1CastError(holder, [clazz])
+  }
+
   static tryCastAndFrom<T extends DERHolder>(holder: DERTriplet, clazz: Class<T>, type?: Type.DER): Result<DERCursor<T>, ASN1CastError> {
     if (holder instanceof clazz)
       if (type === undefined || holder.type.equals(type))
