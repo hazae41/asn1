@@ -84,7 +84,9 @@ export namespace UTCTime {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = cursor.readOrThrow(length.value)
+      const content = cursor.readOrThrow(length.value)
+
+      const bytes = new Uint8Array(content)
       const text = Bytes.toUtf8(bytes)
 
       if (text.length !== 13)
