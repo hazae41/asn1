@@ -25,8 +25,8 @@ export class Set<T extends readonly Set.Inner[] = readonly Set.Inner[]> {
     readonly triplets: T
   ) { }
 
-  static create<T extends readonly Triplet[]>(triplets: T): Set<T> {
-    return new Set(this.type, triplets)
+  static create<T extends readonly Triplet[]>(type = this.type, triplets: T): Set<T> {
+    return new Set(type, triplets)
   }
 
   toDER() {

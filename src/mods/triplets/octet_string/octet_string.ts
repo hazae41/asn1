@@ -16,8 +16,8 @@ export class OctetString {
     readonly bytes: Uint8Array
   ) { }
 
-  static create(bytes: Uint8Array) {
-    return new OctetString(this.type, bytes)
+  static create(type = this.type, bytes: Uint8Array) {
+    return new OctetString(type, bytes)
   }
 
   toDER() {

@@ -15,8 +15,8 @@ export class Null {
     readonly type: Type
   ) { }
 
-  static create() {
-    return new Null(this.type)
+  static create(type = this.type) {
+    return new Null(type)
   }
 
   toDER() {

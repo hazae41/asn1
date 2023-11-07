@@ -16,8 +16,8 @@ export class IA5String {
     readonly value: string
   ) { }
 
-  static create(value: string) {
-    return new IA5String(this.type, value)
+  static create(type = this.type, value: string) {
+    return new IA5String(type, value)
   }
 
   toDER() {

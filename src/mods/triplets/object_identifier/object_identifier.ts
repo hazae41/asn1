@@ -56,8 +56,8 @@ export class ObjectIdentifier<T extends string = string>  {
     readonly value: OID<T>
   ) { }
 
-  static create<T extends string>(value: OID<T>) {
-    return new ObjectIdentifier(this.type, value)
+  static create<T extends string>(type = this.type, value: OID<T>) {
+    return new ObjectIdentifier(type, value)
   }
 
   toDER() {

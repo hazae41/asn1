@@ -16,8 +16,8 @@ export class UTF8String {
     readonly value: string
   ) { }
 
-  static create(value: string) {
-    return new UTF8String(this.type, value)
+  static create(type = this.type, value: string) {
+    return new UTF8String(type, value)
   }
 
   toDER() {

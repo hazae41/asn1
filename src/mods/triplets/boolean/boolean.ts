@@ -16,8 +16,8 @@ export class Boolean {
     readonly value: number
   ) { }
 
-  static create(value: number) {
-    return new Boolean(this.type, value)
+  static create(type = this.type, value: number) {
+    return new Boolean(type, value)
   }
 
   toDER() {

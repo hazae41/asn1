@@ -21,8 +21,8 @@ export class UTCTime {
     readonly value: Date,
   ) { }
 
-  static create(value: Date) {
-    return new UTCTime(this.type, value)
+  static create(type = this.type, value: Date) {
+    return new UTCTime(type, value)
   }
 
   toDER() {

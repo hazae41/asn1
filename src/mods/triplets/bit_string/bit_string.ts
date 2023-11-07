@@ -17,8 +17,8 @@ export class BitString {
     readonly bytes: Uint8Array,
   ) { }
 
-  static create(padding: number, bytes: Uint8Array) {
-    return new BitString(this.type, padding, bytes)
+  static create(type = this.type, padding: number, bytes: Uint8Array) {
+    return new BitString(type, padding, bytes)
   }
 
   toDER() {

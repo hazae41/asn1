@@ -25,8 +25,8 @@ export class Sequence<T extends readonly Sequence.Inner[] = readonly Sequence.In
     readonly triplets: T
   ) { }
 
-  static create<T extends readonly Triplet[]>(triplets: T) {
-    return new Sequence(this.type, triplets)
+  static create<T extends readonly Triplet[]>(type = this.type, triplets: T) {
+    return new Sequence(type, triplets)
   }
 
   toDER() {

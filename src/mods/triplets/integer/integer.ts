@@ -18,8 +18,8 @@ export class Integer {
     readonly value: bigint
   ) { }
 
-  static create(value: bigint) {
-    return new Integer(this.type, value)
+  static create(type = this.type, value: bigint) {
+    return new Integer(type, value)
   }
 
   toDER() {

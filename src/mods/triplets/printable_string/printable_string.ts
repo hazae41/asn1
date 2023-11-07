@@ -18,26 +18,22 @@ export class PrintableString {
     readonly value: string,
   ) { }
 
-  static newOrThrow(type: Type, value: string) {
+  static createWithoutCheck(type = this.type, value: string) {
+    return new PrintableString(type, value)
+  }
+
+  static createOrThrow(type = this.type, value: string) {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       throw new InvalidValueError(`PrintableString`, value)
 
     return new PrintableString(type, value)
   }
 
-  static tryNew(type: Type, value: string): Result<PrintableString, InvalidValueError> {
+  static tryCreate(type = this.type, value: string): Result<PrintableString, InvalidValueError> {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       return new Err(new InvalidValueError(`PrintableString`, value))
 
     return new Ok(new PrintableString(type, value))
-  }
-
-  static createOrThrow(value: string) {
-    return this.newOrThrow(this.type, value)
-  }
-
-  static tryCreate(value: string): Result<PrintableString, InvalidValueError> {
-    return this.tryNew(this.type, value)
   }
 
   toDER() {
