@@ -8,7 +8,7 @@ import { Type } from "mods/type/type.js";
 
 export class PrintableString {
 
-  static readonly type = Type.from(
+  static readonly type = Type.create(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.PRINTABLE_STRING)
@@ -22,7 +22,7 @@ export class PrintableString {
     if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
       throw new InvalidValueError(`PrintableString`, value)
 
-    return new Ok(new PrintableString(type, value))
+    return new PrintableString(type, value)
   }
 
   static tryNew(type: Type, value: string): Result<PrintableString, InvalidValueError> {

@@ -6,7 +6,7 @@ import { Type } from "mods/type/type.js";
 
 export class UTF8String {
 
-  static readonly type = Type.from(
+  static readonly type = Type.create(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.UTF8_STRING)

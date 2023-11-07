@@ -6,7 +6,7 @@ import { Type } from "mods/type/type.js";
 
 export class BitString {
 
-  static readonly type = Type.from(
+  static readonly type = Type.create(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.BIT_STRING)
@@ -51,6 +51,7 @@ export namespace BitString {
 
     static from(asn1: BitString) {
       const length = new Length(asn1.bytes.length + 1).toDER()
+
       return new DER(asn1.type.toDER(), length, asn1.padding, asn1.bytes)
     }
 

@@ -6,7 +6,7 @@ import { Type } from "mods/type/type.js";
 
 export class OctetString {
 
-  static readonly type = Type.from(
+  static readonly type = Type.create(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
     Type.tags.OCTET_STRING)
@@ -46,6 +46,7 @@ export namespace OctetString {
 
     static from(asn1: OctetString) {
       const length = new Length(asn1.bytes.length).toDER()
+
       return new DER(asn1.type.toDER(), length, asn1.bytes)
     }
 

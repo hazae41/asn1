@@ -31,27 +31,17 @@ export class Type {
   } as const
 
   constructor(
-    readonly byte: number,
     readonly clazz: number,
     readonly wrap: number,
     readonly tag: number
   ) { }
 
-  static from(clazz: number, wrap: number, tag: number) {
-    let byte = 0
-    byte |= clazz << 6
-    byte |= wrap << 5
-    byte |= tag
-
-    return new Type(byte, clazz, wrap, tag)
-  }
-
-  equals(other: Type) {
-    return this.byte === other.byte
+  static create(clazz: number, wrap: number, tag: number) {
+    return new Type(clazz, wrap, tag)
   }
 
   toDER() {
-    return new Type.DER(this.byte, this.clazz, this.wrap, this.tag)
+    return Type.DER.from(this)
   }
 
 }
@@ -59,6 +49,7 @@ export class Type {
 export namespace Type {
 
   export class DER extends Type {
+
     static readonly size = 1
 
     constructor(
@@ -67,7 +58,16 @@ export namespace Type {
       readonly wrap: number,
       readonly tag: number
     ) {
-      super(byte, clazz, wrap, tag)
+      super(clazz, wrap, tag)
+    }
+
+    static from(type: Type) {
+      let byte = 0
+      byte |= type.clazz << 6
+      byte |= type.wrap << 5
+      byte |= type.tag
+
+      return new DER(byte, type.clazz, type.wrap, type.tag)
     }
 
     sizeOrThrow() {

@@ -8,18 +8,7 @@ export class VLQ {
   ) { }
 
   toDER() {
-    let value = this.value
-
-    const values = new Array<number>()
-
-    do {
-      values.push(value % 128)
-      value = Math.floor(value / 128)
-    } while (value)
-
-    values.reverse()
-
-    return new VLQ.DER(this.value, values)
+    return VLQ.DER.from(this)
   }
 
 }
@@ -33,6 +22,21 @@ export namespace VLQ {
       readonly values: Array<number>
     ) {
       super(value)
+    }
+
+    static from(vlq: VLQ) {
+      let value = vlq.value
+
+      const values = new Array<number>()
+
+      do {
+        values.push(value % 128)
+        value = Math.floor(value / 128)
+      } while (value)
+
+      values.reverse()
+
+      return new DER(vlq.value, values)
     }
 
     sizeOrThrow() {

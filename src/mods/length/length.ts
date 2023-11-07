@@ -7,21 +7,7 @@ export class Length {
   ) { }
 
   toDER(): Length.DER {
-    if (this.value < 128)
-      return new Length.DER.Short(this.value)
-
-    let floor = this.value
-
-    const values = new Array<number>()
-
-    do {
-      values.push(floor % 256)
-      floor = Math.floor(floor / 256)
-    } while (floor)
-
-    values.reverse()
-
-    return new Length.DER.Long(this.value, values)
+    return Length.DER.from(this)
   }
 
 }
@@ -33,6 +19,24 @@ export namespace Length {
     | DER.Long
 
   export namespace DER {
+
+    export function from(length: Length) {
+      if (length.value < 128)
+        return new Short(length.value)
+
+      let floor = length.value
+
+      const values = new Array<number>()
+
+      do {
+        values.push(floor % 256)
+        floor = Math.floor(floor / 256)
+      } while (floor)
+
+      values.reverse()
+
+      return new Long(length.value, values)
+    }
 
     export function readOrThrow(cursor: Cursor) {
       const first = cursor.readUint8OrThrow()
