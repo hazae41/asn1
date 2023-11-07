@@ -3,7 +3,7 @@ import { Writable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
 import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
-import { DER } from "mods/resolvers/der/der.js";
+import { DER } from "mods/resolvers/der/index.js";
 import { relative, resolve } from "node:path";
 import { Constructed } from "./constructed.js";
 

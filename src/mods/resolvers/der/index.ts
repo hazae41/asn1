@@ -1,3 +1,5 @@
+export * from "./triplet.js";
+
 import { Cursor } from "@hazae41/cursor";
 import { Opaque } from "mods/triplets/opaque/opaque.js";
 

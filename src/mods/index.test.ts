@@ -9,7 +9,7 @@ import { assert, test } from "@hazae41/phobos";
 import { Result } from "@hazae41/result";
 import { readFile } from "fs/promises";
 import { relative, resolve } from "node:path";
-import { DER } from "./resolvers/der/der.js";
+import { DER } from "./resolvers/der/index.js";
 
 export namespace PEM {
   export const header = `-----BEGIN CERTIFICATE-----`
