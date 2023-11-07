@@ -1,7 +1,6 @@
 import { Class } from "libs/reflection/reflection.js"
 import { DERTriplet } from "mods/resolvers/der/triplet.js"
 import { Type } from "mods/type/type.js"
-import { CastError, ReadError } from "./errors.js"
 
 export interface DERHolder extends DERTriplet {
   readonly triplets: DERTriplet[]
@@ -31,7 +30,7 @@ export class DERCursor {
     const triplet = this.get()
 
     if (triplet == null)
-      throw new ReadError()
+      throw new DERCursor.ReadError()
 
     return triplet
   }
@@ -62,7 +61,7 @@ export class DERCursor {
     const triplet = this.read()
 
     if (triplet == null)
-      throw new ReadError()
+      throw new DERCursor.ReadError()
 
     return triplet
   }
@@ -87,20 +86,20 @@ export class DERCursor {
       if (triplet instanceof clazz)
         return triplet as T
 
-    throw new CastError()
+    throw new DERCursor.CastError()
   }
 
   readAsTypeOrThrow<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T {
     const triplet = this.readOrThrow()
 
     if (!triplet.type.equals(type))
-      throw new CastError()
+      throw new DERCursor.CastError()
 
     for (const clazz of clazzes)
       if (triplet instanceof clazz)
         return triplet as T
 
-    throw new CastError()
+    throw new DERCursor.CastError()
   }
 
   subAsOrThrow<T extends DERHolder>(clazz: Class<T>): DERCursor {
@@ -109,6 +108,34 @@ export class DERCursor {
 
   subAsTypeOrThrow<T extends DERHolder>(type: Type.DER, clazz: Class<T>): DERCursor {
     return new DERCursor(this.readAsTypeOrThrow(type, clazz).triplets)
+  }
+
+}
+
+export namespace DERCursor {
+
+  export type AnyError =
+    | CastError
+    | ReadError
+
+  export class CastError extends Error {
+    readonly #class = CastError
+    readonly name = this.#class.name
+
+    constructor() {
+      super(`Could not cast triplet`)
+    }
+
+  }
+
+  export class ReadError extends Error {
+    readonly #class = ReadError
+    readonly name = this.#class.name
+
+    constructor() {
+      super(`Could not read triplet`)
+    }
+
   }
 
 }
