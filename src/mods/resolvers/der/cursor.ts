@@ -48,8 +48,42 @@ export class DERCursor {
     return undefined
   }
 
+  getAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T | undefined {
+    const triplet = this.get()
+
+    if (triplet == null)
+      return undefined
+
+    if (!triplet.type.equals(type))
+      return undefined
+
+    for (const clazz of clazzes)
+      if (triplet instanceof clazz)
+        return triplet as T
+
+    return undefined
+  }
+
   read() {
     const triplet = this.get()
+
+    if (triplet != null)
+      this.offset++
+
+    return triplet
+  }
+
+  readAs<T extends DERTriplet>(...clazzes: Class<T>[]): T | undefined {
+    const triplet = this.getAs(...clazzes)
+
+    if (triplet != null)
+      this.offset++
+
+    return triplet
+  }
+
+  readAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T | undefined {
+    const triplet = this.getAsType(type, ...clazzes)
 
     if (triplet != null)
       this.offset++
@@ -66,56 +100,22 @@ export class DERCursor {
     return triplet
   }
 
-  readAs<T extends DERTriplet>(...clazzes: Class<T>[]): T | undefined {
-    const triplet = this.read()
-
-    if (triplet == null)
-      return undefined
-
-    for (const clazz of clazzes)
-      if (triplet instanceof clazz)
-        return triplet as T
-
-    return undefined
-  }
-
-  readAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T | undefined {
-    const triplet = this.read()
-
-    if (triplet == null)
-      return undefined
-
-    if (!triplet.type.equals(type))
-      throw new DERCursor.CastError()
-
-    for (const clazz of clazzes)
-      if (triplet instanceof clazz)
-        return triplet as T
-
-    return undefined
-  }
-
   readAsOrThrow<T extends DERTriplet>(...clazzes: Class<T>[]): T {
-    const triplet = this.readOrThrow()
+    const triplet = this.readAs(...clazzes)
 
-    for (const clazz of clazzes)
-      if (triplet instanceof clazz)
-        return triplet as T
+    if (triplet == null)
+      throw new DERCursor.ReadError()
 
-    throw new DERCursor.CastError()
+    return triplet
   }
 
   readAsTypeOrThrow<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T {
-    const triplet = this.readOrThrow()
+    const triplet = this.readAsType(type, ...clazzes)
 
-    if (!triplet.type.equals(type))
-      throw new DERCursor.CastError()
+    if (triplet == null)
+      throw new DERCursor.ReadError()
 
-    for (const clazz of clazzes)
-      if (triplet instanceof clazz)
-        return triplet as T
-
-    throw new DERCursor.CastError()
+    return triplet
   }
 
   subAs<T extends DERHolder>(clazz: Class<T>): DERCursor | undefined {
