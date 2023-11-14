@@ -102,6 +102,15 @@ export class DERCursor {
     throw new DERCursor.CastError()
   }
 
+  subAs<T extends DERHolder>(clazz: Class<T>): DERCursor | undefined {
+    const triplet = this.readAs(clazz)
+
+    if (triplet == null)
+      return undefined
+
+    return new DERCursor(triplet.triplets)
+  }
+
   subAsOrThrow<T extends DERHolder>(clazz: Class<T>): DERCursor {
     return new DERCursor(this.readAsOrThrow(clazz).triplets)
   }
