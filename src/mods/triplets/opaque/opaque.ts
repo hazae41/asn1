@@ -44,6 +44,10 @@ export class Opaque {
     return `OPAQUE ${Base16.get().tryEncode(this.bytes).unwrap()}`
   }
 
+  readIntoOrNull<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> | undefined {
+    return Readable.readFromBytesOrNull(readable, this.bytes)
+  }
+
   readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
     return Readable.readFromBytesOrThrow(readable, this.bytes)
   }

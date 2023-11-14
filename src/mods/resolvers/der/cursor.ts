@@ -1,6 +1,7 @@
-import { Opaque, Readable } from "@hazae41/binary"
+import { Readable } from "@hazae41/binary"
 import { Class } from "libs/reflection/reflection.js"
 import { DERTriplet } from "mods/resolvers/der/triplet.js"
+import { Opaque } from "mods/triplets/opaque/opaque.js"
 import { Type } from "mods/type/type.js"
 
 export interface DERHolder extends DERTriplet {
@@ -47,10 +48,15 @@ export class DERCursor {
     for (const clazz of clazzes) {
       if (triplet instanceof clazz)
         return triplet as T
-      if (triplet instanceof Opaque)
-        return triplet.readIntoOrThrow(clazz)
-    }
 
+      if (triplet instanceof Opaque) {
+        const resolved = triplet.readIntoOrNull(clazz)
+
+        if (resolved != null)
+          return resolved
+        continue
+      }
+    }
 
     return undefined
   }
@@ -67,8 +73,14 @@ export class DERCursor {
     for (const clazz of clazzes) {
       if (triplet instanceof clazz)
         return triplet as T
-      if (triplet instanceof Opaque)
-        return triplet.readIntoOrThrow(clazz)
+
+      if (triplet instanceof Opaque) {
+        const resolved = triplet.readIntoOrNull(clazz)
+
+        if (resolved != null)
+          return resolved
+        continue
+      }
     }
 
     return undefined
