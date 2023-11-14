@@ -49,29 +49,27 @@ export class DERCursor {
     return triplet
   }
 
-  getAs<T extends DERTriplet>(...clazzes: DERFactory<T>[]): Nullable<T> {
+  getAs<T extends DERTriplet>(clazz: DERFactory<T>): Nullable<T> {
     const triplet = this.get()
 
     if (triplet == null)
       return undefined
 
-    for (const clazz of clazzes) {
-      if (triplet instanceof clazz)
-        return triplet as T
+    if (triplet instanceof clazz)
+      return triplet as T
 
-      if (triplet instanceof Opaque) {
-        const resolved = triplet.readIntoOrNull(clazz)
+    if (triplet instanceof Opaque) {
+      const resolved = triplet.readIntoOrNull(clazz)
 
-        if (resolved != null)
-          return resolved
-        continue
-      }
+      if (resolved != null)
+        return resolved
+      return undefined
     }
 
     return undefined
   }
 
-  getAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): Nullable<T> {
+  getAsType<T extends DERTriplet>(type: Type.DER, clazz: DERFactory<T>): Nullable<T> {
     const triplet = this.get()
 
     if (triplet == null)
@@ -80,17 +78,15 @@ export class DERCursor {
     if (!triplet.type.equals(type))
       return undefined
 
-    for (const clazz of clazzes) {
-      if (triplet instanceof clazz)
-        return triplet as T
+    if (triplet instanceof clazz)
+      return triplet as T
 
-      if (triplet instanceof Opaque) {
-        const resolved = triplet.readIntoOrNull(clazz)
+    if (triplet instanceof Opaque) {
+      const resolved = triplet.readIntoOrNull(clazz)
 
-        if (resolved != null)
-          return resolved
-        continue
-      }
+      if (resolved != null)
+        return resolved
+      return undefined
     }
 
     return undefined
@@ -105,8 +101,8 @@ export class DERCursor {
     return triplet
   }
 
-  readAs<T extends DERTriplet>(...clazzes: DERFactory<T>[]): Nullable<T> {
-    const triplet = this.getAs(...clazzes)
+  readAs<T extends DERTriplet>(clazz: DERFactory<T>): Nullable<T> {
+    const triplet = this.getAs(clazz)
 
     if (triplet != null)
       this.offset++
@@ -114,8 +110,8 @@ export class DERCursor {
     return triplet
   }
 
-  readAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): Nullable<T> {
-    const triplet = this.getAsType(type, ...clazzes)
+  readAsType<T extends DERTriplet>(type: Type.DER, clazz: DERFactory<T>): Nullable<T> {
+    const triplet = this.getAsType(type, clazz)
 
     if (triplet != null)
       this.offset++
@@ -132,8 +128,8 @@ export class DERCursor {
     return triplet
   }
 
-  readAsOrThrow<T extends DERTriplet>(...clazzes: DERFactory<T>[]): T {
-    const triplet = this.readAs(...clazzes)
+  readAsOrThrow<T extends DERTriplet>(clazz: DERFactory<T>): T {
+    const triplet = this.readAs(clazz)
 
     if (triplet == null)
       throw new DERCursor.ReadError()
@@ -141,8 +137,8 @@ export class DERCursor {
     return triplet
   }
 
-  readAsTypeOrThrow<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): T {
-    const triplet = this.readAsType(type, ...clazzes)
+  readAsTypeOrThrow<T extends DERTriplet>(type: Type.DER, clazzes: DERFactory<T>): T {
+    const triplet = this.readAsType(type, clazzes)
 
     if (triplet == null)
       throw new DERCursor.ReadError()
@@ -159,8 +155,8 @@ export class DERCursor {
     return new DERCursor(triplet.triplets)
   }
 
-  subAsType<T extends DERHolder>(type: Type.DER, ...clazzes: DERFactory<T>[]): Nullable<DERCursor> {
-    const triplet = this.readAsType(type, ...clazzes)
+  subAsType<T extends DERHolder>(type: Type.DER, clazz: DERFactory<T>): Nullable<DERCursor> {
+    const triplet = this.readAsType(type, clazz)
 
     if (triplet == null)
       return undefined
@@ -168,12 +164,12 @@ export class DERCursor {
     return new DERCursor(triplet.triplets)
   }
 
-  subAsOrThrow<T extends DERHolder>(...clazzes: DERFactory<T>[]): DERCursor {
-    return new DERCursor(this.readAsOrThrow(...clazzes).triplets)
+  subAsOrThrow<T extends DERHolder>(clazz: DERFactory<T>): DERCursor {
+    return new DERCursor(this.readAsOrThrow(clazz).triplets)
   }
 
-  subAsTypeOrThrow<T extends DERHolder>(type: Type.DER, ...clazzes: DERFactory<T>[]): DERCursor {
-    return new DERCursor(this.readAsTypeOrThrow(type, ...clazzes).triplets)
+  subAsTypeOrThrow<T extends DERHolder>(type: Type.DER, clazz: DERFactory<T>): DERCursor {
+    return new DERCursor(this.readAsTypeOrThrow(type, clazz).triplets)
   }
 
   resolveAsOrThrow<T>(resolvable: DERResolvable<T>): T {
