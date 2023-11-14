@@ -9,7 +9,6 @@ import { Integer } from "mods/triplets/integer/integer.js";
 import { Set } from "mods/triplets/set/set.js";
 import { Type } from "mods/type/type.js";
 import { BitString } from "../bit_string/bit_string.js";
-import { Constructed } from "../constructed/constructed.js";
 import { IA5String } from "../ia5_string/ia5_string.js";
 import { Null } from "../null/null.js";
 import { ObjectIdentifier } from "../object_identifier/object_identifier.js";
@@ -98,9 +97,6 @@ export namespace Opaque {
         return this.readIntoOrThrow(IA5String.DER)
       if (this.type.equals(UTCTime.DER.type))
         return this.readIntoOrThrow(UTCTime.DER)
-
-      if (this.type.wrap === Type.wraps.CONSTRUCTED)
-        return this.readIntoOrThrow(Constructed.DER).resolveOrThrow()
 
       return this
     }
