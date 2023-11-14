@@ -40,6 +40,10 @@ export class Type {
     return new Type(clazz, wrap, tag)
   }
 
+  retag(tag: number) {
+    return new Type(this.clazz, this.wrap, tag)
+  }
+
   toDER() {
     return Type.DER.from(this)
   }
@@ -72,6 +76,10 @@ export namespace Type {
 
     equals(other: DER) {
       return this.byte === other.byte
+    }
+
+    retag(tag: number) {
+      return super.retag(tag).toDER()
     }
 
     sizeOrThrow() {
