@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@hazae41/asn1",
-  "version": "1.3.12",
+  "version": "1.3.13",
   "description": "Zero-copy ASN.1 <=> DER encoding for the web",
   "homepage": "https://github.com/hazae41/asn1",
   "repository": "github:hazae41/asn1",
