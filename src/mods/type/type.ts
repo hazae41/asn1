@@ -40,16 +40,28 @@ export class Type {
     return new Type(clazz, wrap, tag)
   }
 
-  context(tag: number) {
-    return new Type(Type.clazzes.CONTEXT, this.wrap, tag)
+  static context(constructed: boolean, tag: number) {
+    const wrap = constructed
+      ? Type.wraps.CONSTRUCTED
+      : Type.wraps.PRIMITIVE
+
+    return new Type(Type.clazzes.CONTEXT, wrap, tag)
   }
 
-  application(tag: number) {
-    return new Type(Type.clazzes.APPLICATION, this.wrap, tag)
+  static application(constructed: boolean, tag: number) {
+    const wrap = constructed
+      ? Type.wraps.CONSTRUCTED
+      : Type.wraps.PRIMITIVE
+
+    return new Type(Type.clazzes.APPLICATION, wrap, tag)
   }
 
-  private(tag: number) {
-    return new Type(Type.clazzes.PRIVATE, this.wrap, tag)
+  static private(constructed: boolean, tag: number) {
+    const wrap = constructed
+      ? Type.wraps.CONSTRUCTED
+      : Type.wraps.PRIMITIVE
+
+    return new Type(Type.clazzes.PRIVATE, wrap, tag)
   }
 
   toDER() {
@@ -86,16 +98,16 @@ export namespace Type {
       return this.byte === other.byte
     }
 
-    context(tag: number) {
-      return super.context(tag).toDER()
+    static context(constructed: boolean, tag: number) {
+      return super.context(constructed, tag).toDER()
     }
 
-    application(tag: number) {
-      return super.application(tag).toDER()
+    static application(constructed: boolean, tag: number) {
+      return super.application(constructed, tag).toDER()
     }
 
-    private(tag: number) {
-      return super.private(tag).toDER()
+    static private(constructed: boolean, tag: number) {
+      return super.private(constructed, tag).toDER()
     }
 
     sizeOrThrow() {
