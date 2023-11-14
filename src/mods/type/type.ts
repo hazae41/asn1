@@ -40,8 +40,16 @@ export class Type {
     return new Type(clazz, wrap, tag)
   }
 
-  retag(tag: number) {
-    return new Type(this.clazz, this.wrap, tag)
+  context(tag: number) {
+    return new Type(Type.clazzes.CONTEXT, this.wrap, tag)
+  }
+
+  application(tag: number) {
+    return new Type(Type.clazzes.APPLICATION, this.wrap, tag)
+  }
+
+  private(tag: number) {
+    return new Type(Type.clazzes.PRIVATE, this.wrap, tag)
   }
 
   toDER() {
@@ -78,8 +86,16 @@ export namespace Type {
       return this.byte === other.byte
     }
 
-    retag(tag: number) {
-      return super.retag(tag).toDER()
+    context(tag: number) {
+      return super.context(tag).toDER()
+    }
+
+    application(tag: number) {
+      return super.application(tag).toDER()
+    }
+
+    private(tag: number) {
+      return super.private(tag).toDER()
     }
 
     sizeOrThrow() {
