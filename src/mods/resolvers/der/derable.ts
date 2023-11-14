@@ -1,4 +1,6 @@
-export interface DERable<T> {
+import { DERTriplet } from "./triplet.js"
+
+export interface DERable<T extends DERTriplet = DERTriplet> {
   toDER(): T
 }
 
