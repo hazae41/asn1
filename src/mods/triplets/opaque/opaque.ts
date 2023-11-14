@@ -119,8 +119,7 @@ export namespace Opaque {
 
       cursor.offset = start
 
-      const content = cursor.readOrThrow(end - start + length.value)
-      const bytes = new Uint8Array(content)
+      const bytes = cursor.readAndCopyOrThrow(end - start + length.value)
 
       return new DER(type, bytes)
     }

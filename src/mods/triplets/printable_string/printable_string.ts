@@ -83,8 +83,7 @@ export namespace PrintableString {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const content = cursor.readOrThrow(length.value)
-      const bytes = new Uint8Array(content)
+      const bytes = cursor.readAndCopyOrThrow(length.value)
       const value = Bytes.toUtf8(bytes)
 
       if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))

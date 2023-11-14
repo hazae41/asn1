@@ -66,9 +66,7 @@ export namespace UTF8String {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const content = cursor.readOrThrow(length.value)
-
-      const bytes = new Uint8Array(content)
+      const bytes = cursor.readAndCopyOrThrow(length.value)
       const value = Bytes.toUtf8(bytes)
 
       return new DER(type, length, value, bytes)

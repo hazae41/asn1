@@ -71,12 +71,10 @@ export namespace BitString {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const content = cursor.readOrThrow(length.value)
-      const subcursor = new Cursor(content)
+      const subcursor = new Cursor(cursor.readOrThrow(length.value))
 
       const padding = subcursor.readUint8OrThrow()
-      const string = subcursor.readOrThrow(subcursor.remaining)
-      const bytes = new Uint8Array(string)
+      const bytes = subcursor.readAndCopyOrThrow(subcursor.remaining)
 
       return new DER(type, length, padding, bytes)
     }

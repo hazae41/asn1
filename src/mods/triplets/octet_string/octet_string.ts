@@ -65,8 +65,7 @@ export namespace OctetString {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const content = cursor.readOrThrow(length.value)
-      const bytes = new Uint8Array(content)
+      const bytes = cursor.readAndCopyOrThrow(length.value)
 
       return new DER(type, length, bytes)
     }
