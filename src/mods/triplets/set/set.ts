@@ -60,7 +60,7 @@ export namespace Set {
     }
 
     static from<T extends readonly Set.Inner[] = readonly Set.Inner[]>(asn1: Set<T>) {
-      const triplets = asn1.triplets.map(it => it?.toDER()) as DERable.AllFrom<T>
+      const triplets = asn1.triplets.map(it => it?.toDER()) as DERable.AllFromOrSelf<T>
       const size = triplets.reduce((p, c) => p + (c == null ? 0 : c.sizeOrThrow()), 0)
       const length = new Length(size).toDER()
 

@@ -12,4 +12,10 @@ export namespace DERable {
     readonly [Index in keyof T]: From<T[Index]>
   }
 
+  export type FromOrSelf<T> = T extends DERable<infer U> ? U : T
+
+  export type AllFromOrSelf<T extends readonly unknown[]> = {
+    readonly [Index in keyof T]: FromOrSelf<T[Index]>
+  }
+
 }

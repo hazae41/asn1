@@ -54,7 +54,7 @@ export namespace Constructed {
     }
 
     static from<T extends readonly Constructed.Inner[] = readonly Constructed.Inner[]>(asn1: Constructed<T>) {
-      const triplets = asn1.triplets.map(it => it?.toDER()) as DERable.AllFrom<T>
+      const triplets = asn1.triplets.map(it => it?.toDER()) as DERable.AllFromOrSelf<T>
       const size = triplets.reduce((p, c) => p + (c == null ? 0 : c.sizeOrThrow()), 0)
       const length = new Length(size).toDER()
 

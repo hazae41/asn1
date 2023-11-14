@@ -60,7 +60,7 @@ export namespace Sequence {
     }
 
     static from<T extends readonly Sequence.Inner[] = readonly Sequence.Inner[]>(asn1: Sequence<T>) {
-      const triplets = asn1.triplets.map(x => x?.toDER()) as DERable.AllFrom<T>
+      const triplets = asn1.triplets.map(x => x?.toDER()) as DERable.AllFromOrSelf<T>
       const size = triplets.reduce((p, c) => p + (c == null ? 0 : c.sizeOrThrow()), 0)
       const length = new Length(size).toDER()
 

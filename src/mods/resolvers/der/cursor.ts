@@ -18,6 +18,10 @@ export class DERCursor {
     readonly triplets: DERTriplet[]
   ) { }
 
+  get remaining() {
+    return this.triplets.length - this.offset
+  }
+
   get before() {
     return this.triplets.slice(0, this.offset)
   }
