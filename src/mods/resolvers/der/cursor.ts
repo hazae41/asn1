@@ -1,4 +1,5 @@
 import { Readable } from "@hazae41/binary"
+import { Nullable } from "@hazae41/option"
 import { Class } from "libs/reflection/reflection.js"
 import { DERTriplet } from "mods/resolvers/der/triplet.js"
 import { Opaque } from "mods/triplets/opaque/opaque.js"
@@ -9,6 +10,11 @@ export interface DERHolder extends DERTriplet {
 }
 
 export type DERFactory<T extends DERTriplet> = Class<T> & Readable<T>
+
+export interface DERResolvable<T> {
+  readonly struct: DERFactory<DERHolder>
+  resolveOrThrow(cursor: DERCursor): T
+}
 
 export class DERCursor {
 
@@ -43,7 +49,7 @@ export class DERCursor {
     return triplet
   }
 
-  getAs<T extends DERTriplet>(...clazzes: DERFactory<T>[]): T | undefined {
+  getAs<T extends DERTriplet>(...clazzes: DERFactory<T>[]): Nullable<T> {
     const triplet = this.get()
 
     if (triplet == null)
@@ -65,7 +71,7 @@ export class DERCursor {
     return undefined
   }
 
-  getAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): T | undefined {
+  getAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): Nullable<T> {
     const triplet = this.get()
 
     if (triplet == null)
@@ -99,7 +105,7 @@ export class DERCursor {
     return triplet
   }
 
-  readAs<T extends DERTriplet>(...clazzes: DERFactory<T>[]): T | undefined {
+  readAs<T extends DERTriplet>(...clazzes: DERFactory<T>[]): Nullable<T> {
     const triplet = this.getAs(...clazzes)
 
     if (triplet != null)
@@ -108,7 +114,7 @@ export class DERCursor {
     return triplet
   }
 
-  readAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): T | undefined {
+  readAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: DERFactory<T>[]): Nullable<T> {
     const triplet = this.getAsType(type, ...clazzes)
 
     if (triplet != null)
@@ -144,7 +150,7 @@ export class DERCursor {
     return triplet
   }
 
-  subAs<T extends DERHolder>(clazz: DERFactory<T>): DERCursor | undefined {
+  subAs<T extends DERHolder>(clazz: DERFactory<T>): Nullable<DERCursor> {
     const triplet = this.readAs(clazz)
 
     if (triplet == null)
@@ -153,7 +159,7 @@ export class DERCursor {
     return new DERCursor(triplet.triplets)
   }
 
-  subAsType<T extends DERHolder>(type: Type.DER, ...clazzes: DERFactory<T>[]): DERCursor | undefined {
+  subAsType<T extends DERHolder>(type: Type.DER, ...clazzes: DERFactory<T>[]): Nullable<DERCursor> {
     const triplet = this.readAsType(type, ...clazzes)
 
     if (triplet == null)
@@ -168,6 +174,38 @@ export class DERCursor {
 
   subAsTypeOrThrow<T extends DERHolder>(type: Type.DER, ...clazzes: DERFactory<T>[]): DERCursor {
     return new DERCursor(this.readAsTypeOrThrow(type, ...clazzes).triplets)
+  }
+
+  resolveAsOrThrow<T>(resolvable: DERResolvable<T>): T {
+    const struct = this.readAsOrThrow(resolvable.struct)
+    const subcursor = new DERCursor(struct.triplets)
+    return resolvable.resolveOrThrow(subcursor)
+  }
+
+  resolveAsTypeOrThrow<T>(type: Type.DER, resolvable: DERResolvable<T>): T {
+    const struct = this.readAsTypeOrThrow(type, resolvable.struct)
+    const subcursor = new DERCursor(struct.triplets)
+    return resolvable.resolveOrThrow(subcursor)
+  }
+
+  resolveAs<T>(resolvable: DERResolvable<T>): Nullable<T> {
+    const struct = this.readAs(resolvable.struct)
+
+    if (struct == null)
+      return undefined
+
+    const subcursor = new DERCursor(struct.triplets)
+    return resolvable.resolveOrThrow(subcursor)
+  }
+
+  resolveAsType<T>(type: Type.DER, resolvable: DERResolvable<T>): Nullable<T> {
+    const struct = this.readAsType(type, resolvable.struct)
+
+    if (struct == null)
+      return undefined
+
+    const subcursor = new DERCursor(struct.triplets)
+    return resolvable.resolveOrThrow(subcursor)
   }
 
 }
