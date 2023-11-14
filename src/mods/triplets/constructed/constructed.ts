@@ -23,7 +23,7 @@ export class Constructed<T extends readonly Constructed.Inner[] = readonly Const
     readonly triplets: T
   ) { }
 
-  static create<T extends readonly Triplet[]>(type: Type, triplets: T) {
+  static create<T extends readonly Constructed.Inner[]>(type: Type, triplets: T) {
     return new Constructed(type, triplets)
   }
 
