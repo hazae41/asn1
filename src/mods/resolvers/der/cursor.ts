@@ -79,6 +79,22 @@ export class DERCursor {
     return undefined
   }
 
+  readAsType<T extends DERTriplet>(type: Type.DER, ...clazzes: Class<T>[]): T | undefined {
+    const triplet = this.read()
+
+    if (triplet == null)
+      return undefined
+
+    if (!triplet.type.equals(type))
+      throw new DERCursor.CastError()
+
+    for (const clazz of clazzes)
+      if (triplet instanceof clazz)
+        return triplet as T
+
+    return undefined
+  }
+
   readAsOrThrow<T extends DERTriplet>(...clazzes: Class<T>[]): T {
     const triplet = this.readOrThrow()
 
@@ -104,6 +120,15 @@ export class DERCursor {
 
   subAs<T extends DERHolder>(clazz: Class<T>): DERCursor | undefined {
     const triplet = this.readAs(clazz)
+
+    if (triplet == null)
+      return undefined
+
+    return new DERCursor(triplet.triplets)
+  }
+
+  subAsType<T extends DERHolder>(type: Type.DER, clazz: Class<T>): DERCursor | undefined {
+    const triplet = this.readAsType(type, clazz)
 
     if (triplet == null)
       return undefined
