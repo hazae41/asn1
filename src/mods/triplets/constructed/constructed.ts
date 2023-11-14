@@ -1,4 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
+import { Nullable } from "@hazae41/option";
 import { DERable } from "index.js";
 import { InvalidTypeError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
@@ -8,11 +9,11 @@ import { Opaque } from "mods/triplets/opaque/opaque.js";
 import { Type } from "mods/type/type.js";
 
 const stringify = (parent: Constructed) => `[${parent.type.tag}] {
-  ${parent.triplets.map(it => it.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
+  ${parent.triplets.map(it => it?.toString()).join(`\n`).replaceAll("\n", "\n" + "  ")}
 }`
 
 export namespace Constructed {
-  export type Inner = Triplet
+  export type Inner = Nullable<Triplet>
 }
 
 export class Constructed<T extends readonly Constructed.Inner[] = readonly Constructed.Inner[]> {
@@ -39,7 +40,7 @@ export class Constructed<T extends readonly Constructed.Inner[] = readonly Const
 export namespace Constructed {
 
   export namespace DER {
-    export type Inner = DERTriplet
+    export type Inner = Nullable<DERTriplet>
   }
 
   export class DER<T extends readonly DER.Inner[] = readonly DER.Inner[]> extends Constructed<T> {
@@ -53,8 +54,8 @@ export namespace Constructed {
     }
 
     static from<T extends readonly Constructed.Inner[] = readonly Constructed.Inner[]>(asn1: Constructed<T>) {
-      const triplets = asn1.triplets.map(it => it.toDER()) as DERable.AllFrom<T>
-      const size = triplets.reduce((p, c) => p + c.sizeOrThrow(), 0)
+      const triplets = asn1.triplets.map(it => it?.toDER()) as DERable.AllFrom<T>
+      const size = triplets.reduce((p, c) => p + (c == null ? 0 : c.sizeOrThrow()), 0)
       const length = new Length(size).toDER()
 
       return new Constructed.DER(asn1.type.toDER(), length, triplets)
@@ -75,7 +76,7 @@ export namespace Constructed {
       this.length.writeOrThrow(cursor)
 
       for (const triplet of this.triplets)
-        triplet.writeOrThrow(cursor)
+        triplet?.writeOrThrow(cursor)
 
       return
     }

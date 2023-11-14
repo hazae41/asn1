@@ -1,4 +1,3 @@
-import { Arrays } from "@hazae41/arrays";
 import { Cursor } from "@hazae41/cursor";
 
 export class VLQ {
@@ -55,7 +54,7 @@ export namespace VLQ {
         cursor.writeUint8OrThrow(byte)
       }
 
-      cursor.writeUint8OrThrow(Arrays.last(this.values)!)
+      cursor.writeUint8OrThrow(this.values[this.values.length - 1])
     }
 
     static readOrThrow(cursor: Cursor) {

@@ -1,4 +1,3 @@
-import { Arrays } from "@hazae41/arrays";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -59,7 +58,7 @@ export namespace Integer {
         divided /= bn256
       } while (divided)
 
-      if (Arrays.last(values)! > 127)
+      if (values[values.length - 1] > 127)
         values.push(0)
 
       values.reverse()
