@@ -1,6 +1,6 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result } from "@hazae41/result";
+import { Result } from "@hazae41/result";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -18,22 +18,21 @@ export class PrintableString {
     readonly value: string,
   ) { }
 
-  static createWithoutCheck(type = this.type, value: string) {
-    return new PrintableString(type, value)
+  static is(value: string) {
+    /**
+     * a-z, A-Z, ' () +,-.?:/= and SPACE
+     */
+    return /^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value)
   }
 
   static createOrThrow(type = this.type, value: string) {
-    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
+    if (!PrintableString.is(value))
       throw new InvalidValueError(`PrintableString`, value)
-
     return new PrintableString(type, value)
   }
 
-  static tryCreate(type = this.type, value: string): Result<PrintableString, InvalidValueError> {
-    if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
-      return new Err(new InvalidValueError(`PrintableString`, value))
-
-    return new Ok(new PrintableString(type, value))
+  static tryCreate(type = this.type, value: string): Result<PrintableString, Error> {
+    return Result.runAndDoubleWrapSync(() => this.createOrThrow(type, value))
   }
 
   toDER() {
@@ -86,7 +85,7 @@ export namespace PrintableString {
       const bytes = cursor.readAndCopyOrThrow(length.value)
       const value = Bytes.toUtf8(bytes)
 
-      if (!/^[a-zA-Z0-9'()+,\-.\/:=? ]+$/g.test(value))
+      if (!PrintableString.is(value))
         throw new InvalidValueError(`PrintableString`, value)
 
       return new DER(type, length, value, bytes)

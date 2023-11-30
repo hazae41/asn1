@@ -10,11 +10,13 @@ import { Set } from "mods/triplets/set/set.js";
 import { Type } from "mods/type/type.js";
 import { BitString } from "../bit_string/bit_string.js";
 import { IA5String } from "../ia5_string/ia5_string.js";
+import { GeneralizedTime } from "../index.js";
 import { Null } from "../null/null.js";
 import { ObjectIdentifier } from "../object_identifier/object_identifier.js";
 import { OctetString } from "../octet_string/octet_string.js";
 import { PrintableString } from "../printable_string/printable_string.js";
 import { Sequence } from "../sequence/sequence.js";
+import { TeletexString } from "../teletex_string/teletex_string.js";
 import { UTCTime } from "../utc_time/utc_time.js";
 import { UTF8String } from "../utf8_string/utf8_string.js";
 
@@ -89,14 +91,18 @@ export namespace Opaque {
         return this.readIntoOrThrow(UTF8String.DER.DER)
       if (this.type.equals(PrintableString.DER.type))
         return this.readIntoOrThrow(PrintableString.DER)
+      if (this.type.equals(TeletexString.DER.type))
+        return this.readIntoOrThrow(TeletexString.DER)
+      if (this.type.equals(IA5String.DER.type))
+        return this.readIntoOrThrow(IA5String.DER)
       if (this.type.equals(Sequence.DER.type))
         return this.readIntoOrThrow(Sequence.DER).resolveOrThrow()
       if (this.type.equals(Set.DER.type))
         return this.readIntoOrThrow(Set.DER).resolveOrThrow()
-      if (this.type.equals(IA5String.DER.type))
-        return this.readIntoOrThrow(IA5String.DER)
       if (this.type.equals(UTCTime.DER.type))
         return this.readIntoOrThrow(UTCTime.DER)
+      if (this.type.equals(GeneralizedTime.DER.type))
+        return this.readIntoOrThrow(GeneralizedTime.DER)
 
       return this
     }

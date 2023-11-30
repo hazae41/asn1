@@ -1,5 +1,6 @@
 import { Cursor } from "@hazae41/cursor";
-import { Err, Ok, Result } from "@hazae41/result";
+import { Result } from "@hazae41/result";
+import { InvalidValueError } from "index.js";
 import { Numbers } from "libs/numbers/numbers.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -18,32 +19,6 @@ export class NotAnOID extends Error {
 
 }
 
-export class OID<T extends string> {
-
-  private constructor(
-    readonly inner: T
-  ) { }
-
-  static newWithoutCheck<T extends string>(inner: T) {
-    return new OID(inner)
-  }
-
-  static newOrThrow<T extends string>(inner: T) {
-    if (!inner.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x))))
-      throw new NotAnOID(inner)
-
-    return new OID<T>(inner)
-  }
-
-  static tryNew<T extends string>(inner: T): Result<OID<T>, NotAnOID> {
-    if (!inner.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x))))
-      return new Err(new NotAnOID(inner))
-
-    return new Ok(new OID<T>(inner))
-  }
-
-}
-
 export class ObjectIdentifier<T extends string = string>  {
 
   static readonly type = Type.create(
@@ -53,11 +28,25 @@ export class ObjectIdentifier<T extends string = string>  {
 
   constructor(
     readonly type: Type,
-    readonly value: OID<T>
+    readonly value: T
   ) { }
 
-  static create<T extends string>(type = this.type, value: OID<T>) {
+  static is(value: string) {
+    return value.split(".").every(x => Numbers.isSafeNonNegativeInteger(Number(x)))
+  }
+
+  static create<T extends string>(type = this.type, value: T) {
     return new ObjectIdentifier(type, value)
+  }
+
+  static createOrThrow<T extends string>(type = this.type, value: T) {
+    if (!ObjectIdentifier.is(value))
+      throw new InvalidValueError(`ObjectIdentifier`, value)
+    return new ObjectIdentifier(type, value)
+  }
+
+  static tryCreate<T extends string>(type = this.type, value: T): Result<ObjectIdentifier<T>, Error> {
+    return Result.runAndDoubleWrapSync(() => ObjectIdentifier.createOrThrow(type, value))
   }
 
   toDER() {
@@ -79,7 +68,7 @@ export namespace ObjectIdentifier {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly value: OID<T>,
+      readonly value: T,
       readonly head: readonly number[],
       readonly body: readonly VLQ.DER[]
     ) {
@@ -87,7 +76,7 @@ export namespace ObjectIdentifier {
     }
 
     static from<T extends string = string>(asn1: ObjectIdentifier<T>) {
-      const texts = asn1.value.inner.split(".")
+      const texts = asn1.value.split(".")
 
       const first = Number(texts[0])
       const second = Number(texts[1])
@@ -147,9 +136,11 @@ export namespace ObjectIdentifier {
       }
 
       const value = all.join(".")
-      const oid = OID.newOrThrow(value)
 
-      return new DER(type, length, oid, head, body)
+      if (!ObjectIdentifier.is(value))
+        throw new InvalidValueError(`ObjectIdentifier`, value)
+
+      return new DER(type, length, value, head, body)
     }
   }
 

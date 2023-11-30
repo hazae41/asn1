@@ -1,16 +1,15 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { InvalidValueError } from "index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
 
-export class IA5String {
+export class TeletexString {
 
   static readonly type = Type.create(
     Type.clazzes.UNIVERSAL,
     Type.wraps.PRIMITIVE,
-    Type.tags.IA5_STRING)
+    Type.tags.TELETEX_STRING)
 
   constructor(
     readonly type: Type,
@@ -19,33 +18,29 @@ export class IA5String {
 
   static is(value: string) {
     /**
-     * ASCII
+     * TODO T.61
      */
-    return /^[\x00-\x7F]*$/.test(value)
+    return true
   }
 
-  static createOrThrow(type = this.type, value: string) {
-    if (!IA5String.is(value))
-      throw new InvalidValueError(`IA5String`, value)
-
-    return new IA5String(type, value)
+  static create(type = this.type, value: string) {
+    return new TeletexString(type, value)
   }
 
   toDER() {
-    return IA5String.DER.from(this)
+    return TeletexString.DER.from(this)
   }
 
   toString() {
-    return `IA5String ${this.value}`
+    return `TeletexString ${this.value}`
   }
-
 }
 
-export namespace IA5String {
+export namespace TeletexString {
 
-  export class DER extends IA5String {
+  export class DER extends TeletexString {
 
-    static readonly type = IA5String.type.toDER()
+    static readonly type = TeletexString.type.toDER()
 
     constructor(
       readonly type: Type.DER,
@@ -56,8 +51,8 @@ export namespace IA5String {
       super(type, value)
     }
 
-    static from(asn1: IA5String) {
-      const bytes = Bytes.fromAscii(asn1.value)
+    static from(asn1: TeletexString) {
+      const bytes = Bytes.fromUtf8(asn1.value)
       const length = new Length(bytes.length).toDER()
 
       return new DER(asn1.type.toDER(), length, asn1.value, bytes)
@@ -79,14 +74,9 @@ export namespace IA5String {
       const length = Length.DER.readOrThrow(cursor)
 
       const bytes = cursor.readAndCopyOrThrow(length.value)
-      const value = Bytes.toAscii(bytes)
-
-      if (!IA5String.is(value))
-        throw new InvalidValueError(`IA5String`, value)
+      const value = Bytes.toUtf8(bytes)
 
       return new DER(type, length, value, bytes)
     }
-
   }
-
 }

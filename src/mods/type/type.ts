@@ -25,9 +25,13 @@ export class Type {
     UTF8_STRING: 12,
     SEQUENCE: 16,
     SET: 17,
+    NUMERIC_STRING: 18,
     PRINTABLE_STRING: 19,
+    TELETEX_STRING: 20,
+    VIDEO_TEX_STRING: 21,
     IA5_STRING: 22,
-    UTC_TIME: 23
+    UTC_TIME: 23,
+    GENERALIZED_TIME: 24,
   } as const
 
   constructor(
