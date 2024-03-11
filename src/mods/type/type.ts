@@ -1,5 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
-import { Unimplemented } from "@hazae41/result";
+import { Unimplemented } from "index.js";
 
 export class Type {
 
@@ -130,7 +130,7 @@ export namespace Type {
       const tag = byte & 0b11111
 
       if (tag > 30) // TODO
-        throw new Unimplemented({ cause: `Type tag > 30` })
+        throw new Unimplemented()
 
       return new DER(byte, clazz, wrap, tag)
     }
