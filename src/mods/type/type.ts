@@ -1,5 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
-import { Unimplemented } from "index.js";
+import { Unimplemented } from "mods/errors/errors.js";
 
 export class Type {
 
