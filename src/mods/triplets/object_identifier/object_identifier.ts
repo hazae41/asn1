@@ -1,5 +1,4 @@
 import { Cursor } from "@hazae41/cursor";
-import { Result } from "@hazae41/result";
 import { Numbers } from "libs/numbers/numbers.js";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
@@ -43,10 +42,6 @@ export class ObjectIdentifier<T extends string = string> {
     if (!ObjectIdentifier.is(value))
       throw new InvalidValueError(`ObjectIdentifier`, value)
     return new ObjectIdentifier(type, value)
-  }
-
-  static tryCreate<T extends string>(type = this.type, value: T): Result<ObjectIdentifier<T>, Error> {
-    return Result.runAndDoubleWrapSync(() => ObjectIdentifier.createOrThrow(type, value))
   }
 
   toDER() {

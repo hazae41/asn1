@@ -1,6 +1,6 @@
 import { Cursor } from "@hazae41/cursor";
-import { Nullable } from "@hazae41/option";
 import { DERable } from "index.js";
+import { Nullable } from "libs/nullable/index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Triplet } from "mods/resolvers/triplet.js";

@@ -1,5 +1,5 @@
 import { Readable } from "@hazae41/binary"
-import { Nullable } from "@hazae41/option"
+import { Nullable } from "libs/nullable/index.js"
 import { Class } from "libs/reflection/reflection.js"
 import { DERTriplet } from "mods/resolvers/der/triplet.js"
 import { Opaque } from "mods/triplets/opaque/opaque.js"
