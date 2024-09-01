@@ -26,7 +26,7 @@ export class BitString {
   }
 
   toString() {
-    const bignum = BigInt("0x" + Base16.get().encodeOrThrow(this.bytes))
+    const bignum = BigInt("0x" + Base16.get().getOrThrow().encodeOrThrow(this.bytes))
     const cursor = bignum.toString(2).padStart(this.bytes.length * 8, "0")
 
     return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`

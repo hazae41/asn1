@@ -2,7 +2,6 @@ import { Base16 } from "@hazae41/base16";
 import { Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Result } from "@hazae41/result";
 import { Integer } from "mods/triplets/integer/integer.js";
 import { relative, resolve } from "node:path";
 
@@ -10,15 +9,15 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
-Result.debug = true
+
 
 function hexToBytes(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  return Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose()
+  return Base16.get().getOrThrow().padStartAndDecodeOrThrow(hex2).bytes
 }
 
 function bytesToTriplet(bytes: Uint8Array) {
-  return Readable.tryReadFromBytes(Integer.DER, bytes).unwrap()
+  return Readable.readFromBytesOrThrow(Integer.DER, bytes)
 }
 
 function hexToTriplet(hex: string) {
@@ -39,7 +38,7 @@ test("Read", async () => {
 function checkReadWrite(hex: string) {
   const input = hexToBytes(hex)
   const triplet = bytesToTriplet(input)
-  const output = Writable.tryWriteToBytes(triplet).unwrap()
+  const output = Writable.writeToBytesOrThrow(triplet)
   return Bytes.equals(input, output)
 }
 

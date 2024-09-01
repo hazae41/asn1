@@ -25,7 +25,7 @@ export class OctetString {
   }
 
   toString() {
-    return `OCTET STRING ${Base16.get().tryEncode(this.bytes).unwrap()}`
+    return `OCTET STRING ${Base16.get().getOrThrow().encodeOrThrow(this.bytes)}`
   }
 
 }

@@ -2,7 +2,6 @@ import { Base16 } from "@hazae41/base16";
 import { Readable, Writable } from "@hazae41/binary";
 import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
-import { Result } from "@hazae41/result";
 import { Integer } from "index.js";
 import { DER } from "mods/resolvers/der/index.js";
 import { relative, resolve } from "node:path";
@@ -12,11 +11,9 @@ const directory = resolve("./dist/test/")
 const { pathname } = new URL(import.meta.url)
 console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
-Result.debug = true
-
 function hexToBytes(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  return Base16.get().tryPadStartAndDecode(hex2).unwrap().copyAndDispose()
+  return Base16.get().getOrThrow().padStartAndDecodeOrThrow(hex2).bytes
 }
 
 function bytesToTriplet(bytes: Uint8Array) {
@@ -26,7 +23,7 @@ function bytesToTriplet(bytes: Uint8Array) {
     throw new Error(`Not an opaque`)
   if (opaque.type.tag !== 1)
     throw new Error(`Not a custom integer`)
-  return opaque.tryReadInto(Integer.DER).unwrap()
+  return opaque.readIntoOrThrow(Integer.DER)
 }
 
 function hexToTriplet(hex: string) {

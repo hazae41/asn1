@@ -1,6 +1,5 @@
 import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
-import { Result } from "@hazae41/result";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -29,10 +28,6 @@ export class PrintableString {
     if (!PrintableString.is(value))
       throw new InvalidValueError(`PrintableString`, value)
     return new PrintableString(type, value)
-  }
-
-  static tryCreate(type = this.type, value: string): Result<PrintableString, Error> {
-    return Result.runAndDoubleWrapSync(() => this.createOrThrow(type, value))
   }
 
   toDER() {

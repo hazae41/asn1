@@ -1,7 +1,6 @@
 import { Base16 } from "@hazae41/base16";
-import { ReadError, Readable } from "@hazae41/binary";
+import { Readable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Result } from "@hazae41/result";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
@@ -9,8 +8,8 @@ import { Integer } from "mods/triplets/integer/integer.js";
 import { Set } from "mods/triplets/set/set.js";
 import { Type } from "mods/type/type.js";
 import { BitString } from "../bit_string/bit_string.js";
+import { GeneralizedTime } from "../generalized_time/generalized_time.js";
 import { IA5String } from "../ia5_string/ia5_string.js";
-import { GeneralizedTime } from "../index.js";
 import { Null } from "../null/null.js";
 import { ObjectIdentifier } from "../object_identifier/object_identifier.js";
 import { OctetString } from "../octet_string/octet_string.js";
@@ -42,7 +41,7 @@ export class Opaque {
   }
 
   toString() {
-    return `OPAQUE ${Base16.get().tryEncode(this.bytes).unwrap()}`
+    return `OPAQUE ${Base16.get().getOrThrow().encodeOrThrow(this.bytes)}`
   }
 
   readIntoOrNull<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> | undefined {
@@ -51,10 +50,6 @@ export class Opaque {
 
   readIntoOrThrow<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> {
     return Readable.readFromBytesOrThrow(readable, this.bytes)
-  }
-
-  tryReadInto<T extends Readable.Infer<T>>(readable: T): Result<Readable.Output<T>, ReadError> {
-    return Readable.tryReadFromBytes(readable, this.bytes)
   }
 
 }
