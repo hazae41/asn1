@@ -13,7 +13,7 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Base16.get().getOrThrow().padStartAndDecodeOrThrow(hex2).bytes
+  const buffer = Base16.padStartAndDecodeOrThrow(hex2)
   return new Cursor(buffer)
 }
 
@@ -40,7 +40,7 @@ function checkReadWriteVLQ(hex: string) {
   const vlq = VLQ.DER.readOrThrow(input)
 
   const output = Writable.writeToBytesOrThrow(vlq)
-  return input.buffer.equals(output)
+  return Buffer.from(input.bytes).equals(Buffer.from(output))
 }
 
 test("Read then write", async () => {

@@ -22,7 +22,7 @@ function checkReadWrite(hex: string) {
   const triplet = BitString.DER.readOrThrow(input)
 
   const output = Writable.writeToBytesOrThrow(triplet)
-  return input.buffer.equals(output)
+  return Buffer.from(input.bytes).equals(Buffer.from(output))
 }
 
 test("Read then write", async () => {

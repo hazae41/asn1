@@ -13,7 +13,7 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function hexToCursor(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Base16.get().getOrThrow().padStartAndDecodeOrThrow(hex2).bytes
+  const buffer = Base16.padStartAndDecodeOrThrow(hex2)
   return new Cursor(buffer)
 }
 
@@ -22,7 +22,7 @@ function checkReadWrite(hex: string) {
   const triplet = OctetString.DER.readOrThrow(input)
 
   const output = Writable.writeToBytesOrThrow(triplet)
-  return input.buffer.equals(output)
+  return Buffer.from(input.bytes).equals(Buffer.from(output))
 }
 
 test("Read then write", async () => {

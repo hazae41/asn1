@@ -13,7 +13,7 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function hexToType(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  const buffer = Base16.get().getOrThrow().padStartAndDecodeOrThrow(hex2).bytes
+  const buffer = Base16.padStartAndDecodeOrThrow(hex2)
   return Type.DER.readOrThrow(new Cursor(buffer))
 }
 

@@ -1,6 +1,5 @@
 import { Base16 } from "@hazae41/base16";
 import { Readable, Writable } from "@hazae41/binary";
-import { Bytes } from "@hazae41/bytes";
 import { assert, test } from "@hazae41/phobos";
 import { Integer } from "index.js";
 import { DER } from "mods/resolvers/der/index.js";
@@ -13,10 +12,10 @@ console.log(relative(directory, pathname.replace(".mjs", ".ts")))
 
 function hexToBytes(hex: string) {
   const hex2 = hex.replaceAll(" ", "")
-  return Base16.get().getOrThrow().padStartAndDecodeOrThrow(hex2).bytes
+  return Base16.padStartAndDecodeOrThrow(hex2)
 }
 
-function bytesToTriplet(bytes: Uint8Array) {
+function bytesToTriplet(bytes: Uint8Array<ArrayBuffer>) {
   const opaque = Readable.readFromBytesOrThrow(DER, bytes)
 
   if (!(opaque instanceof Opaque))
@@ -45,7 +44,7 @@ function checkReadWrite(hex: string) {
   const input = hexToBytes(hex)
   const triplet = bytesToTriplet(input)
   const output = Writable.writeToBytesOrThrow(triplet)
-  return Bytes.equals(input, output)
+  return Buffer.from(input).equals(Buffer.from(output))
 }
 
 test("Read then write", async () => {

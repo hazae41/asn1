@@ -23,9 +23,8 @@ export namespace PEM {
       throw new Error(`Missing PEM footer`)
 
     const body = text.slice(header.length, -footer.length)
-    using memory = Base64.get().getOrThrow().decodePaddedOrThrow(body)
 
-    return memory.bytes.slice()
+    return Base64.decodePaddedOrThrow(body)
   }
 }
 
@@ -42,9 +41,8 @@ export namespace PKCS7 {
       throw new Error(`Missing PKCS7 footer`)
 
     const body = text.slice(header.length, -footer.length)
-    using memory = Base64.get().getOrThrow().decodePaddedOrThrow(body)
 
-    return memory.bytes.slice()
+    return Base64.decodePaddedOrThrow(body)
   }
 }
 
@@ -80,14 +78,14 @@ test("Cert PKCS7", async () => {
 })
 
 test("Cert frank4dd-rsa", async () => {
-  const buffer = await readFile("./certs/frank4dd-rsa.der")
+  const buffer = new Uint8Array(await readFile("./certs/frank4dd-rsa.der"))
   const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
   assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert frank4dd-dsa", async () => {
-  const buffer = await readFile("./certs/frank4dd-dsa.der")
+  const buffer = new Uint8Array(await readFile("./certs/frank4dd-dsa.der"))
   const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
   assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
@@ -95,16 +93,16 @@ test("Cert frank4dd-dsa", async () => {
 
 test("Cert Tor", async () => {
   const text = await readFile("./certs/tor.pem", "utf8")
-  const buffer = Base64.get().getOrThrow().decodePaddedOrThrow(text)
-  const triplet = Readable.readFromBytesOrThrow(DER, buffer.bytes.slice())
+  const buffer = Base64.decodePaddedOrThrow(text)
+  const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
-  assert(compare(buffer.bytes.slice(), Writable.writeToBytesOrThrow(triplet)))
+  assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
 
 test("Cert Tor 2", async () => {
   const text = await readFile("./certs/tor2.pem", "utf8")
-  const buffer = Base64.get().getOrThrow().decodePaddedOrThrow(text)
-  const triplet = Readable.readFromBytesOrThrow(DER, buffer.bytes.slice())
+  const buffer = Base64.decodePaddedOrThrow(text)
+  const triplet = Readable.readFromBytesOrThrow(DER, buffer)
 
-  assert(compare(buffer.bytes.slice(), Writable.writeToBytesOrThrow(triplet)))
+  assert(compare(buffer, Writable.writeToBytesOrThrow(triplet)))
 })
