@@ -33,7 +33,7 @@ export class Opaque {
     /**
      * The whole triplet (type + length + value)
      */
-    readonly bytes: Uint8Array
+    readonly bytes: Uint8Array<ArrayBuffer>
   ) { }
 
   toDER() {
@@ -41,7 +41,7 @@ export class Opaque {
   }
 
   toString() {
-    return `OPAQUE ${Base16.get().getOrThrow().encodeOrThrow(this.bytes)}`
+    return `OPAQUE ${Base16.encodeOrThrow(this.bytes)}`
   }
 
   readIntoOrNull<T extends Readable.Infer<T>>(readable: T): Readable.Output<T> | undefined {
@@ -60,7 +60,7 @@ export namespace Opaque {
 
     constructor(
       readonly type: Type.DER,
-      readonly bytes: Uint8Array
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, bytes)
     }
@@ -106,11 +106,11 @@ export namespace Opaque {
       return this.bytes.length
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const start = cursor.offset
 
       const type = Type.DER.readOrThrow(cursor)
@@ -120,7 +120,7 @@ export namespace Opaque {
 
       cursor.offset = start
 
-      const bytes = cursor.readAndCopyOrThrow(end - start + length.value)
+      const bytes = new Uint8Array(cursor.readOrThrow(end - start + length.value))
 
       return new DER(type, bytes)
     }

@@ -54,12 +54,12 @@ export namespace Null {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 

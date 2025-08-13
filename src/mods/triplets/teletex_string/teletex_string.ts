@@ -1,4 +1,3 @@
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -52,7 +51,7 @@ export namespace TeletexString {
     }
 
     static from(asn1: TeletexString) {
-      const bytes = Bytes.fromUtf8(asn1.value)
+      const bytes = new TextEncoder().encode(asn1.value)
       const length = new Length(bytes.length).toDER()
 
       return new DER(asn1.type.toDER(), length, asn1.value, bytes)
@@ -62,19 +61,19 @@ export namespace TeletexString {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = cursor.readAndCopyOrThrow(length.value)
-      const value = Bytes.toUtf8(bytes)
+      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
+      const value = new TextDecoder().decode(bytes)
 
       return new DER(type, length, value, bytes)
     }

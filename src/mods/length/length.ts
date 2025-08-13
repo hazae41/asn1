@@ -76,7 +76,7 @@ export namespace Length {
         return 1
       }
 
-      writeOrThrow(cursor: Cursor) {
+      writeOrThrow(cursor: Cursor<ArrayBuffer>) {
         cursor.writeUint8OrThrow(this.value)
       }
 
@@ -95,7 +95,7 @@ export namespace Length {
         return 1 + this.values.length
       }
 
-      writeOrThrow(cursor: Cursor) {
+      writeOrThrow(cursor: Cursor<ArrayBuffer>) {
         let count = this.values.length
 
         /**

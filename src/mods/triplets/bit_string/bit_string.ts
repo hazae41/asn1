@@ -26,7 +26,7 @@ export class BitString {
   }
 
   toString() {
-    const bignum = BigInt("0x" + Base16.get().getOrThrow().encodeOrThrow(this.bytes))
+    const bignum = BigInt("0x" + Base16.encodeOrThrow(this.bytes))
     const cursor = bignum.toString(2).padStart(this.bytes.length * 8, "0")
 
     return `BITSTRING ${cursor.slice(0, cursor.length - this.padding)}`
@@ -59,7 +59,7 @@ export namespace BitString {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
@@ -67,14 +67,14 @@ export namespace BitString {
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
       const subcursor = new Cursor(cursor.readOrThrow(length.value))
 
       const padding = subcursor.readUint8OrThrow()
-      const bytes = subcursor.readAndCopyOrThrow(subcursor.remaining)
+      const bytes = new Uint8Array(subcursor.readOrThrow(subcursor.remaining))
 
       return new DER(type, length, padding, bytes)
     }

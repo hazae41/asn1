@@ -25,7 +25,7 @@ export class OctetString {
   }
 
   toString() {
-    return `OCTET STRING ${Base16.get().getOrThrow().encodeOrThrow(this.bytes)}`
+    return `OCTET STRING ${Base16.encodeOrThrow(this.bytes)}`
   }
 
 }
@@ -54,18 +54,18 @@ export namespace OctetString {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = cursor.readAndCopyOrThrow(length.value)
+      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
 
       return new DER(type, length, bytes)
     }

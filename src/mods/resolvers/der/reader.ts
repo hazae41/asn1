@@ -3,7 +3,7 @@ import { Opaque } from "mods/triplets/opaque/opaque.js";
 
 export namespace DER {
 
-  export function readOrThrow(cursor: Cursor) {
+  export function readOrThrow(cursor: Cursor<ArrayBuffer>) {
     return Opaque.DER.readOrThrow(cursor).resolveOrThrow()
   }
 

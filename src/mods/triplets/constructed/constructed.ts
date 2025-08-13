@@ -71,7 +71,7 @@ export namespace Constructed {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
@@ -81,7 +81,7 @@ export namespace Constructed {
       return
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
 
       if (type.wrap !== Type.wraps.CONSTRUCTED)

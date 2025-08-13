@@ -1,4 +1,3 @@
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
@@ -63,7 +62,7 @@ export namespace UTCTime {
       const mm = pad2(asn1.value.getUTCMinutes())
       const ss = pad2(asn1.value.getUTCSeconds())
 
-      const bytes = Bytes.fromUtf8(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
+      const bytes = new TextEncoder().encode(`${YY}${MM}${DD}${hh}${mm}${ss}Z`)
       const length = new Length(bytes.length).toDER()
 
       return new DER(asn1.type.toDER(), length, asn1.value, bytes)
@@ -73,19 +72,19 @@ export namespace UTCTime {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor): void {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>): void {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = cursor.readAndCopyOrThrow(length.value)
-      const text = Bytes.toUtf8(bytes)
+      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
+      const text = new TextDecoder().decode(bytes)
 
       if (text.length !== 13)
         throw new InvalidValueError(`UTCTime`, text)

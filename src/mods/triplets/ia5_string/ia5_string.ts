@@ -1,4 +1,3 @@
-import { Bytes } from "@hazae41/bytes";
 import { Cursor } from "@hazae41/cursor";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
@@ -57,7 +56,7 @@ export namespace IA5String {
     }
 
     static from(asn1: IA5String) {
-      const bytes = Bytes.fromAscii(asn1.value)
+      const bytes = new TextEncoder().encode(asn1.value)
       const length = new Length(bytes.length).toDER()
 
       return new DER(asn1.type.toDER(), length, asn1.value, bytes)
@@ -67,19 +66,19 @@ export namespace IA5String {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = cursor.readAndCopyOrThrow(length.value)
-      const value = Bytes.toAscii(bytes)
+      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
+      const value = new TextDecoder().decode(bytes)
 
       if (!IA5String.is(value))
         throw new InvalidValueError(`IA5String`, value)

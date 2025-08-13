@@ -42,7 +42,7 @@ export namespace VLQ {
       return this.values.length
     }
 
-    writeOrThrow(cursor: Cursor) {
+    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
       for (let i = 0; i < this.values.length - 1; i++) {
         let byte = this.values[i]
 
@@ -57,7 +57,7 @@ export namespace VLQ {
       cursor.writeUint8OrThrow(this.values[this.values.length - 1])
     }
 
-    static readOrThrow(cursor: Cursor) {
+    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
       let value = 0
 
       const values = new Array<number>()
