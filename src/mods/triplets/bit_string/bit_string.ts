@@ -1,6 +1,5 @@
 import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
-import { Bytes } from "libs/bytes/index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -15,10 +14,10 @@ export class BitString {
   constructor(
     readonly type: Type,
     readonly padding: number,
-    readonly bytes: Bytes,
+    readonly bytes: Uint8Array<ArrayBuffer>,
   ) { }
 
-  static create(type = this.type, padding: number, bytes: Bytes) {
+  static create(type = this.type, padding: number, bytes: Uint8Array<ArrayBuffer>) {
     return new BitString(type, padding, bytes)
   }
 
@@ -45,7 +44,7 @@ export namespace BitString {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly padding: number,
-      readonly bytes: Bytes
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, padding, bytes)
     }
@@ -75,7 +74,7 @@ export namespace BitString {
       const subcursor = new Cursor(cursor.readOrThrow(length.value))
 
       const padding = subcursor.readUint8OrThrow()
-      const bytes = Bytes.copy(subcursor.readOrThrow(subcursor.remaining))
+      const bytes = new Uint8Array(subcursor.readOrThrow(subcursor.remaining))
 
       return new DER(type, length, padding, bytes)
     }

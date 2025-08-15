@@ -1,6 +1,5 @@
 import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
-import { Bytes, BytesLike } from "libs/bytes/index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -14,11 +13,11 @@ export class OctetString {
 
   constructor(
     readonly type: Type,
-    readonly bytes: Bytes
+    readonly bytes: Uint8Array<ArrayBuffer>
   ) { }
 
-  static create(type = this.type, bytes: BytesLike) {
-    return new OctetString(type, Bytes.from(bytes))
+  static create(type = this.type, bytes: Uint8Array<ArrayBuffer>) {
+    return new OctetString(type, bytes)
   }
 
   toDER() {
@@ -40,7 +39,7 @@ export namespace OctetString {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly bytes: Bytes
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, bytes)
     }
@@ -66,7 +65,7 @@ export namespace OctetString {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = Bytes.copy(cursor.readOrThrow(length.value))
+      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
 
       return new DER(type, length, bytes)
     }

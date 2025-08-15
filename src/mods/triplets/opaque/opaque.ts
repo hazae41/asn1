@@ -1,7 +1,6 @@
 import { Base16 } from "@hazae41/base16";
 import { Readable } from "@hazae41/binary";
 import { Cursor } from "@hazae41/cursor";
-import { Bytes } from "libs/bytes/index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Boolean } from "mods/triplets/boolean/boolean.js";
@@ -34,7 +33,7 @@ export class Opaque {
     /**
      * The whole triplet (type + length + value)
      */
-    readonly bytes: Bytes
+    readonly bytes: Uint8Array<ArrayBuffer>
   ) { }
 
   toDER() {
@@ -61,7 +60,7 @@ export namespace Opaque {
 
     constructor(
       readonly type: Type.DER,
-      readonly bytes: Bytes
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, bytes)
     }
@@ -121,7 +120,7 @@ export namespace Opaque {
 
       cursor.offset = start
 
-      const bytes = Bytes.copy(cursor.readOrThrow(end - start + length.value))
+      const bytes = new Uint8Array(cursor.readOrThrow(end - start + length.value))
 
       return new DER(type, bytes)
     }

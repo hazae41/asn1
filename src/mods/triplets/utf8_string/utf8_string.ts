@@ -1,5 +1,4 @@
 import { Cursor } from "@hazae41/cursor";
-import { Bytes } from "libs/bytes/index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -39,7 +38,7 @@ export namespace UTF8String {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: string,
-      readonly bytes: Bytes
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, value)
     }
@@ -66,7 +65,7 @@ export namespace UTF8String {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = Bytes.copy(cursor.readOrThrow(length.value))
+      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
       const value = new TextDecoder().decode(bytes)
 
       return new DER(type, length, value, bytes)
