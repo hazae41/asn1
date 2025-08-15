@@ -38,7 +38,7 @@ export namespace Length {
       return new Long(length.value, values)
     }
 
-    export function readOrThrow(cursor: Cursor) {
+    export function readOrThrow(cursor: Cursor<ArrayBuffer>) {
       const first = cursor.readUint8OrThrow()
 
       if (first < 128)
