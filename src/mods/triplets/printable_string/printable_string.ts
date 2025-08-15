@@ -1,4 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
+import { Bytes } from "libs/bytes/index.js";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -49,7 +50,7 @@ export namespace PrintableString {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: string,
-      readonly bytes: Uint8Array<ArrayBuffer>
+      readonly bytes: Bytes
     ) {
       super(type.toDER(), value)
     }
@@ -65,18 +66,18 @@ export namespace PrintableString {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
+    writeOrThrow(cursor: Cursor) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
+    static readOrThrow(cursor: Cursor) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
+      const bytes = Bytes.copy(cursor.readOrThrow(length.value))
       const value = new TextDecoder().decode(bytes)
 
       if (!PrintableString.is(value))

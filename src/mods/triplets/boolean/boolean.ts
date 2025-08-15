@@ -56,14 +56,14 @@ export namespace Boolean {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
+    writeOrThrow(cursor: Cursor) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeUint8OrThrow(this.value)
     }
 
-    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
+    static readOrThrow(cursor: Cursor) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 

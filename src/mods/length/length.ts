@@ -38,7 +38,7 @@ export namespace Length {
       return new Long(length.value, values)
     }
 
-    export function readOrThrow(cursor: Cursor<ArrayBuffer>) {
+    export function readOrThrow(cursor: Cursor) {
       const first = cursor.readUint8OrThrow()
 
       if (first < 128)
@@ -76,7 +76,7 @@ export namespace Length {
         return 1
       }
 
-      writeOrThrow(cursor: Cursor<ArrayBuffer>) {
+      writeOrThrow(cursor: Cursor) {
         cursor.writeUint8OrThrow(this.value)
       }
 
@@ -95,7 +95,7 @@ export namespace Length {
         return 1 + this.values.length
       }
 
-      writeOrThrow(cursor: Cursor<ArrayBuffer>) {
+      writeOrThrow(cursor: Cursor) {
         let count = this.values.length
 
         /**

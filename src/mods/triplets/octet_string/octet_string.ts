@@ -1,5 +1,6 @@
 import { Base16 } from "@hazae41/base16";
 import { Cursor } from "@hazae41/cursor";
+import { Bytes, BytesLike } from "libs/bytes/index.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
 import { Type } from "mods/type/type.js";
@@ -13,11 +14,11 @@ export class OctetString {
 
   constructor(
     readonly type: Type,
-    readonly bytes: Uint8Array<ArrayBuffer>
+    readonly bytes: Bytes
   ) { }
 
-  static create(type = this.type, bytes: Uint8Array<ArrayBuffer>) {
-    return new OctetString(type, bytes)
+  static create(type = this.type, bytes: BytesLike) {
+    return new OctetString(type, Bytes.from(bytes))
   }
 
   toDER() {
@@ -39,7 +40,7 @@ export namespace OctetString {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly bytes: Uint8Array<ArrayBuffer>
+      readonly bytes: Bytes
     ) {
       super(type, bytes)
     }
@@ -54,18 +55,18 @@ export namespace OctetString {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
+    writeOrThrow(cursor: Cursor) {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
+    static readOrThrow(cursor: Cursor) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
+      const bytes = Bytes.copy(cursor.readOrThrow(length.value))
 
       return new DER(type, length, bytes)
     }

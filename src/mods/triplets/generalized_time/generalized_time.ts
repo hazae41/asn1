@@ -1,4 +1,5 @@
 import { Cursor } from "@hazae41/cursor";
+import { Bytes } from "libs/bytes/index.js";
 import { InvalidValueError } from "mods/errors/errors.js";
 import { Length } from "mods/length/length.js";
 import { DERTriplet } from "mods/resolvers/der/triplet.js";
@@ -48,7 +49,7 @@ export namespace GeneralizedTime {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: Date,
-      readonly bytes: Uint8Array<ArrayBuffer>
+      readonly bytes: Bytes
     ) {
       super(type, value)
     }
@@ -74,18 +75,18 @@ export namespace GeneralizedTime {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor<ArrayBuffer>): void {
+    writeOrThrow(cursor: Cursor): void {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
       cursor.writeOrThrow(this.bytes)
     }
 
-    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
+    static readOrThrow(cursor: Cursor) {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 
-      const bytes = new Uint8Array(cursor.readOrThrow(length.value))
+      const bytes = Bytes.copy(cursor.readOrThrow(length.value))
       const text = new TextDecoder().decode(bytes)
 
       if (text.length !== 15)

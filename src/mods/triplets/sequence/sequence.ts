@@ -77,7 +77,7 @@ export namespace Sequence {
       return DERTriplet.sizeOrThrow(this.length)
     }
 
-    writeOrThrow(cursor: Cursor<ArrayBuffer>): void {
+    writeOrThrow(cursor: Cursor): void {
       this.type.writeOrThrow(cursor)
       this.length.writeOrThrow(cursor)
 
@@ -87,7 +87,7 @@ export namespace Sequence {
       return
     }
 
-    static readOrThrow(cursor: Cursor<ArrayBuffer>): Sequence.DER<Opaque.DER[]> {
+    static readOrThrow(cursor: Cursor): Sequence.DER<Opaque.DER[]> {
       const type = Type.DER.readOrThrow(cursor)
       const length = Length.DER.readOrThrow(cursor)
 

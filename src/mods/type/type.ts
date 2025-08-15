@@ -118,11 +118,11 @@ export namespace Type {
       return 1
     }
 
-    writeOrThrow(cursor: Cursor<ArrayBuffer>) {
+    writeOrThrow(cursor: Cursor) {
       cursor.writeUint8OrThrow(this.byte)
     }
 
-    static readOrThrow(cursor: Cursor<ArrayBuffer>) {
+    static readOrThrow(cursor: Cursor) {
       const byte = cursor.readUint8OrThrow()
 
       const clazz = byte >> 6
