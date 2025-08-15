@@ -48,7 +48,7 @@ export namespace GeneralizedTime {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: Date,
-      readonly bytes: Uint8Array
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, value)
     }

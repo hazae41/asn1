@@ -14,10 +14,10 @@ export class BitString {
   constructor(
     readonly type: Type,
     readonly padding: number,
-    readonly bytes: Uint8Array,
+    readonly bytes: Uint8Array<ArrayBuffer>,
   ) { }
 
-  static create(type = this.type, padding: number, bytes: Uint8Array) {
+  static create(type = this.type, padding: number, bytes: Uint8Array<ArrayBuffer>) {
     return new BitString(type, padding, bytes)
   }
 
@@ -44,7 +44,7 @@ export namespace BitString {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly padding: number,
-      readonly bytes: Uint8Array,
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, padding, bytes)
     }

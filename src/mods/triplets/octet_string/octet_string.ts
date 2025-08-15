@@ -13,10 +13,10 @@ export class OctetString {
 
   constructor(
     readonly type: Type,
-    readonly bytes: Uint8Array
+    readonly bytes: Uint8Array<ArrayBuffer>
   ) { }
 
-  static create(type = this.type, bytes: Uint8Array) {
+  static create(type = this.type, bytes: Uint8Array<ArrayBuffer>) {
     return new OctetString(type, bytes)
   }
 
@@ -39,7 +39,7 @@ export namespace OctetString {
     constructor(
       readonly type: Type.DER,
       readonly length: Length.DER,
-      readonly bytes: Uint8Array
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type, bytes)
     }

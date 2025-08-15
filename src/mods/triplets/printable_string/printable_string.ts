@@ -49,7 +49,7 @@ export namespace PrintableString {
       readonly type: Type.DER,
       readonly length: Length.DER,
       readonly value: string,
-      readonly bytes: Uint8Array
+      readonly bytes: Uint8Array<ArrayBuffer>
     ) {
       super(type.toDER(), value)
     }
